@@ -46,6 +46,8 @@ const Dashboard = () => {
     }
   };
 
+  if (!ready) return null;
+
   return (
     <div className="min-h-screen" style={{ background: "#F1F5F9" }}>
       <DashboardSidebar activeItem={activeItem} onNavigate={setActiveItem} />
