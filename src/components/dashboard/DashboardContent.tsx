@@ -12,6 +12,13 @@ interface Profile {
   modules: string[] | null;
 }
 
+interface GoalWithProgress {
+  id: string;
+  titulo: string;
+  progresso: number;
+  status: string;
+}
+
 interface Task {
   id: string;
   titulo: string;
@@ -50,6 +57,7 @@ const DashboardContent = () => {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [completedHabitsToday, setCompletedHabitsToday] = useState<Set<string>>(new Set());
   const [maxStreak, setMaxStreak] = useState(0);
+  const [activeGoal, setActiveGoal] = useState<GoalWithProgress | null>(null);
   const [showTaskModal, setShowTaskModal] = useState(false);
   const revealRef = useScrollReveal();
 
@@ -65,7 +73,35 @@ const DashboardContent = () => {
       .then(({ data }) => { if (data) setProfile(data); });
     fetchTasks();
     fetchHabits();
+    fetchActiveGoal();
   }, [user]);
+
+  const fetchActiveGoal = async () => {
+    if (!user) return;
+    const { data: goalsData } = await supabase
+      .from("goals")
+      .select("id, titulo, progresso, status")
+      .eq("user_id", user.id)
+      .eq("status", "ativa")
+      .order("created_at", { ascending: false })
+      .limit(1);
+    if (goalsData && goalsData.length > 0) {
+      const goal = goalsData[0];
+      // Calculate real progress from linked tasks
+      const { data: linkedTasks } = await supabase
+        .from("tasks")
+        .select("concluida")
+        .eq("user_id", user.id)
+        .eq("goal_id", goal.id);
+      if (linkedTasks && linkedTasks.length > 0) {
+        const done = linkedTasks.filter((t: any) => t.concluida).length;
+        const progress = Math.round((done / linkedTasks.length) * 100);
+        setActiveGoal({ ...goal, progresso: progress } as GoalWithProgress);
+      } else {
+        setActiveGoal(goal as GoalWithProgress);
+      }
+    }
+  };
 
   const fetchTasks = async () => {
     if (!user) return;
@@ -153,15 +189,18 @@ const DashboardContent = () => {
   });
 
   const pendingToday = todayTasks.filter((t) => !t.concluida).length;
-  const goalText = profile.first_goal
-    ? profile.first_goal.length > 28 ? profile.first_goal.slice(0, 28) + "..." : profile.first_goal
-    : "Nenhuma";
+  const goalTitle = activeGoal
+    ? activeGoal.titulo.length > 28 ? activeGoal.titulo.slice(0, 28) + "..." : activeGoal.titulo
+    : profile.first_goal
+      ? profile.first_goal.length > 28 ? profile.first_goal.slice(0, 28) + "..." : profile.first_goal
+      : "Nenhuma";
+  const goalProgress = activeGoal?.progresso ?? 0;
   const modulesCount = profile.modules?.length || 0;
 
   const summaryCards = [
     { icon: CheckSquare, iconColor: "#00B4D8", label: "TAREFAS HOJE", value: String(pendingToday), sub: "pendentes" },
     { icon: Flame, iconColor: "#F59E0B", label: "SEQUENCIA", value: String(maxStreak), sub: "dias seguidos" },
-    { icon: Target, iconColor: "#00B4D8", label: "META DO MES", value: goalText, isText: true, sub: "definida por voce" },
+    { icon: Target, iconColor: "#00B4D8", label: "META ATIVA", value: goalTitle, isText: true, sub: `${goalProgress}% concluido`, hasProgress: true, progress: goalProgress },
     { icon: TrendingUp, iconColor: "#10B981", label: "MODULOS ATIVOS", value: String(modulesCount), sub: "areas organizadas" },
   ];
 
@@ -204,6 +243,11 @@ const DashboardContent = () => {
               <p className={`truncate leading-tight ${card.isText ? "text-base" : ""}`} style={{ color: "#0F172A", fontSize: card.isText ? 16 : 32, fontWeight: 300 }}>
                 {card.value}
               </p>
+              {(card as any).hasProgress && (
+                <div className="mt-2 h-1.5 rounded-full overflow-hidden" style={{ background: "#E2E8F0" }}>
+                  <div className="h-full rounded-full transition-all duration-700" style={{ width: `${(card as any).progress}%`, background: "linear-gradient(90deg, #1E3A5F, #00B4D8)" }} />
+                </div>
+              )}
               <p className="mt-0.5" style={{ color: "#94A3B8", fontSize: 12, fontWeight: 300 }}>
                 {card.sub}
               </p>

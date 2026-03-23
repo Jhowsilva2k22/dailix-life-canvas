@@ -179,6 +179,7 @@ export type Database = {
           concluida: boolean
           created_at: string
           descricao: string | null
+          goal_id: string | null
           id: string
           prazo: string | null
           prioridade: string
@@ -189,6 +190,7 @@ export type Database = {
           concluida?: boolean
           created_at?: string
           descricao?: string | null
+          goal_id?: string | null
           id?: string
           prazo?: string | null
           prioridade?: string
@@ -199,13 +201,22 @@ export type Database = {
           concluida?: boolean
           created_at?: string
           descricao?: string | null
+          goal_id?: string | null
           id?: string
           prazo?: string | null
           prioridade?: string
           titulo?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "tasks_goal_id_fkey"
+            columns: ["goal_id"]
+            isOneToOne: false
+            referencedRelation: "goals"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
