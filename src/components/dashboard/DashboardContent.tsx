@@ -163,7 +163,6 @@ const DashboardContent = () => {
       .limit(1);
     if (goalsData && goalsData.length > 0) {
       const goal = goalsData[0];
-      // Calculate real progress from linked tasks
       const { data: linkedTasks } = await supabase
         .from("tasks")
         .select("concluida")
@@ -172,9 +171,9 @@ const DashboardContent = () => {
       if (linkedTasks && linkedTasks.length > 0) {
         const done = linkedTasks.filter((t: any) => t.concluida).length;
         const progress = Math.round((done / linkedTasks.length) * 100);
-        setActiveGoal({ ...goal, progresso: progress } as GoalWithProgress);
+        setActiveGoal({ ...goal, progresso: progress, hasLinkedTasks: true } as GoalWithProgress);
       } else {
-        setActiveGoal(goal as GoalWithProgress);
+        setActiveGoal({ ...goal, progresso: 0, hasLinkedTasks: false } as GoalWithProgress);
       }
     }
   };
