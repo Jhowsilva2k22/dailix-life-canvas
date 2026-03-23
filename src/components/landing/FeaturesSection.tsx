@@ -1,4 +1,4 @@
-import { Target, Users, Briefcase, Heart } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useEffect, useRef, useState } from "react";
 
 const features = [
