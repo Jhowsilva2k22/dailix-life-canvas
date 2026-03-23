@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LayoutDashboard } from "lucide-react";
 
 const navLinks = [
   { label: "Recursos", href: "#features" },
@@ -21,7 +21,8 @@ const Navbar = () => {
       }}
     >
       <div className="container flex items-center justify-between h-16">
-        <a href="/" className="text-lg font-bold" style={{ color: "#1E3A5F" }}>
+        <a href="/" className="flex items-center gap-2 text-lg font-bold" style={{ color: "#1E3A5F" }}>
+          <LayoutDashboard className="h-5 w-5" style={{ color: "#00B4D8" }} />
           Dailix
         </a>
 

@@ -84,14 +84,14 @@ const HeroSection = () => {
               className={`transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
             >
               <span
-                className="inline-block px-4 py-1.5 rounded-full text-[13px] font-medium"
+                className="inline-block px-4 py-1.5 rounded-full text-[12px] font-normal"
                 style={{
-                  border: "1px solid rgba(0,180,216,0.3)",
-                  background: "rgba(0,180,216,0.06)",
+                  border: "1px solid rgba(0,180,216,0.2)",
+                  background: "rgba(0,180,216,0.04)",
                   color: "#00B4D8",
                 }}
               >
-                Organize. Evolua. Viva.
+                Organize · Evolua · Viva
               </span>
             </div>
 
