@@ -101,7 +101,7 @@ const PricingSection = () => {
                 {p.name}
               </h3>
               <div className="flex items-baseline gap-1 mb-6">
-                <span className="text-5xl font-extrabold" style={{ color: "#0F172A" }}>
+                <span className="text-5xl font-bold" style={{ color: "#0F172A" }}>
                   {p.price}
                 </span>
                 <span className="text-sm" style={{ color: "#64748B" }}>
