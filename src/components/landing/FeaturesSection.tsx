@@ -3,22 +3,22 @@ import { useEffect, useRef, useState } from "react";
 
 const features = [
   {
-    icon: Target,
+    num: "01",
     title: "Produtividade",
     desc: "Tarefas, metas semanais e habitos diarios com acompanhamento visual do seu progresso.",
   },
   {
-    icon: Users,
+    num: "02",
     title: "Familia",
     desc: "Organize eventos, compromissos e decisoes familiares em um espaco compartilhado.",
   },
   {
-    icon: Briefcase,
+    num: "03",
     title: "Negocios",
     desc: "Projetos, financas e objetivos profissionais com visao clara de resultados.",
   },
   {
-    icon: Heart,
+    num: "04",
     title: "Bem-estar",
     desc: "Acompanhe sono, exercicios e saude mental com metricas que fazem sentido.",
   },
