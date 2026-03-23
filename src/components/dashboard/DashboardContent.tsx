@@ -17,6 +17,7 @@ interface GoalWithProgress {
   titulo: string;
   progresso: number;
   status: string;
+  hasLinkedTasks: boolean;
 }
 
 interface Task {
