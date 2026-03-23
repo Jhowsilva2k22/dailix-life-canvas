@@ -18,13 +18,17 @@ interface DashboardSidebarProps {
 
 const DashboardSidebar = ({ activeItem, onNavigate }: DashboardSidebarProps) => {
   const { user, signOut } = useAuth();
-  const [profile, setProfile] = useState<{ display_name: string | null; email: string | null }>({ display_name: null, email: null });
+  const [profile, setProfile] = useState<{ display_name: string | null; email: string | null; plano: string }>({
+    display_name: null,
+    email: null,
+    plano: "free",
+  });
 
   useEffect(() => {
     if (!user) return;
     supabase
       .from("profiles")
-      .select("display_name, email")
+      .select("display_name, email, plano")
       .eq("user_id", user.id)
       .single()
       .then(({ data }) => {
@@ -38,6 +42,7 @@ const DashboardSidebar = ({ activeItem, onNavigate }: DashboardSidebarProps) => 
       style={{
         width: 240,
         background: "#0F172A",
+        borderRight: "1px solid rgba(255,255,255,0.06)",
       }}
     >
       {/* Logo */}
@@ -46,35 +51,63 @@ const DashboardSidebar = ({ activeItem, onNavigate }: DashboardSidebarProps) => 
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 flex flex-col gap-1 px-3 mt-2">
-        {navItems.map((item) => {
-          const isActive = activeItem === item.path;
-          return (
-            <button
-              key={item.path}
-              onClick={() => onNavigate(item.path)}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-left"
-              style={{
-                color: isActive ? "#FFFFFF" : "rgba(255,255,255,0.5)",
-                background: isActive ? "rgba(255,255,255,0.08)" : "transparent",
-                borderLeft: isActive ? "3px solid #00B4D8" : "3px solid transparent",
-              }}
-            >
-              <item.icon size={18} />
-              <span>{item.label}</span>
-            </button>
-          );
-        })}
+      <nav className="flex-1 flex flex-col px-3 mt-2">
+        <div className="flex flex-col gap-1">
+          {navItems.map((item) => {
+            const isActive = activeItem === item.path;
+            return (
+              <button
+                key={item.path}
+                onClick={() => onNavigate(item.path)}
+                className="flex items-center gap-3 rounded-lg text-sm font-medium transition-all text-left"
+                style={{
+                  padding: "10px 16px",
+                  color: isActive ? "#00B4D8" : "rgba(255,255,255,0.5)",
+                  background: isActive ? "rgba(0,180,216,0.08)" : "transparent",
+                  borderRadius: 8,
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.color = "rgba(255,255,255,0.9)";
+                    e.currentTarget.style.background = "rgba(255,255,255,0.06)";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.color = "rgba(255,255,255,0.5)";
+                    e.currentTarget.style.background = "transparent";
+                  }
+                }}
+              >
+                <item.icon size={18} />
+                <span>{item.label}</span>
+              </button>
+            );
+          })}
+        </div>
 
-        <div className="mt-auto" />
+        <div className="flex-1" />
 
         <button
           onClick={() => onNavigate("configuracoes")}
-          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors text-left mt-4"
+          className="flex items-center gap-3 rounded-lg text-sm font-medium transition-all text-left mb-4"
           style={{
-            color: activeItem === "configuracoes" ? "#FFFFFF" : "rgba(255,255,255,0.5)",
-            background: activeItem === "configuracoes" ? "rgba(255,255,255,0.08)" : "transparent",
-            borderLeft: activeItem === "configuracoes" ? "3px solid #00B4D8" : "3px solid transparent",
+            padding: "10px 16px",
+            color: activeItem === "configuracoes" ? "#00B4D8" : "rgba(255,255,255,0.5)",
+            background: activeItem === "configuracoes" ? "rgba(0,180,216,0.08)" : "transparent",
+            borderRadius: 8,
+          }}
+          onMouseEnter={(e) => {
+            if (activeItem !== "configuracoes") {
+              e.currentTarget.style.color = "rgba(255,255,255,0.9)";
+              e.currentTarget.style.background = "rgba(255,255,255,0.06)";
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (activeItem !== "configuracoes") {
+              e.currentTarget.style.color = "rgba(255,255,255,0.5)";
+              e.currentTarget.style.background = "transparent";
+            }
           }}
         >
           <Settings size={18} />
@@ -88,7 +121,7 @@ const DashboardSidebar = ({ activeItem, onNavigate }: DashboardSidebarProps) => 
         style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
       >
         <div
-          className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold"
+          className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
           style={{ background: "rgba(0,180,216,0.2)", color: "#00B4D8" }}
         >
           {(profile.display_name || "U").charAt(0).toUpperCase()}
@@ -97,9 +130,15 @@ const DashboardSidebar = ({ activeItem, onNavigate }: DashboardSidebarProps) => 
           <p className="text-sm font-medium text-white truncate">
             {profile.display_name || "Usuário"}
           </p>
-          <p className="text-xs truncate" style={{ color: "rgba(255,255,255,0.4)" }}>
-            {profile.email || user?.email}
-          </p>
+          <span
+            className="text-[10px] font-medium px-1.5 py-0.5 rounded"
+            style={{
+              background: "rgba(0,180,216,0.15)",
+              color: "#00B4D8",
+            }}
+          >
+            {profile.plano}
+          </span>
         </div>
         <button
           onClick={signOut}
