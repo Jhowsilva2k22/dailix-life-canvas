@@ -73,7 +73,8 @@ const Onboarding = () => {
       console.error(error);
     } else {
       localStorage.removeItem("dailix_welcome_shown");
-      navigate("/dashboard");
+      setExiting(true);
+      setTimeout(() => navigate("/dashboard"), 600);
     }
     setSubmitting(false);
   };
