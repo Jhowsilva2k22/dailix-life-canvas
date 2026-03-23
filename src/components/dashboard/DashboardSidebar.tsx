@@ -59,26 +59,37 @@ const DashboardSidebar = ({ activeItem, onNavigate }: DashboardSidebarProps) => 
               <button
                 key={item.path}
                 onClick={() => onNavigate(item.path)}
-                className="flex items-center gap-3 rounded-lg text-sm font-medium transition-all text-left"
+                className="flex items-center gap-3 text-sm font-medium transition-all text-left relative"
                 style={{
                   padding: "10px 16px",
-                  color: isActive ? "#00B4D8" : "rgba(255,255,255,0.5)",
+                  color: isActive ? "#00B4D8" : "rgba(255,255,255,0.45)",
                   background: isActive ? "rgba(0,180,216,0.08)" : "transparent",
                   borderRadius: 8,
                 }}
                 onMouseEnter={(e) => {
                   if (!isActive) {
-                    e.currentTarget.style.color = "rgba(255,255,255,0.9)";
-                    e.currentTarget.style.background = "rgba(255,255,255,0.06)";
+                    e.currentTarget.style.color = "rgba(255,255,255,0.85)";
+                    e.currentTarget.style.background = "rgba(255,255,255,0.05)";
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (!isActive) {
-                    e.currentTarget.style.color = "rgba(255,255,255,0.5)";
+                    e.currentTarget.style.color = "rgba(255,255,255,0.45)";
                     e.currentTarget.style.background = "transparent";
                   }
                 }}
               >
+                {isActive && (
+                  <div
+                    className="absolute left-0 top-1/2 -translate-y-1/2"
+                    style={{
+                      width: 2,
+                      height: 20,
+                      background: "#00B4D8",
+                      borderRadius: 2,
+                    }}
+                  />
+                )}
                 <item.icon size={18} />
                 <span>{item.label}</span>
               </button>
@@ -90,26 +101,32 @@ const DashboardSidebar = ({ activeItem, onNavigate }: DashboardSidebarProps) => 
 
         <button
           onClick={() => onNavigate("configuracoes")}
-          className="flex items-center gap-3 rounded-lg text-sm font-medium transition-all text-left mb-4"
+          className="flex items-center gap-3 text-sm font-medium transition-all text-left mb-4 relative"
           style={{
             padding: "10px 16px",
-            color: activeItem === "configuracoes" ? "#00B4D8" : "rgba(255,255,255,0.5)",
+            color: activeItem === "configuracoes" ? "#00B4D8" : "rgba(255,255,255,0.45)",
             background: activeItem === "configuracoes" ? "rgba(0,180,216,0.08)" : "transparent",
             borderRadius: 8,
           }}
           onMouseEnter={(e) => {
             if (activeItem !== "configuracoes") {
-              e.currentTarget.style.color = "rgba(255,255,255,0.9)";
-              e.currentTarget.style.background = "rgba(255,255,255,0.06)";
+              e.currentTarget.style.color = "rgba(255,255,255,0.85)";
+              e.currentTarget.style.background = "rgba(255,255,255,0.05)";
             }
           }}
           onMouseLeave={(e) => {
             if (activeItem !== "configuracoes") {
-              e.currentTarget.style.color = "rgba(255,255,255,0.5)";
+              e.currentTarget.style.color = "rgba(255,255,255,0.45)";
               e.currentTarget.style.background = "transparent";
             }
           }}
         >
+          {activeItem === "configuracoes" && (
+            <div
+              className="absolute left-0 top-1/2 -translate-y-1/2"
+              style={{ width: 2, height: 20, background: "#00B4D8", borderRadius: 2 }}
+            />
+          )}
           <Settings size={18} />
           <span>Configurações</span>
         </button>
@@ -121,8 +138,15 @@ const DashboardSidebar = ({ activeItem, onNavigate }: DashboardSidebarProps) => 
         style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
       >
         <div
-          className="w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
-          style={{ background: "rgba(0,180,216,0.2)", color: "#00B4D8" }}
+          className="flex items-center justify-center text-sm font-bold flex-shrink-0 font-display"
+          style={{
+            width: 42,
+            height: 42,
+            borderRadius: 12,
+            background: "#1E3A5F",
+            color: "white",
+            fontSize: 16,
+          }}
         >
           {(profile.display_name || "U").charAt(0).toUpperCase()}
         </div>
@@ -131,10 +155,11 @@ const DashboardSidebar = ({ activeItem, onNavigate }: DashboardSidebarProps) => 
             {profile.display_name || "Usuário"}
           </p>
           <span
-            className="text-[10px] font-medium px-1.5 py-0.5 rounded"
+            className="text-[11px] font-medium px-2 py-0.5"
             style={{
               background: "rgba(0,180,216,0.15)",
               color: "#00B4D8",
+              borderRadius: 6,
             }}
           >
             {profile.plano}
@@ -145,6 +170,8 @@ const DashboardSidebar = ({ activeItem, onNavigate }: DashboardSidebarProps) => 
           className="p-1.5 rounded-lg transition-colors"
           style={{ color: "rgba(255,255,255,0.4)" }}
           title="Sair"
+          onMouseEnter={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.7)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.4)"; }}
         >
           <LogOut size={16} />
         </button>

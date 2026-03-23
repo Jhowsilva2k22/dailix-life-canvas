@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { ArrowRight, ArrowLeft } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -15,7 +13,7 @@ const modules = [
 ];
 
 const Onboarding = () => {
-  const { session, loading } = useAuth();
+  const { session, signOut, loading } = useAuth();
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [displayName, setDisplayName] = useState("");
@@ -57,9 +55,7 @@ const Onboarding = () => {
       toast.error("Selecione pelo menos uma área.");
       return;
     }
-
     setSubmitting(true);
-
     const { error } = await supabase
       .from("profiles")
       .update({
@@ -75,45 +71,86 @@ const Onboarding = () => {
       console.error(error);
     } else {
       localStorage.removeItem("dailix_welcome_shown");
-      navigate("/welcome");
+      navigate("/dashboard");
     }
     setSubmitting(false);
   };
 
-  const progressWidth = `${(step / 3) * 100}%`;
+  const progressSegments = [1, 2, 3];
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: "#F8FAFC" }}>
-      <div className="w-full h-1" style={{ background: "#E2E8F0" }}>
-        <div
-          className="h-full transition-all duration-500"
-          style={{ width: progressWidth, background: "linear-gradient(90deg, #1E3A5F, #00B4D8)" }}
-        />
+    <div className="min-h-screen flex flex-col" style={{ background: "#0F172A" }}>
+      {/* Navbar */}
+      <header className="flex items-center justify-between px-6 h-14 flex-shrink-0">
+        <span className="font-display text-lg font-bold text-white tracking-tight">Dailix</span>
+        <button
+          onClick={signOut}
+          className="text-sm transition-colors"
+          style={{ color: "rgba(255,255,255,0.4)" }}
+          onMouseEnter={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.7)"; }}
+          onMouseLeave={(e) => { e.currentTarget.style.color = "rgba(255,255,255,0.4)"; }}
+        >
+          Sair
+        </button>
+      </header>
+
+      {/* Progress bar */}
+      <div className="flex gap-2 px-6 mb-8">
+        {progressSegments.map((s) => (
+          <div
+            key={s}
+            className="flex-1 h-1 rounded-full transition-all duration-500"
+            style={{
+              background: step >= s ? "#00B4D8" : "rgba(255,255,255,0.1)",
+            }}
+          />
+        ))}
       </div>
 
-      <div className="flex-1 flex items-center justify-center px-4">
-        <div className="w-full" style={{ maxWidth: 560 }}>
-          <p className="text-xs font-medium mb-2" style={{ color: "#94A3B8" }}>
+      {/* Content */}
+      <div className="flex-1 flex items-start md:items-center justify-center px-4 pt-4 md:pt-0">
+        <div
+          className="w-full"
+          style={{
+            maxWidth: 520,
+            background: "rgba(255,255,255,0.04)",
+            border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: 16,
+            padding: "40px",
+            backdropFilter: "blur(12px)",
+          }}
+        >
+          <p className="text-xs font-medium mb-6" style={{ color: "rgba(255,255,255,0.35)" }}>
             Passo {step} de 3
           </p>
 
           {step === 1 && (
             <div className="flex flex-col gap-6">
               <div>
-                <h2 className="font-display text-2xl font-bold" style={{ color: "#0F172A" }}>
+                <h2 className="font-display text-2xl font-bold text-white">
                   Configure seu espaço
                 </h2>
-                <p className="text-sm mt-1" style={{ color: "#64748B" }}>
-                  Como prefere ser chamado na plataforma?
+                <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.5)" }}>
+                  Como prefere ser chamado?
                 </p>
               </div>
               <div className="flex flex-col gap-1.5">
-                <Label htmlFor="displayName" style={{ color: "#0F172A" }}>Nome preferido</Label>
-                <Input
-                  id="displayName"
+                <label className="text-sm font-medium" style={{ color: "rgba(255,255,255,0.7)" }}>
+                  Nome preferido
+                </label>
+                <input
+                  type="text"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   placeholder="Ex: Ana, Carlos..."
+                  className="w-full px-4 py-3 text-sm rounded-[10px] outline-none transition-colors"
+                  style={{
+                    background: "rgba(255,255,255,0.06)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    color: "white",
+                  }}
+                  onFocus={(e) => { e.currentTarget.style.borderColor = "#00B4D8"; }}
+                  onBlur={(e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; }}
                 />
               </div>
               <button
@@ -133,11 +170,11 @@ const Onboarding = () => {
           {step === 2 && (
             <div className="flex flex-col gap-6">
               <div>
-                <h2 className="font-display text-2xl font-bold" style={{ color: "#0F172A" }}>
+                <h2 className="font-display text-2xl font-bold text-white">
                   Escolha suas áreas
                 </h2>
-                <p className="text-sm mt-1" style={{ color: "#64748B" }}>
-                  Selecione o que quer organizar.
+                <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.5)" }}>
+                  O que você quer organizar?
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -147,17 +184,15 @@ const Onboarding = () => {
                     <button
                       key={m.id}
                       onClick={() => toggleModule(m.id)}
-                      className="flex flex-col items-start p-4 rounded-xl transition-all duration-200 text-left active:scale-[0.97]"
+                      className="flex flex-col items-start p-5 rounded-xl transition-all duration-200 text-left active:scale-[0.97]"
                       style={{
                         border: selected
-                          ? "2px solid #00B4D8"
-                          : "1px solid #E2E8F0",
+                          ? "1px solid #00B4D8"
+                          : "1px solid rgba(255,255,255,0.08)",
                         background: selected
-                          ? "rgba(0,180,216,0.04)"
-                          : "#FFFFFF",
-                        boxShadow: selected
-                          ? "0 0 0 1px rgba(0,180,216,0.2)"
-                          : "none",
+                          ? "rgba(0,180,216,0.08)"
+                          : "rgba(255,255,255,0.04)",
+                        borderRadius: 12,
                       }}
                     >
                       <span
@@ -170,10 +205,10 @@ const Onboarding = () => {
                       >
                         {m.num}
                       </span>
-                      <p className="font-display text-lg font-bold mt-1" style={{ color: "#0F172A" }}>
+                      <p className="font-display text-base font-bold mt-1 text-white">
                         {m.label}
                       </p>
-                      <p className="text-[13px] mt-0.5" style={{ color: "#64748B" }}>
+                      <p className="text-[13px] mt-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>
                         {m.desc}
                       </p>
                     </button>
@@ -184,7 +219,7 @@ const Onboarding = () => {
                 <button
                   onClick={() => setStep(1)}
                   className="inline-flex items-center gap-1.5 px-5 py-3 text-sm font-medium rounded-[10px] transition-colors"
-                  style={{ color: "#64748B" }}
+                  style={{ color: "rgba(255,255,255,0.4)" }}
                 >
                   <ArrowLeft className="h-4 w-4" />
                   Voltar
@@ -213,27 +248,37 @@ const Onboarding = () => {
           {step === 3 && (
             <div className="flex flex-col gap-6">
               <div>
-                <h2 className="font-display text-2xl font-bold" style={{ color: "#0F172A" }}>
+                <h2 className="font-display text-2xl font-bold text-white">
                   Defina sua primeira meta
                 </h2>
-                <p className="text-sm mt-1" style={{ color: "#64748B" }}>
+                <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.5)" }}>
                   O que quer conquistar nos próximos 30 dias?
                 </p>
               </div>
               <div className="flex flex-col gap-1.5">
-                <Label htmlFor="goal" style={{ color: "#0F172A" }}>Sua meta</Label>
-                <Input
-                  id="goal"
+                <label className="text-sm font-medium" style={{ color: "rgba(255,255,255,0.7)" }}>
+                  Sua meta
+                </label>
+                <input
+                  type="text"
                   value={firstGoal}
                   onChange={(e) => setFirstGoal(e.target.value)}
-                  placeholder="Ex: Organizar minha rotina matinal"
+                  placeholder="Ex: Criar uma rotina matinal consistente"
+                  className="w-full px-4 py-3 text-sm rounded-[10px] outline-none transition-colors"
+                  style={{
+                    background: "rgba(255,255,255,0.06)",
+                    border: "1px solid rgba(255,255,255,0.1)",
+                    color: "white",
+                  }}
+                  onFocus={(e) => { e.currentTarget.style.borderColor = "#00B4D8"; }}
+                  onBlur={(e) => { e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; }}
                 />
               </div>
               <div className="flex justify-between">
                 <button
                   onClick={() => setStep(2)}
                   className="inline-flex items-center gap-1.5 px-5 py-3 text-sm font-medium rounded-[10px] transition-colors"
-                  style={{ color: "#64748B" }}
+                  style={{ color: "rgba(255,255,255,0.4)" }}
                 >
                   <ArrowLeft className="h-4 w-4" />
                   Voltar
