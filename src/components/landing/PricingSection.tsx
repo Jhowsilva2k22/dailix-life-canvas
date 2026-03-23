@@ -63,7 +63,7 @@ const PricingSection = () => {
   }, []);
 
   return (
-    <section id="pricing" className="py-20 md:py-28 bg-white" ref={ref}>
+    <section id="pricing" className="py-20 md:py-28" ref={ref} style={{ background: "#F8FAFC" }}>
       <div className="container">
         <div
           className={`text-center max-w-2xl mx-auto mb-16 transition-all duration-700 ${
