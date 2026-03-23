@@ -61,7 +61,13 @@ const Navbar = () => {
           </button>
           <button
             onClick={() => navigate("/cadastro")}
-            className="px-5 py-2 text-sm font-semibold text-white rounded-[10px] transition-all duration-200 active:scale-[0.97]"
+            className="px-5 py-2 text-sm text-white rounded-[10px] transition-all duration-200 active:scale-[0.97]"
+            style={{
+              fontWeight: 400,
+              letterSpacing: "0.02em",
+              background: "linear-gradient(135deg, #1E3A5F, #00B4D8)",
+              boxShadow: "0 4px 16px rgba(0,180,216,0.3)",
+            }}
             style={{
               background: "linear-gradient(135deg, #1E3A5F, #00B4D8)",
               boxShadow: "0 4px 16px rgba(0,180,216,0.3)",
