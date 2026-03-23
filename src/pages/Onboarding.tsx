@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { Target, Users, Briefcase, Heart, ArrowRight, ArrowLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -8,10 +8,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const modules = [
-  { id: "foco", label: "Foco", icon: Target, desc: "Produtividade e tarefas" },
-  { id: "familia", label: "Familia", icon: Users, desc: "Rotina e organizacao familiar" },
-  { id: "negocios", label: "Negocios", icon: Briefcase, desc: "Projetos e metas profissionais" },
-  { id: "bem-estar", label: "Bem-estar", icon: Heart, desc: "Saude e habitos" },
+  { id: "foco", label: "Foco", icon: Target, desc: "Tarefas e produtividade" },
+  { id: "familia", label: "Família", icon: Users, desc: "Rotinas e organização" },
+  { id: "negocios", label: "Negócios", icon: Briefcase, desc: "Projetos e contatos" },
+  { id: "bem-estar", label: "Bem-estar", icon: Heart, desc: "Hábitos e saúde" },
 ];
 
 const Onboarding = () => {
@@ -22,8 +22,28 @@ const Onboarding = () => {
   const [selectedModules, setSelectedModules] = useState<string[]>([]);
   const [firstGoal, setFirstGoal] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [checkingOnboarding, setCheckingOnboarding] = useState(true);
 
-  if (loading) return null;
+  useEffect(() => {
+    if (!session) {
+      setCheckingOnboarding(false);
+      return;
+    }
+    const check = async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("onboarding_completed")
+        .eq("user_id", session.user.id)
+        .single();
+      if (data?.onboarding_completed) {
+        navigate("/dashboard", { replace: true });
+      }
+      setCheckingOnboarding(false);
+    };
+    check();
+  }, [session, navigate]);
+
+  if (loading || checkingOnboarding) return null;
   if (!session) return <Navigate to="/login" replace />;
 
   const toggleModule = (id: string) => {
@@ -34,7 +54,7 @@ const Onboarding = () => {
 
   const handleFinish = async () => {
     if (selectedModules.length === 0) {
-      toast.error("Selecione pelo menos uma area.");
+      toast.error("Selecione pelo menos uma área.");
       return;
     }
 
@@ -63,7 +83,6 @@ const Onboarding = () => {
 
   return (
     <div className="min-h-screen flex flex-col" style={{ background: "#F8FAFC" }}>
-      {/* Progress bar */}
       <div className="w-full h-1" style={{ background: "#E2E8F0" }}>
         <div
           className="h-full transition-all duration-500"
@@ -72,8 +91,7 @@ const Onboarding = () => {
       </div>
 
       <div className="flex-1 flex items-center justify-center px-4">
-        <div className="w-full" style={{ maxWidth: 480 }}>
-          {/* Step indicator */}
+        <div className="w-full" style={{ maxWidth: 560 }}>
           <p className="text-xs font-medium mb-2" style={{ color: "#94A3B8" }}>
             Passo {step} de 3
           </p>
@@ -82,10 +100,10 @@ const Onboarding = () => {
             <div className="flex flex-col gap-6">
               <div>
                 <h2 className="text-2xl font-bold" style={{ color: "#0F172A" }}>
-                  Configure seu espaco
+                  Configure seu espaço
                 </h2>
                 <p className="text-sm mt-1" style={{ color: "#64748B" }}>
-                  Como gostaria de ser chamado?
+                  Como prefere ser chamado na plataforma?
                 </p>
               </div>
               <div className="flex flex-col gap-1.5">
@@ -105,7 +123,7 @@ const Onboarding = () => {
                   boxShadow: "0 4px 16px rgba(0,180,216,0.3)",
                 }}
               >
-                Proximo
+                Continuar
                 <ArrowRight className="h-4 w-4" />
               </button>
             </div>
@@ -115,10 +133,10 @@ const Onboarding = () => {
             <div className="flex flex-col gap-6">
               <div>
                 <h2 className="text-2xl font-bold" style={{ color: "#0F172A" }}>
-                  Escolha suas areas
+                  Escolha suas áreas
                 </h2>
                 <p className="text-sm mt-1" style={{ color: "#64748B" }}>
-                  Selecione pelo menos uma area para comecar.
+                  Selecione o que quer organizar.
                 </p>
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -171,7 +189,7 @@ const Onboarding = () => {
                 <button
                   onClick={() => {
                     if (selectedModules.length === 0) {
-                      toast.error("Selecione pelo menos uma area.");
+                      toast.error("Selecione pelo menos uma área.");
                       return;
                     }
                     setStep(3);
@@ -182,7 +200,7 @@ const Onboarding = () => {
                     boxShadow: "0 4px 16px rgba(0,180,216,0.3)",
                   }}
                 >
-                  Proximo
+                  Continuar
                   <ArrowRight className="h-4 w-4" />
                 </button>
               </div>
@@ -196,7 +214,7 @@ const Onboarding = () => {
                   Defina sua primeira meta
                 </h2>
                 <p className="text-sm mt-1" style={{ color: "#64748B" }}>
-                  O que voce quer conquistar primeiro?
+                  O que quer conquistar nos próximos 30 dias?
                 </p>
               </div>
               <div className="flex flex-col gap-1.5">
