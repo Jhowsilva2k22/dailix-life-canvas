@@ -82,30 +82,32 @@ const TasksTab = () => {
 
   return (
     <div>
-      {/* Filters + counters */}
-      <div className="flex items-center justify-between mb-4" data-reveal style={{ transitionDelay: "160ms" }}>
+      {/* Filters */}
+      <div className="mb-2 overflow-x-auto" data-reveal style={{ transitionDelay: "160ms" }}>
         <div className="flex gap-2">
           {filters.map((f) => (
             <button
               key={f.key}
               onClick={() => setFilter(f.key)}
-              className="px-3 py-1.5 rounded-lg transition-colors"
+              className="px-4 py-2 rounded-lg transition-colors whitespace-nowrap"
               style={{
-                fontSize: 12,
+                fontSize: 13,
                 fontWeight: 400,
-                background: filter === f.key ? "rgba(0,180,216,0.08)" : "transparent",
+                background: filter === f.key ? "rgba(0,180,216,0.1)" : "transparent",
                 color: filter === f.key ? "#00B4D8" : "#94A3B8",
-                border: filter === f.key ? "1px solid rgba(0,180,216,0.2)" : "1px solid transparent",
+                border: filter === f.key ? "1px solid rgba(0,180,216,0.3)" : "1px solid transparent",
               }}
             >
               {f.label}
             </button>
           ))}
         </div>
-        <div className="flex gap-3" style={{ fontSize: 12, color: "#94A3B8", fontWeight: 300 }}>
-          <span>{pending} pendentes</span>
-          <span>{done} concluidas</span>
-        </div>
+      </div>
+      {/* Counters */}
+      <div className="mb-4" data-reveal style={{ transitionDelay: "200ms", fontSize: 12, color: "#94A3B8", fontWeight: 300 }}>
+        <span>{pending} pendentes</span>
+        <span className="mx-1.5">·</span>
+        <span>{done} concluidas</span>
       </div>
 
       {/* Task list */}
