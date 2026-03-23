@@ -22,6 +22,7 @@ const Onboarding = () => {
   const [firstGoal, setFirstGoal] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [checkingOnboarding, setCheckingOnboarding] = useState(true);
+  const [exiting, setExiting] = useState(false);
 
   useEffect(() => {
     if (!session) {
