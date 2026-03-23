@@ -210,7 +210,7 @@ const Onboarding = () => {
           {step === 3 && (
             <div className="flex flex-col gap-6">
               <div>
-                <h2 className="text-2xl font-bold" style={{ color: "#0F172A" }}>
+                <h2 className="font-display text-2xl font-bold" style={{ color: "#0F172A" }}>
                   Defina sua primeira meta
                 </h2>
                 <p className="text-sm mt-1" style={{ color: "#64748B" }}>
