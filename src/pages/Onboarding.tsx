@@ -82,7 +82,13 @@ const Onboarding = () => {
   const progressSegments = [1, 2, 3];
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: "#0F172A" }}>
+    <motion.div
+      className="min-h-screen flex flex-col"
+      style={{ background: "#0F172A" }}
+      initial={{ opacity: 1 }}
+      animate={{ opacity: exiting ? 0 : 1 }}
+      transition={{ duration: 0.6 }}
+    >
       {/* Navbar */}
       <header className="flex items-center justify-between px-6 h-14 flex-shrink-0">
         <span className="font-display text-lg font-bold text-white tracking-tight">Dailix</span>
