@@ -8,10 +8,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const modules = [
-  { id: "foco", label: "Foco", icon: Target, desc: "Tarefas e produtividade" },
-  { id: "familia", label: "Família", icon: Users, desc: "Rotinas e organização" },
-  { id: "negocios", label: "Negócios", icon: Briefcase, desc: "Projetos e contatos" },
-  { id: "bem-estar", label: "Bem-estar", icon: Heart, desc: "Hábitos e saúde" },
+  { id: "foco", num: "01", label: "Foco", desc: "Tarefas e produtividade" },
+  { id: "familia", num: "02", label: "Família", desc: "Rotinas e organização" },
+  { id: "negocios", num: "03", label: "Negócios", desc: "Projetos e contatos" },
+  { id: "bem-estar", num: "04", label: "Bem-estar", desc: "Hábitos e saúde" },
 ];
 
 const Onboarding = () => {
