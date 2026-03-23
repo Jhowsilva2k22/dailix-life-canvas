@@ -25,26 +25,49 @@ const statusBadge = (s: string) => {
 const GoalsTab = () => {
   const { user } = useAuth();
   const [goals, setGoals] = useState<Goal[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<Goal | null>(null);
 
   const fetchGoals = async () => {
-    if (!user) return;
-    const { data } = await supabase
-      .from("goals")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
-    if (data) setGoals(data as Goal[]);
+    if (!user) { setLoading(false); return; }
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from("goals")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      setGoals((data as Goal[]) || []);
+    } catch (err) {
+      console.error("Erro ao buscar metas:", err);
+      toast.error("Erro ao carregar metas.");
+      setGoals([]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => { fetchGoals(); }, [user]);
 
   const deleteGoal = async (id: string) => {
-    await supabase.from("goals").delete().eq("id", id);
-    setGoals((prev) => prev.filter((g) => g.id !== id));
-    toast.success("Meta removida.");
+    try {
+      await supabase.from("goals").delete().eq("id", id);
+      setGoals((prev) => prev.filter((g) => g.id !== id));
+      toast.success("Meta removida.");
+    } catch {
+      toast.error("Erro ao remover meta.");
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-16" data-reveal>
+        <div className="w-6 h-6 border-2 rounded-full animate-spin" style={{ borderColor: "#E2E8F0", borderTopColor: "#00B4D8" }} />
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -99,7 +122,6 @@ const GoalsTab = () => {
                     </button>
                   </div>
                 </div>
-                {/* Progress bar */}
                 <div className="flex items-center gap-3">
                   <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ background: "#E2E8F0" }}>
                     <div
@@ -158,23 +180,31 @@ const GoalModal = ({ goal, onClose, onSaved }: GoalModalProps) => {
   const handleSave = async () => {
     if (!titulo.trim() || !user) return;
     setSaving(true);
+    try {
+      const payload = {
+        titulo: titulo.trim(),
+        descricao: descricao.trim() || null,
+        progresso,
+        data_limite: dataLimite || null,
+        status,
+      };
 
-    const payload = {
-      titulo: titulo.trim(),
-      descricao: descricao.trim() || null,
-      progresso,
-      data_limite: dataLimite || null,
-      status,
-    };
+      if (goal) {
+        const { error } = await supabase.from("goals").update(payload).eq("id", goal.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("goals").insert({ ...payload, user_id: user.id });
+        if (error) throw error;
+      }
 
-    if (goal) {
-      await supabase.from("goals").update(payload).eq("id", goal.id);
-    } else {
-      await supabase.from("goals").insert({ ...payload, user_id: user.id });
+      toast.success(goal ? "Meta atualizada." : "Meta criada.");
+      onSaved();
+    } catch (err) {
+      console.error("Erro ao salvar meta:", err);
+      toast.error("Erro ao salvar meta.");
+    } finally {
+      setSaving(false);
     }
-
-    toast.success(goal ? "Meta atualizada." : "Meta criada.");
-    onSaved();
   };
 
   const statuses = [
