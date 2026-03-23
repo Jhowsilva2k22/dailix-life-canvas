@@ -28,7 +28,7 @@ const CTASection = () => {
           style={{ background: "linear-gradient(135deg, #1E3A5F, #0F172A)" }}
         >
           <div className="relative z-10 max-w-xl mx-auto">
-            <h2 className="font-display text-3xl md:text-[2.5rem] font-bold text-white mb-4" style={{ lineHeight: 1.15 }}>
+            <h2 className="font-display text-3xl md:text-[2.5rem] font-bold tracking-tight text-white mb-4" style={{ lineHeight: 1.15 }}>
               Tudo que voce precisa. Em um lugar so.
             </h2>
             <p className="text-lg mb-8" style={{ color: "rgba(255,255,255,0.7)" }}>
@@ -36,10 +36,12 @@ const CTASection = () => {
             </p>
             <button
               onClick={() => navigate("/cadastro")}
-              className="inline-flex items-center gap-2 px-7 py-3.5 text-sm font-semibold rounded-[10px] transition-all duration-200 active:scale-[0.97]"
+              className="inline-flex items-center gap-2 px-7 py-3.5 text-sm rounded-[10px] transition-all duration-200 active:scale-[0.97]"
               style={{
                 background: "#fff",
                 color: "#1E3A5F",
+                fontWeight: 400,
+                letterSpacing: "0.02em",
               }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.boxShadow = "0 8px 32px rgba(255,255,255,0.25)";

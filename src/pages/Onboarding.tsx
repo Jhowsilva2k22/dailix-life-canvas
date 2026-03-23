@@ -136,7 +136,7 @@ const Onboarding = () => {
           {step === 1 && (
             <div className="flex flex-col gap-6">
               <div>
-                <h2 className="font-display text-2xl font-bold text-white">
+                <h2 className="font-display text-2xl text-white" style={{ fontWeight: 400 }}>
                   Configure seu espaço
                 </h2>
                 <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.5)" }}>
@@ -164,8 +164,10 @@ const Onboarding = () => {
               </div>
               <button
                 onClick={() => setStep(2)}
-                className="self-end inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white rounded-[10px] transition-all duration-200 active:scale-[0.97]"
+                className="self-end inline-flex items-center gap-2 px-6 py-3 text-sm text-white rounded-[10px] transition-all duration-200 active:scale-[0.97]"
                 style={{
+                  fontWeight: 400,
+                  letterSpacing: "0.02em",
                   background: "linear-gradient(135deg, #1E3A5F, #00B4D8)",
                   boxShadow: "0 4px 16px rgba(0,180,216,0.3)",
                 }}
@@ -179,7 +181,7 @@ const Onboarding = () => {
           {step === 2 && (
             <div className="flex flex-col gap-6">
               <div>
-                <h2 className="font-display text-2xl font-bold text-white">
+                <h2 className="font-display text-2xl text-white" style={{ fontWeight: 400 }}>
                   Escolha suas áreas
                 </h2>
                 <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.5)" }}>
@@ -214,7 +216,7 @@ const Onboarding = () => {
                       >
                         {m.num}
                       </span>
-                      <p className="font-display text-base font-bold mt-1 text-white">
+                      <p className="font-display text-base mt-1 text-white" style={{ fontWeight: 400 }}>
                         {m.label}
                       </p>
                       <p className="text-[13px] mt-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>
@@ -241,8 +243,10 @@ const Onboarding = () => {
                     }
                     setStep(3);
                   }}
-                  className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white rounded-[10px] transition-all duration-200 active:scale-[0.97]"
+                  className="inline-flex items-center gap-2 px-6 py-3 text-sm text-white rounded-[10px] transition-all duration-200 active:scale-[0.97]"
                   style={{
+                    fontWeight: 400,
+                    letterSpacing: "0.02em",
                     background: "linear-gradient(135deg, #1E3A5F, #00B4D8)",
                     boxShadow: "0 4px 16px rgba(0,180,216,0.3)",
                   }}
@@ -257,7 +261,7 @@ const Onboarding = () => {
           {step === 3 && (
             <div className="flex flex-col gap-6">
               <div>
-                <h2 className="font-display text-2xl font-bold text-white">
+                <h2 className="font-display text-2xl text-white" style={{ fontWeight: 400 }}>
                   Defina sua primeira meta
                 </h2>
                 <p className="text-sm mt-1" style={{ color: "rgba(255,255,255,0.5)" }}>
@@ -295,8 +299,10 @@ const Onboarding = () => {
                 <button
                   onClick={handleFinish}
                   disabled={submitting}
-                  className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white rounded-[10px] transition-all duration-200 active:scale-[0.97] disabled:opacity-60"
+                  className="inline-flex items-center gap-2 px-6 py-3 text-sm text-white rounded-[10px] transition-all duration-200 active:scale-[0.97] disabled:opacity-60"
                   style={{
+                    fontWeight: 400,
+                    letterSpacing: "0.02em",
                     background: "linear-gradient(135deg, #1E3A5F, #00B4D8)",
                     boxShadow: "0 4px 16px rgba(0,180,216,0.3)",
                   }}

@@ -92,7 +92,7 @@ const HeroSection = () => {
 
             {/* Headline */}
             <h1
-              className={`font-display text-[2.5rem] md:text-[3.25rem] lg:text-[3.5rem] font-extrabold transition-all duration-700 delay-100 ${
+              className={`font-display text-[2.5rem] md:text-[3.25rem] lg:text-[3.5rem] font-bold tracking-tight transition-all duration-700 delay-100 ${
                 visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               }`}
               style={{ color: "#0F172A", lineHeight: 1.1 }}
@@ -136,10 +136,12 @@ const HeroSection = () => {
             >
               <button
                 onClick={() => navigate("/cadastro")}
-                className="inline-flex items-center gap-2 px-7 py-3.5 text-sm font-semibold text-white rounded-[10px] transition-all duration-200 active:scale-[0.97]"
+                className="inline-flex items-center gap-2 px-7 py-3.5 text-sm text-white rounded-[10px] transition-all duration-200 active:scale-[0.97]"
                 style={{
                   background: "linear-gradient(135deg, #1E3A5F, #00B4D8)",
                   boxShadow: "0 8px 32px rgba(0,180,216,0.35)",
+                  fontWeight: 400,
+                  letterSpacing: "0.02em",
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.boxShadow = "0 12px 40px rgba(0,180,216,0.5)";
@@ -154,11 +156,13 @@ const HeroSection = () => {
                 <ArrowRight className="h-4 w-4" />
               </button>
               <button
-                className="px-7 py-3.5 text-sm font-semibold rounded-[10px] transition-all duration-200 active:scale-[0.97]"
+                className="px-7 py-3.5 text-sm rounded-[10px] transition-all duration-200 active:scale-[0.97]"
                 style={{
                   border: "1.5px solid #1E3A5F",
                   color: "#1E3A5F",
                   background: "transparent",
+                  fontWeight: 400,
+                  letterSpacing: "0.02em",
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = "rgba(30,58,95,0.04)";

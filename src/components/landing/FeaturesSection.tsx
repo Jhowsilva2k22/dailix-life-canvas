@@ -51,7 +51,7 @@ const FeaturesSection = () => {
             visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
           }`}
         >
-          <h2 className="font-display text-[2rem] md:text-[2.5rem] font-bold mb-4" style={{ color: "#0F172A" }}>
+          <h2 className="font-display text-[2rem] md:text-[2.5rem] font-bold tracking-tight mb-4" style={{ color: "#0F172A" }}>
             Quatro areas. Uma plataforma.
           </h2>
           <p style={{ fontSize: 18, color: "#64748B" }}>
@@ -90,7 +90,7 @@ const FeaturesSection = () => {
               <span style={{ fontSize: 11, letterSpacing: "0.1em", color: "#00B4D8", fontWeight: 500 }}>
                 {f.num}
               </span>
-              <h3 className="font-display text-xl font-bold mb-2 mt-2" style={{ color: "#0F172A" }}>
+              <h3 className="font-display text-xl font-bold tracking-tight mb-2 mt-2" style={{ color: "#0F172A" }}>
                 {f.title}
               </h3>
               <p style={{ fontSize: 15, color: "#64748B", lineHeight: 1.6 }}>{f.desc}</p>

@@ -111,13 +111,13 @@ const AvatarUploadModal = ({ onClose }: AvatarUploadModalProps) => {
           background: "#FFFFFF",
           borderRadius: 16,
           border: "1px solid #E2E8F0",
-          boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
         }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: "1px solid #E2E8F0" }}>
-          <h2 className="font-display text-lg font-bold" style={{ color: "#0F172A" }}>
+          <h2 className="font-display text-lg" style={{ color: "#0F172A", fontWeight: 400 }}>
             {step === "upload" ? "Alterar foto" : "Ajustar foto"}
           </h2>
           <button onClick={onClose} className="p-1 rounded-lg transition-colors" style={{ color: "#94A3B8" }}>

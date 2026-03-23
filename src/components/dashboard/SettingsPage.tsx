@@ -29,7 +29,7 @@ const SettingsPage = () => {
           <div className="flex items-start gap-4 mb-4">
             <UserAvatar avatarUrl={avatarUrl} displayName={displayName} size={72} />
             <div className="pt-1">
-              <p className="font-display text-xl font-bold" style={{ color: "#0F172A" }}>
+              <p className="font-display text-xl" style={{ color: "#0F172A", fontWeight: 400 }}>
                 {displayName || "Usuário"}
               </p>
               <p className="text-sm" style={{ color: "#64748B" }}>
@@ -53,7 +53,7 @@ const SettingsPage = () => {
 
         {/* Plan section */}
         <div className="p-8 mb-6" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 16 }}>
-          <h2 className="font-display text-base font-bold mb-4" style={{ color: "#0F172A" }}>
+          <h2 className="font-display text-base mb-4" style={{ color: "#0F172A", fontWeight: 400 }}>
             Plano atual
           </h2>
           <div className="flex items-center gap-3 mb-3">

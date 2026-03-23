@@ -63,14 +63,14 @@ const PricingSection = () => {
   }, []);
 
   return (
-    <section id="pricing" className="py-20 md:py-28 bg-white" ref={ref}>
+    <section id="pricing" className="py-20 md:py-28" ref={ref} style={{ background: "#F8FAFC" }}>
       <div className="container">
         <div
           className={`text-center max-w-2xl mx-auto mb-16 transition-all duration-700 ${
             visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
           }`}
         >
-          <h2 className="font-display text-[2rem] md:text-[2.5rem] font-bold mb-4" style={{ color: "#0F172A" }}>
+          <h2 className="font-display text-[2rem] md:text-[2.5rem] font-bold tracking-tight mb-4" style={{ color: "#0F172A" }}>
             Planos simples, sem surpresas.
           </h2>
           <p style={{ fontSize: 18, color: "#64748B" }}>
@@ -97,11 +97,11 @@ const PricingSection = () => {
                 transform: p.highlight ? "scale(1.04)" : "scale(1)",
               }}
             >
-              <h3 className="font-display text-[22px] font-bold mb-2" style={{ color: "#0F172A" }}>
+              <h3 className="font-display text-[22px] font-bold tracking-tight mb-2" style={{ color: "#0F172A" }}>
                 {p.name}
               </h3>
               <div className="flex items-baseline gap-1 mb-6">
-                <span className="text-5xl font-extrabold" style={{ color: "#0F172A" }}>
+                <span className="text-5xl font-bold" style={{ color: "#0F172A" }}>
                   {p.price}
                 </span>
                 <span className="text-sm" style={{ color: "#64748B" }}>
@@ -120,9 +120,11 @@ const PricingSection = () => {
 
               <button
                 onClick={() => navigate("/cadastro")}
-                className="w-full py-3 text-sm font-semibold rounded-[10px] transition-all duration-200 active:scale-[0.97]"
-                style={
-                  p.highlight
+                className="w-full py-3 text-sm rounded-[10px] transition-all duration-200 active:scale-[0.97]"
+                style={{
+                  fontWeight: 400,
+                  letterSpacing: "0.02em",
+                  ...(p.highlight
                     ? {
                         background: "linear-gradient(135deg, #1E3A5F, #00B4D8)",
                         color: "#fff",
@@ -132,8 +134,8 @@ const PricingSection = () => {
                         border: "1.5px solid #1E3A5F",
                         color: "#1E3A5F",
                         background: "transparent",
-                      }
-                }
+                      }),
+                }}
                 onMouseEnter={(e) => {
                   if (p.highlight) {
                     e.currentTarget.style.boxShadow = "0 8px 28px rgba(0,180,216,0.45)";

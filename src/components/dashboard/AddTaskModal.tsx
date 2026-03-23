@@ -55,12 +55,12 @@ const AddTaskModal = ({ onClose, onSaved }: AddTaskModalProps) => {
         className="w-full max-w-md rounded-2xl p-6"
         style={{
           background: "#FFFFFF",
-          boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
         }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-6">
-          <h3 className="font-display text-lg font-bold" style={{ color: "#0F172A" }}>
+          <h3 className="font-display text-lg" style={{ color: "#0F172A", fontWeight: 400 }}>
             Nova tarefa
           </h3>
           <button onClick={onClose} className="p-1" style={{ color: "#94A3B8" }}>
@@ -145,9 +145,11 @@ const AddTaskModal = ({ onClose, onSaved }: AddTaskModalProps) => {
         <button
           onClick={handleSave}
           disabled={!titulo.trim() || saving}
-          className="w-full mt-6 py-3 text-sm font-semibold text-white rounded-xl transition-opacity disabled:opacity-50"
+          className="w-full mt-6 py-3 text-sm text-white rounded-lg transition-opacity disabled:opacity-50"
           style={{
             background: "linear-gradient(135deg, #1E3A5F, #00B4D8)",
+            fontWeight: 400,
+            letterSpacing: "0.02em",
           }}
         >
           {saving ? "Salvando..." : "Salvar tarefa"}
