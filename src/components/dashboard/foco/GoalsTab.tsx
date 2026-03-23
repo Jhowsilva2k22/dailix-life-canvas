@@ -1,5 +1,5 @@
 import { Component, useEffect, useState, useCallback, type ReactNode } from "react";
-import { Plus, Pencil, Trash2, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, Pencil, Trash2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
