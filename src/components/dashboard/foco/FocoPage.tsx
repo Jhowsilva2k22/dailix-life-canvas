@@ -25,7 +25,7 @@ const FocoPage = () => {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-0 mb-8 border-b" style={{ borderColor: "#E2E8F0" }} data-reveal style-={{ transitionDelay: "80ms" }}>
+        <div className="flex gap-0 mb-8 border-b" style={{ borderColor: "#E2E8F0" }} data-reveal>
           {tabs.map((tab) => (
             <button
               key={tab.key}
