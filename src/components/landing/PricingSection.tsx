@@ -1,5 +1,6 @@
 import { Check, ArrowRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const plans = [
   {
