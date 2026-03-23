@@ -106,7 +106,7 @@ const Cadastro = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                placeholder="Minimo 6 caracteres"
+                placeholder="Mínimo 8 caracteres"
               />
               <button
                 type="button"
