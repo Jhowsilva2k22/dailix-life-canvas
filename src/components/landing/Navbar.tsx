@@ -68,10 +68,6 @@ const Navbar = () => {
               background: "linear-gradient(135deg, #1E3A5F, #00B4D8)",
               boxShadow: "0 4px 16px rgba(0,180,216,0.3)",
             }}
-            style={{
-              background: "linear-gradient(135deg, #1E3A5F, #00B4D8)",
-              boxShadow: "0 4px 16px rgba(0,180,216,0.3)",
-            }}
             onMouseEnter={(e) => {
               e.currentTarget.style.boxShadow = "0 6px 24px rgba(0,180,216,0.45)";
               e.currentTarget.style.transform = "translateY(-1px)";
