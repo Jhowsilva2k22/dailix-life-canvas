@@ -41,10 +41,12 @@ const DashboardSidebar = ({ activeItem, onNavigate }: DashboardSidebarProps) => 
                 <button
                   key={item.path}
                   onClick={() => onNavigate(item.path)}
-                  className="flex items-center gap-3 text-sm font-medium transition-all text-left relative"
+                  className="flex items-center gap-3 transition-all text-left relative"
                   style={{
                     padding: "10px 16px",
-                    color: isActive ? "#00B4D8" : "rgba(255,255,255,0.45)",
+                    fontSize: 13,
+                    fontWeight: 400,
+                    color: isActive ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.45)",
                     background: isActive ? "rgba(0,180,216,0.08)" : "transparent",
                     borderRadius: 8,
                   }}
@@ -94,7 +96,7 @@ const DashboardSidebar = ({ activeItem, onNavigate }: DashboardSidebarProps) => 
             </div>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-white truncate">{displayName || "Usuário"}</p>
+            <p className="truncate" style={{ fontSize: 13, fontWeight: 400, color: "rgba(255,255,255,0.7)" }}>{displayName || "Usuário"}</p>
             <span
               className="text-[11px] font-medium px-2 py-0.5"
               style={{ background: "rgba(0,180,216,0.15)", color: "#00B4D8", borderRadius: 6 }}

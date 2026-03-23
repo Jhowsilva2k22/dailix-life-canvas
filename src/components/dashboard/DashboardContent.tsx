@@ -141,10 +141,10 @@ const DashboardContent = () => {
       <div style={{ maxWidth: 1200 }} className="mx-auto px-4 md:px-8 pt-20 md:pt-8 pb-24 md:pb-10">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="font-display text-2xl md:text-[30px] font-bold" style={{ color: "#0F172A" }}>
+          <h1 className="font-display text-[28px]" style={{ color: "#0F172A", fontWeight: 500 }}>
             {getGreeting(profile.display_name || "Usuário")}
           </h1>
-          <p className="text-sm mt-1 capitalize" style={{ color: "#94A3B8" }}>
+          <p className="mt-1 capitalize" style={{ color: "#94A3B8", fontSize: 13, fontWeight: 300, letterSpacing: "0.03em" }}>
             {todayStr}
           </p>
         </div>
@@ -172,20 +172,20 @@ const DashboardContent = () => {
             >
               <card.icon size={20} style={{ color: card.iconColor }} className="mb-3" />
               <p
-                className="text-xs font-medium mb-1"
-                style={{ color: "#94A3B8", letterSpacing: "0.06em" }}
+                className="mb-1"
+                style={{ color: "#94A3B8", fontSize: 11, fontWeight: 400, letterSpacing: "0.08em", textTransform: "uppercase" as const }}
               >
                 {card.label}
               </p>
               <p
-                className={`font-display font-bold truncate leading-tight ${
-                  card.isText ? "text-base" : "text-3xl md:text-[36px]"
+                className={`truncate leading-tight ${
+                  card.isText ? "text-base" : ""
                 }`}
-                style={{ color: "#0F172A" }}
+                style={{ color: "#0F172A", fontSize: card.isText ? 16 : 32, fontWeight: 300 }}
               >
                 {card.value}
               </p>
-              <p className="text-[13px] mt-0.5" style={{ color: "#94A3B8" }}>
+              <p className="mt-0.5" style={{ color: "#94A3B8", fontSize: 12, fontWeight: 300 }}>
                 {card.sub}
               </p>
             </div>
@@ -195,7 +195,7 @@ const DashboardContent = () => {
         {/* Por onde começar */}
         {todayTasks.length === 0 && (
           <section className="mb-10">
-            <h2 className="font-display text-lg font-bold mb-4" style={{ color: "#0F172A" }}>
+            <h2 className="font-display mb-4" style={{ color: "#0F172A", fontSize: 16, fontWeight: 500, letterSpacing: "0.01em" }}>
               Por onde começar
             </h2>
             <div className="grid md:grid-cols-3 gap-4">
@@ -228,13 +228,13 @@ const DashboardContent = () => {
                   >
                     {card.num}
                   </span>
-                  <h3 className="font-display text-base font-bold mt-2 mb-1" style={{ color: "#0F172A" }}>
+                  <h3 className="font-display mt-2 mb-1" style={{ color: "#0F172A", fontSize: 15, fontWeight: 500 }}>
                     {card.title}
                   </h3>
-                  <p className="text-sm mb-4" style={{ color: "#64748B" }}>
+                  <p className="mb-4" style={{ color: "#64748B", fontSize: 13, fontWeight: 300, lineHeight: 1.6 }}>
                     {card.desc}
                   </p>
-                  <span className="text-sm font-medium" style={{ color: "#1E3A5F" }}>
+                  <span style={{ color: "#1E3A5F", fontSize: 13, fontWeight: 400, letterSpacing: "0.02em" }}>
                     {card.cta}
                   </span>
                 </div>
@@ -245,7 +245,7 @@ const DashboardContent = () => {
 
         {/* Hoje */}
         <section className="mb-10">
-          <h2 className="font-display text-lg font-bold mb-4" style={{ color: "#0F172A" }}>
+          <h2 className="font-display mb-4" style={{ color: "#0F172A", fontSize: 16, fontWeight: 500, letterSpacing: "0.01em" }}>
             Hoje
           </h2>
 
@@ -347,7 +347,7 @@ const DashboardContent = () => {
 
         {/* Hábitos */}
         <section className="mb-10">
-          <h2 className="font-display text-lg font-bold mb-4" style={{ color: "#0F172A" }}>
+          <h2 className="font-display mb-4" style={{ color: "#0F172A", fontSize: 16, fontWeight: 500, letterSpacing: "0.01em" }}>
             Hábitos de hoje
           </h2>
           <div
