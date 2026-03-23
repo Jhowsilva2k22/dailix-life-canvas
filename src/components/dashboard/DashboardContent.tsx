@@ -3,6 +3,7 @@ import { CheckSquare, Flame, Target, TrendingUp, Plus } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
+import { toast } from "sonner";
 import AddTaskModal from "./AddTaskModal";
 
 interface Profile {
@@ -89,7 +90,6 @@ const DashboardContent = () => {
       setMaxStreak(best);
     }
 
-    // Fetch today's logs
     const { data: logs } = await supabase
       .from("habit_logs")
       .select("habit_id")
@@ -100,20 +100,49 @@ const DashboardContent = () => {
   }, [user]);
 
   const toggleTask = async (id: string, concluida: boolean) => {
-    await supabase.from("tasks").update({ concluida: !concluida }).eq("id", id);
+    // Optimistic
     setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, concluida: !concluida } : t)));
+    const { error } = await supabase.from("tasks").update({ concluida: !concluida }).eq("id", id);
+    if (error) {
+      setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, concluida } : t)));
+      toast.error("Algo deu errado. Tente novamente.");
+    }
   };
 
   const toggleHabit = async (habitId: string) => {
     if (!user) return;
     const isCompleted = completedHabitsToday.has(habitId);
+
+    // Optimistic
     if (isCompleted) {
-      await supabase.from("habit_logs").delete().eq("habit_id", habitId).eq("user_id", user.id).eq("data", today);
       setCompletedHabitsToday((prev) => { const s = new Set(prev); s.delete(habitId); return s; });
     } else {
-      await supabase.from("habit_logs").insert({ habit_id: habitId, user_id: user.id, data: today, concluido: true });
       setCompletedHabitsToday((prev) => new Set(prev).add(habitId));
     }
+
+    try {
+      if (isCompleted) {
+        const { error } = await supabase.from("habit_logs").delete().eq("habit_id", habitId).eq("user_id", user.id).eq("data", today);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("habit_logs").insert({ habit_id: habitId, user_id: user.id, data: today, concluido: true });
+        if (error) throw error;
+      }
+    } catch {
+      // Revert
+      if (isCompleted) {
+        setCompletedHabitsToday((prev) => new Set(prev).add(habitId));
+      } else {
+        setCompletedHabitsToday((prev) => { const s = new Set(prev); s.delete(habitId); return s; });
+      }
+      toast.error("Algo deu errado. Tente novamente.");
+    }
+  };
+
+  const handleTaskSaved = () => {
+    setShowTaskModal(false);
+    fetchTasks();
+    toast.success("Tarefa criada");
   };
 
   const todayStr = new Date().toLocaleDateString("pt-BR", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
@@ -302,7 +331,7 @@ const DashboardContent = () => {
       {showTaskModal && (
         <AddTaskModal
           onClose={() => setShowTaskModal(false)}
-          onSaved={() => { setShowTaskModal(false); fetchTasks(); }}
+          onSaved={handleTaskSaved}
         />
       )}
     </div>

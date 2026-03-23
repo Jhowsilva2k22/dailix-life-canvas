@@ -32,7 +32,6 @@ const GoalsTab = () => {
   const fetchGoals = async () => {
     if (!user) { setLoading(false); return; }
     try {
-      setLoading(true);
       const { data, error } = await supabase
         .from("goals")
         .select("*")
@@ -40,9 +39,8 @@ const GoalsTab = () => {
         .order("created_at", { ascending: false });
       if (error) throw error;
       setGoals((data as Goal[]) || []);
-    } catch (err) {
-      console.error("Erro ao buscar metas:", err);
-      toast.error("Erro ao carregar metas.");
+    } catch {
+      toast.error("Algo deu errado. Tente novamente.");
       setGoals([]);
     } finally {
       setLoading(false);
@@ -52,13 +50,23 @@ const GoalsTab = () => {
   useEffect(() => { fetchGoals(); }, [user]);
 
   const deleteGoal = async (id: string) => {
-    try {
-      await supabase.from("goals").delete().eq("id", id);
-      setGoals((prev) => prev.filter((g) => g.id !== id));
-      toast.success("Meta removida.");
-    } catch {
-      toast.error("Erro ao remover meta.");
+    const backup = goals;
+    setGoals((prev) => prev.filter((g) => g.id !== id));
+    toast.success("Removido");
+    const { error } = await supabase.from("goals").delete().eq("id", id);
+    if (error) {
+      setGoals(backup);
+      toast.error("Algo deu errado. Tente novamente.");
     }
+  };
+
+  const handleSaved = (savedGoal: Goal, isEdit: boolean) => {
+    if (isEdit) {
+      setGoals((prev) => prev.map((g) => (g.id === savedGoal.id ? savedGoal : g)));
+    } else {
+      setGoals((prev) => [savedGoal, ...prev]);
+    }
+    setShowModal(false);
   };
 
   if (loading) {
@@ -154,7 +162,7 @@ const GoalsTab = () => {
         <GoalModal
           goal={editing}
           onClose={() => setShowModal(false)}
-          onSaved={() => { setShowModal(false); fetchGoals(); }}
+          onSaved={handleSaved}
         />
       )}
     </div>
@@ -165,7 +173,7 @@ const GoalsTab = () => {
 interface GoalModalProps {
   goal: Goal | null;
   onClose: () => void;
-  onSaved: () => void;
+  onSaved: (goal: Goal, isEdit: boolean) => void;
 }
 
 const GoalModal = ({ goal, onClose, onSaved }: GoalModalProps) => {
@@ -192,17 +200,16 @@ const GoalModal = ({ goal, onClose, onSaved }: GoalModalProps) => {
       if (goal) {
         const { error } = await supabase.from("goals").update(payload).eq("id", goal.id);
         if (error) throw error;
+        toast.success("Meta salva");
+        onSaved({ ...goal, ...payload }, true);
       } else {
-        const { error } = await supabase.from("goals").insert({ ...payload, user_id: user.id });
+        const { data, error } = await supabase.from("goals").insert({ ...payload, user_id: user.id }).select().single();
         if (error) throw error;
+        toast.success("Meta criada");
+        onSaved(data as Goal, false);
       }
-
-      toast.success(goal ? "Meta atualizada." : "Meta criada.");
-      onSaved();
-    } catch (err) {
-      console.error("Erro ao salvar meta:", err);
-      toast.error("Erro ao salvar meta.");
-    } finally {
+    } catch {
+      toast.error("Algo deu errado. Tente novamente.");
       setSaving(false);
     }
   };

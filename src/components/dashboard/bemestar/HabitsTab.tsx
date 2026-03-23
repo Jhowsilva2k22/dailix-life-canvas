@@ -32,27 +32,33 @@ const HabitsTab = () => {
 
   const fetchHabits = useCallback(async () => {
     if (!user) return;
-    const { data } = await supabase
-      .from("habits")
-      .select("*")
-      .eq("user_id", user.id)
-      .eq("ativo", true)
-      .order("created_at", { ascending: false });
-    if (data) setHabits(data as Habit[]);
+    try {
+      const { data, error } = await supabase
+        .from("habits")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("ativo", true)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      if (data) setHabits(data as Habit[]);
+    } catch {
+      toast.error("Algo deu errado. Tente novamente.");
+    }
   }, [user]);
 
   const fetchTodayLogs = useCallback(async () => {
     if (!user) return;
-    const { data } = await supabase
-      .from("habit_logs")
-      .select("habit_id")
-      .eq("user_id", user.id)
-      .eq("data", today)
-      .eq("concluido", true);
-    if (data) setCompletedToday(new Set(data.map((l: any) => l.habit_id)));
+    try {
+      const { data } = await supabase
+        .from("habit_logs")
+        .select("habit_id")
+        .eq("user_id", user.id)
+        .eq("data", today)
+        .eq("concluido", true);
+      if (data) setCompletedToday(new Set(data.map((l: any) => l.habit_id)));
+    } catch { /* silent */ }
   }, [user, today]);
 
-  // Calculate streak for a habit
   const calcStreak = useCallback(async (habitId: string): Promise<number> => {
     if (!user) return 0;
     const { data } = await supabase
@@ -74,7 +80,6 @@ const HabitsTab = () => {
       } else if (i > 0) {
         break;
       } else {
-        // Today not done yet, check from yesterday
         d.setDate(d.getDate() - 1);
         continue;
       }
@@ -103,19 +108,47 @@ const HabitsTab = () => {
     if (!user) return;
     const isCompleted = completedToday.has(habitId);
 
+    // Optimistic
     if (isCompleted) {
-      await supabase.from("habit_logs").delete().eq("habit_id", habitId).eq("user_id", user.id).eq("data", today);
       setCompletedToday((prev) => { const s = new Set(prev); s.delete(habitId); return s; });
     } else {
-      await supabase.from("habit_logs").insert({ habit_id: habitId, user_id: user.id, data: today, concluido: true });
       setCompletedToday((prev) => new Set(prev).add(habitId));
+    }
+
+    try {
+      if (isCompleted) {
+        const { error } = await supabase.from("habit_logs").delete().eq("habit_id", habitId).eq("user_id", user.id).eq("data", today);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("habit_logs").insert({ habit_id: habitId, user_id: user.id, data: today, concluido: true });
+        if (error) throw error;
+      }
+    } catch {
+      // Revert
+      if (isCompleted) {
+        setCompletedToday((prev) => new Set(prev).add(habitId));
+      } else {
+        setCompletedToday((prev) => { const s = new Set(prev); s.delete(habitId); return s; });
+      }
+      toast.error("Algo deu errado. Tente novamente.");
     }
   };
 
   const deleteHabit = async (id: string) => {
-    await supabase.from("habits").delete().eq("id", id);
+    const backup = habits;
     setHabits((prev) => prev.filter((h) => h.id !== id));
-    toast.success("Habito removido.");
+    toast.success("Removido");
+    const { error } = await supabase.from("habits").delete().eq("id", id);
+    if (error) {
+      setHabits(backup);
+      toast.error("Algo deu errado. Tente novamente.");
+    }
+  };
+
+  const handleHabitSaved = () => {
+    setShowModal(false);
+    fetchHabits();
+    toast.success("Habito criado");
   };
 
   return (
@@ -195,7 +228,7 @@ const HabitsTab = () => {
       {showModal && (
         <HabitModal
           onClose={() => setShowModal(false)}
-          onSaved={() => { setShowModal(false); fetchHabits(); }}
+          onSaved={handleHabitSaved}
         />
       )}
     </div>
@@ -227,15 +260,20 @@ const HabitModal = ({ onClose, onSaved }: HabitModalProps) => {
   const handleSave = async () => {
     if (!titulo.trim() || !user) return;
     setSaving(true);
-    await supabase.from("habits").insert({
-      user_id: user.id,
-      titulo: titulo.trim(),
-      descricao: descricao.trim() || null,
-      categoria,
-      frequencia,
-    });
-    toast.success("Habito criado.");
-    onSaved();
+    try {
+      const { error } = await supabase.from("habits").insert({
+        user_id: user.id,
+        titulo: titulo.trim(),
+        descricao: descricao.trim() || null,
+        categoria,
+        frequencia,
+      });
+      if (error) throw error;
+      onSaved();
+    } catch {
+      toast.error("Algo deu errado. Tente novamente.");
+      setSaving(false);
+    }
   };
 
   return (
