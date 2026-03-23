@@ -177,7 +177,7 @@ const HeroSection = () => {
 
           {/* Right column — Mockup */}
           <div
-            className={`hidden lg:block transition-all duration-1000 delay-300 ${
+            className={`hidden md:block transition-all duration-1000 delay-300 ${
               visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
             }`}
           >
