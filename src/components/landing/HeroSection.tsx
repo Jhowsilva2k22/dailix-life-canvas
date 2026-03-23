@@ -1,5 +1,6 @@
 import { Check, ArrowRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const benefits = [
   "Tarefas, metas e habitos em um so lugar",
@@ -11,6 +12,7 @@ const benefits = [
 const HeroSection = () => {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 100);
@@ -133,6 +135,7 @@ const HeroSection = () => {
               }`}
             >
               <button
+                onClick={() => navigate("/cadastro")}
                 className="inline-flex items-center gap-2 px-7 py-3.5 text-sm font-semibold text-white rounded-[10px] transition-all duration-200 active:scale-[0.97]"
                 style={{
                   background: "linear-gradient(135deg, #1E3A5F, #00B4D8)",

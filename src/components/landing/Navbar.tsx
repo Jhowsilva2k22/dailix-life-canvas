@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Menu, X, LayoutDashboard } from "lucide-react";
 
 const navLinks = [
@@ -8,6 +9,7 @@ const navLinks = [
 
 const Navbar = () => {
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <nav
@@ -43,6 +45,7 @@ const Navbar = () => {
 
         <div className="hidden md:flex items-center gap-3">
           <button
+            onClick={() => navigate("/login")}
             className="px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-200"
             style={{ color: "#64748B" }}
             onMouseEnter={(e) => {
@@ -57,6 +60,7 @@ const Navbar = () => {
             Entrar
           </button>
           <button
+            onClick={() => navigate("/cadastro")}
             className="px-5 py-2 text-sm font-semibold text-white rounded-[10px] transition-all duration-200 active:scale-[0.97]"
             style={{
               background: "linear-gradient(135deg, #1E3A5F, #00B4D8)",
@@ -105,10 +109,11 @@ const Navbar = () => {
               </a>
             ))}
             <div className="flex flex-col gap-2 pt-2" style={{ borderTop: "1px solid rgba(0,0,0,0.06)" }}>
-              <button className="py-2 text-sm font-medium" style={{ color: "#64748B" }}>
+              <button onClick={() => { setOpen(false); navigate("/login"); }} className="py-2 text-sm font-medium" style={{ color: "#64748B" }}>
                 Entrar
               </button>
               <button
+                onClick={() => { setOpen(false); navigate("/cadastro"); }}
                 className="py-2.5 text-sm font-semibold text-white rounded-[10px]"
                 style={{
                   background: "linear-gradient(135deg, #1E3A5F, #00B4D8)",
