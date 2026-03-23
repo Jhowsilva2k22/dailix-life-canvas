@@ -1,24 +1,23 @@
-import { Target, Users, Briefcase, Heart } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 const features = [
   {
-    icon: Target,
+    num: "01",
     title: "Produtividade",
     desc: "Tarefas, metas semanais e habitos diarios com acompanhamento visual do seu progresso.",
   },
   {
-    icon: Users,
+    num: "02",
     title: "Familia",
     desc: "Organize eventos, compromissos e decisoes familiares em um espaco compartilhado.",
   },
   {
-    icon: Briefcase,
+    num: "03",
     title: "Negocios",
     desc: "Projetos, financas e objetivos profissionais com visao clara de resultados.",
   },
   {
-    icon: Heart,
+    num: "04",
     title: "Bem-estar",
     desc: "Acompanhe sono, exercicios e saude mental com metricas que fazem sentido.",
   },
@@ -88,8 +87,10 @@ const FeaturesSection = () => {
                   "0 4px 24px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.8)";
               }}
             >
-              <f.icon style={{ color: "#00B4D8", width: 28, height: 28, marginBottom: 16 }} />
-              <h3 className="font-display text-xl font-bold mb-2" style={{ color: "#0F172A" }}>
+              <span style={{ fontSize: 11, letterSpacing: "0.1em", color: "#00B4D8", fontWeight: 500 }}>
+                {f.num}
+              </span>
+              <h3 className="font-display text-xl font-bold mb-2 mt-2" style={{ color: "#0F172A" }}>
                 {f.title}
               </h3>
               <p style={{ fontSize: 15, color: "#64748B", lineHeight: 1.6 }}>{f.desc}</p>
