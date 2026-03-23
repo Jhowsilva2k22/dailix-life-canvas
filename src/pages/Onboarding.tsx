@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { ArrowRight, ArrowLeft } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -21,6 +22,7 @@ const Onboarding = () => {
   const [firstGoal, setFirstGoal] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [checkingOnboarding, setCheckingOnboarding] = useState(true);
+  const [exiting, setExiting] = useState(false);
 
   useEffect(() => {
     if (!session) {
@@ -71,7 +73,8 @@ const Onboarding = () => {
       console.error(error);
     } else {
       localStorage.removeItem("dailix_welcome_shown");
-      navigate("/dashboard");
+      setExiting(true);
+      setTimeout(() => navigate("/dashboard"), 600);
     }
     setSubmitting(false);
   };
@@ -79,7 +82,13 @@ const Onboarding = () => {
   const progressSegments = [1, 2, 3];
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: "#0F172A" }}>
+    <motion.div
+      className="min-h-screen flex flex-col"
+      style={{ background: "#0F172A" }}
+      initial={{ opacity: 1 }}
+      animate={{ opacity: exiting ? 0 : 1 }}
+      transition={{ duration: 0.6 }}
+    >
       {/* Navbar */}
       <header className="flex items-center justify-between px-6 h-14 flex-shrink-0">
         <span className="font-display text-lg font-bold text-white tracking-tight">Dailix</span>
@@ -299,7 +308,7 @@ const Onboarding = () => {
           )}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
