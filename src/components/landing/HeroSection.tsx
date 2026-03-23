@@ -7,12 +7,6 @@ const benefits = [
   "Insights educacionais integrados",
 ];
 
-const mockupCards = [
-  { icon: Target, label: "Foco", progress: 75 },
-  { icon: Users, label: "Familia", progress: 60 },
-  { icon: Briefcase, label: "Negocios", progress: 45 },
-  { icon: Heart, label: "Bem-estar", progress: 80 },
-];
 
 const HeroSection = () => {
   const ref = useRef<HTMLDivElement>(null);
