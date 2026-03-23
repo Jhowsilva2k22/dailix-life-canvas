@@ -245,7 +245,7 @@ const DashboardContent = () => {
 
         {/* Hoje */}
         <section className="mb-10">
-          <h2 className="font-display text-lg font-bold mb-4" style={{ color: "#0F172A" }}>
+          <h2 className="font-display mb-4" style={{ color: "#0F172A", fontSize: 16, fontWeight: 500, letterSpacing: "0.01em" }}>
             Hoje
           </h2>
 
