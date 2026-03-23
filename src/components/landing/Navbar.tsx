@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Menu, X, LayoutDashboard } from "lucide-react";
 
 const navLinks = [
