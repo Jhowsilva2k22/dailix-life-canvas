@@ -111,7 +111,7 @@ const AvatarUploadModal = ({ onClose }: AvatarUploadModalProps) => {
           background: "#FFFFFF",
           borderRadius: 16,
           border: "1px solid #E2E8F0",
-          boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
         }}
         onClick={(e) => e.stopPropagation()}
       >

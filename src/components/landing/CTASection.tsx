@@ -36,7 +36,13 @@ const CTASection = () => {
             </p>
             <button
               onClick={() => navigate("/cadastro")}
-              className="inline-flex items-center gap-2 px-7 py-3.5 text-sm font-semibold rounded-[10px] transition-all duration-200 active:scale-[0.97]"
+              className="inline-flex items-center gap-2 px-7 py-3.5 text-sm rounded-[10px] transition-all duration-200 active:scale-[0.97]"
+              style={{
+                background: "#fff",
+                color: "#1E3A5F",
+                fontWeight: 400,
+                letterSpacing: "0.02em",
+              }}
               style={{
                 background: "#fff",
                 color: "#1E3A5F",

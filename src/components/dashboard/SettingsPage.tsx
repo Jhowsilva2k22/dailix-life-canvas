@@ -53,7 +53,7 @@ const SettingsPage = () => {
 
         {/* Plan section */}
         <div className="p-8 mb-6" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 16 }}>
-          <h2 className="font-display text-base font-bold mb-4" style={{ color: "#0F172A" }}>
+          <h2 className="font-display text-base mb-4" style={{ color: "#0F172A", fontWeight: 400 }}>
             Plano atual
           </h2>
           <div className="flex items-center gap-3 mb-3">

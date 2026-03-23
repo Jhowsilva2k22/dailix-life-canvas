@@ -55,7 +55,7 @@ const AddTaskModal = ({ onClose, onSaved }: AddTaskModalProps) => {
         className="w-full max-w-md rounded-2xl p-6"
         style={{
           background: "#FFFFFF",
-          boxShadow: "0 20px 60px rgba(0,0,0,0.15)",
+          boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
         }}
         onClick={(e) => e.stopPropagation()}
       >

@@ -162,7 +162,14 @@ const HeroSection = () => {
                 <ArrowRight className="h-4 w-4" />
               </button>
               <button
-                className="px-7 py-3.5 text-sm font-semibold rounded-[10px] transition-all duration-200 active:scale-[0.97]"
+                className="px-7 py-3.5 text-sm rounded-[10px] transition-all duration-200 active:scale-[0.97]"
+                style={{
+                  border: "1.5px solid #1E3A5F",
+                  color: "#1E3A5F",
+                  background: "transparent",
+                  fontWeight: 400,
+                  letterSpacing: "0.02em",
+                }}
                 style={{
                   border: "1.5px solid #1E3A5F",
                   color: "#1E3A5F",
