@@ -76,7 +76,7 @@ const HeroSection = () => {
 
       {/* Content */}
       <div className="container relative z-10">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+        <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
           {/* Left column */}
           <div className="flex flex-col gap-6">
             {/* Badge */}
