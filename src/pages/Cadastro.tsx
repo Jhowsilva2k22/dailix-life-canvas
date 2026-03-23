@@ -18,8 +18,27 @@ const Cadastro = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
-  if (loading) return null;
-  if (session) return <Navigate to="/dashboard" replace />;
+  const [redirectChecked, setRedirectChecked] = useState(false);
+  const [redirectTo, setRedirectTo] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (loading || !session) {
+      setRedirectChecked(true);
+      return;
+    }
+    supabase
+      .from("profiles")
+      .select("onboarding_completed")
+      .eq("user_id", session.user.id)
+      .single()
+      .then(({ data }) => {
+        setRedirectTo(data?.onboarding_completed ? "/dashboard" : "/welcome");
+        setRedirectChecked(true);
+      });
+  }, [session, loading]);
+
+  if (!redirectChecked || loading) return null;
+  if (redirectTo) return <Navigate to={redirectTo} replace />;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
