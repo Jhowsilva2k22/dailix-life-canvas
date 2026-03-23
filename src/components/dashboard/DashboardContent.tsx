@@ -228,13 +228,13 @@ const DashboardContent = () => {
                   >
                     {card.num}
                   </span>
-                  <h3 className="font-display text-base font-bold mt-2 mb-1" style={{ color: "#0F172A" }}>
+                  <h3 className="font-display mt-2 mb-1" style={{ color: "#0F172A", fontSize: 15, fontWeight: 500 }}>
                     {card.title}
                   </h3>
-                  <p className="text-sm mb-4" style={{ color: "#64748B" }}>
+                  <p className="mb-4" style={{ color: "#64748B", fontSize: 13, fontWeight: 300, lineHeight: 1.6 }}>
                     {card.desc}
                   </p>
-                  <span className="text-sm font-medium" style={{ color: "#1E3A5F" }}>
+                  <span style={{ color: "#1E3A5F", fontSize: 13, fontWeight: 400, letterSpacing: "0.02em" }}>
                     {card.cta}
                   </span>
                 </div>
