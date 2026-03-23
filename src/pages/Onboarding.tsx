@@ -74,7 +74,8 @@ const Onboarding = () => {
       toast.error("Erro ao salvar. Tente novamente.");
       console.error(error);
     } else {
-      navigate("/dashboard");
+      localStorage.removeItem("dailix_welcome_shown");
+      navigate("/welcome");
     }
     setSubmitting(false);
   };

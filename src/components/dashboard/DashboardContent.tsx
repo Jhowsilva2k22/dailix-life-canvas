@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CheckSquare, Flame, TrendingUp, BookOpen, Plus } from "lucide-react";
+import { CheckSquare, Flame, Target, TrendingUp, Plus } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import AddTaskModal from "./AddTaskModal";
@@ -7,6 +7,7 @@ import AddTaskModal from "./AddTaskModal";
 interface Profile {
   display_name: string | null;
   first_goal: string | null;
+  modules: string[] | null;
 }
 
 interface Task {
@@ -18,9 +19,16 @@ interface Task {
   concluida: boolean;
 }
 
+const getGreeting = (name: string) => {
+  const hour = new Date().getHours();
+  if (hour >= 5 && hour < 12) return `Bom dia, ${name}.`;
+  if (hour >= 12 && hour < 18) return `Boa tarde, ${name}.`;
+  return `Boa noite, ${name}.`;
+};
+
 const DashboardContent = () => {
   const { user } = useAuth();
-  const [profile, setProfile] = useState<Profile>({ display_name: null, first_goal: null });
+  const [profile, setProfile] = useState<Profile>({ display_name: null, first_goal: null, modules: null });
   const [tasks, setTasks] = useState<Task[]>([]);
   const [showTaskModal, setShowTaskModal] = useState(false);
 
@@ -28,19 +36,17 @@ const DashboardContent = () => {
     if (!user) return;
     supabase
       .from("profiles")
-      .select("display_name, first_goal")
+      .select("display_name, first_goal, modules")
       .eq("user_id", user.id)
       .single()
       .then(({ data }) => {
         if (data) setProfile(data);
       });
-
     fetchTasks();
   }, [user]);
 
   const fetchTasks = async () => {
     if (!user) return;
-    const today = new Date().toISOString().split("T")[0];
     const { data } = await supabase
       .from("tasks")
       .select("*")
@@ -66,38 +72,52 @@ const DashboardContent = () => {
     return t.prazo === new Date().toISOString().split("T")[0];
   });
 
-  const completedToday = todayTasks.filter((t) => t.concluida).length;
+  const pendingToday = todayTasks.filter((t) => !t.concluida).length;
+  const goalText = profile.first_goal
+    ? profile.first_goal.length > 30
+      ? profile.first_goal.slice(0, 30) + "…"
+      : profile.first_goal
+    : "Nenhuma";
+  const modulesCount = profile.modules?.length || 0;
 
   const summaryCards = [
     {
       icon: CheckSquare,
+      iconColor: "#00B4D8",
       label: "Tarefas hoje",
-      value: String(todayTasks.length),
+      value: String(pendingToday),
+      sub: "pendentes",
     },
     {
       icon: Flame,
+      iconColor: "#F59E0B",
       label: "Sequência",
-      value: "0 dias",
+      value: "0",
+      sub: "dias seguidos",
+    },
+    {
+      icon: Target,
+      iconColor: "#00B4D8",
+      label: "Meta do mês",
+      value: goalText,
+      sub: "definida por você",
     },
     {
       icon: TrendingUp,
-      label: "Meta do mês",
-      value: profile.first_goal || "Nenhuma definida",
-    },
-    {
-      icon: BookOpen,
-      label: "Último conteúdo",
-      value: "Nenhum ainda",
+      iconColor: "#10B981",
+      label: "Módulos ativos",
+      value: String(modulesCount),
+      sub: "áreas organizadas",
     },
   ];
 
   return (
     <div className="flex-1 min-h-screen md:ml-[240px]" style={{ background: "#F8FAFC" }}>
-      <div className="max-w-5xl mx-auto px-4 md:px-8 pt-20 md:pt-10 pb-24 md:pb-10">
+      <div className="max-w-5xl mx-auto px-4 md:px-8 pt-20 md:pt-8 pb-24 md:pb-10">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="font-display text-2xl md:text-[28px] font-bold" style={{ color: "#0F172A" }}>
-            Olá, {profile.display_name || "Usuário"}.
+          <h1 className="font-display text-2xl md:text-[32px] font-bold" style={{ color: "#0F172A" }}>
+            {getGreeting(profile.display_name || "Usuário")}
           </h1>
           <p className="text-sm mt-1 capitalize" style={{ color: "#64748B" }}>
             {todayStr}
@@ -109,49 +129,48 @@ const DashboardContent = () => {
           {summaryCards.map((card) => (
             <div
               key={card.label}
-              className="p-4 rounded-xl"
+              className="p-5 rounded-xl"
               style={{
                 background: "#FFFFFF",
                 border: "1px solid #E2E8F0",
-                boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
+                boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
               }}
             >
-              <card.icon size={20} style={{ color: "#00B4D8" }} className="mb-3" />
+              <card.icon size={20} style={{ color: card.iconColor }} className="mb-3" />
               <p className="text-xs font-medium mb-1" style={{ color: "#64748B" }}>
                 {card.label}
               </p>
-              <p className="font-display text-lg font-bold truncate" style={{ color: "#0F172A" }}>
+              <p className="font-display text-2xl md:text-[32px] font-bold truncate leading-tight" style={{ color: "#0F172A" }}>
                 {card.value}
+              </p>
+              <p className="text-[11px] mt-0.5" style={{ color: "#94A3B8" }}>
+                {card.sub}
               </p>
             </div>
           ))}
         </div>
 
-        {/* Tarefas de hoje */}
+        {/* Hoje */}
         <section className="mb-10">
-          <h2 className="font-display text-lg font-bold mb-4" style={{ color: "#0F172A" }}>
-            Tarefas de hoje
+          <h2 className="font-display text-xl font-bold mb-4" style={{ color: "#0F172A" }}>
+            Hoje
           </h2>
 
           {todayTasks.length === 0 ? (
             <div
-              className="flex flex-col items-center justify-center py-12 rounded-xl"
+              className="flex flex-col items-center justify-center py-8 rounded-xl"
               style={{
-                background: "#FFFFFF",
-                border: "1px solid #E2E8F0",
+                background: "rgba(0,180,216,0.03)",
+                border: "1px dashed rgba(0,180,216,0.2)",
               }}
             >
-              <CheckSquare size={40} style={{ color: "rgba(0,0,0,0.15)" }} className="mb-3" />
               <p className="text-sm font-medium" style={{ color: "#0F172A" }}>
-                Nenhuma tarefa para hoje.
-              </p>
-              <p className="text-xs mt-1 mb-4" style={{ color: "#64748B" }}>
-                Adicione sua primeira tarefa.
+                Nenhuma tarefa para hoje ainda.
               </p>
               <button
                 onClick={() => setShowTaskModal(true)}
-                className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg text-white transition-colors"
-                style={{ background: "#00B4D8" }}
+                className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg transition-colors mt-3"
+                style={{ color: "#00B4D8" }}
               >
                 <Plus size={16} />
                 Adicionar tarefa
@@ -231,23 +250,23 @@ const DashboardContent = () => {
           )}
         </section>
 
-        {/* Hábitos de hoje */}
+        {/* Hábitos */}
         <section>
-          <h2 className="font-display text-lg font-bold mb-4" style={{ color: "#0F172A" }}>
+          <h2 className="font-display text-xl font-bold mb-4" style={{ color: "#0F172A" }}>
             Hábitos de hoje
           </h2>
           <div
-            className="flex flex-col items-center justify-center py-12 rounded-xl"
+            className="flex flex-col items-center justify-center py-8 rounded-xl"
             style={{
-              background: "#FFFFFF",
-              border: "1px solid #E2E8F0",
+              background: "rgba(0,180,216,0.03)",
+              border: "1px dashed rgba(0,180,216,0.2)",
             }}
           >
             <p className="text-sm font-medium" style={{ color: "#0F172A" }}>
               Nenhum hábito configurado.
             </p>
             <button
-              className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg transition-colors mt-4"
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg transition-colors mt-3"
               style={{ color: "#00B4D8" }}
             >
               <Plus size={16} />

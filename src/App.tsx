@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import Cadastro from "./pages/Cadastro";
 import Onboarding from "./pages/Onboarding";
 import Dashboard from "./pages/Dashboard";
+import Welcome from "./pages/Welcome";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,14 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Onboarding />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/welcome"
+              element={
+                <ProtectedRoute>
+                  <Welcome />
                 </ProtectedRoute>
               }
             />
