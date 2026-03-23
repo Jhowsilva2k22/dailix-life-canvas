@@ -172,20 +172,20 @@ const DashboardContent = () => {
             >
               <card.icon size={20} style={{ color: card.iconColor }} className="mb-3" />
               <p
-                className="text-xs font-medium mb-1"
-                style={{ color: "#94A3B8", letterSpacing: "0.06em" }}
+                className="mb-1"
+                style={{ color: "#94A3B8", fontSize: 11, fontWeight: 400, letterSpacing: "0.08em", textTransform: "uppercase" as const }}
               >
                 {card.label}
               </p>
               <p
-                className={`font-display font-bold truncate leading-tight ${
-                  card.isText ? "text-base" : "text-3xl md:text-[36px]"
+                className={`truncate leading-tight ${
+                  card.isText ? "text-base" : ""
                 }`}
-                style={{ color: "#0F172A" }}
+                style={{ color: "#0F172A", fontSize: card.isText ? 16 : 32, fontWeight: 300 }}
               >
                 {card.value}
               </p>
-              <p className="text-[13px] mt-0.5" style={{ color: "#94A3B8" }}>
+              <p className="mt-0.5" style={{ color: "#94A3B8", fontSize: 12, fontWeight: 300 }}>
                 {card.sub}
               </p>
             </div>
