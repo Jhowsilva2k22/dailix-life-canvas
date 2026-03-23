@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 const CTASection = () => {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const observer = new IntersectionObserver(
