@@ -141,10 +141,10 @@ const DashboardContent = () => {
       <div style={{ maxWidth: 1200 }} className="mx-auto px-4 md:px-8 pt-20 md:pt-8 pb-24 md:pb-10">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="font-display text-2xl md:text-[30px] font-bold" style={{ color: "#0F172A" }}>
+          <h1 className="font-display text-[28px]" style={{ color: "#0F172A", fontWeight: 500 }}>
             {getGreeting(profile.display_name || "Usuário")}
           </h1>
-          <p className="text-sm mt-1 capitalize" style={{ color: "#94A3B8" }}>
+          <p className="mt-1 capitalize" style={{ color: "#94A3B8", fontSize: 13, fontWeight: 300, letterSpacing: "0.03em" }}>
             {todayStr}
           </p>
         </div>
