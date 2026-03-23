@@ -136,19 +136,6 @@ const PricingSection = () => {
                         background: "transparent",
                       }),
                 }}
-                style={
-                  p.highlight
-                    ? {
-                        background: "linear-gradient(135deg, #1E3A5F, #00B4D8)",
-                        color: "#fff",
-                        boxShadow: "0 4px 16px rgba(0,180,216,0.3)",
-                      }
-                    : {
-                        border: "1.5px solid #1E3A5F",
-                        color: "#1E3A5F",
-                        background: "transparent",
-                      }
-                }
                 onMouseEnter={(e) => {
                   if (p.highlight) {
                     e.currentTarget.style.boxShadow = "0 8px 28px rgba(0,180,216,0.45)";

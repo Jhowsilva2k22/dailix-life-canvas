@@ -164,11 +164,6 @@ const HeroSection = () => {
                   fontWeight: 400,
                   letterSpacing: "0.02em",
                 }}
-                style={{
-                  border: "1.5px solid #1E3A5F",
-                  color: "#1E3A5F",
-                  background: "transparent",
-                }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.background = "rgba(30,58,95,0.04)";
                 }}

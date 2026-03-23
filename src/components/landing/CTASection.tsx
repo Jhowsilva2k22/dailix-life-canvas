@@ -43,10 +43,6 @@ const CTASection = () => {
                 fontWeight: 400,
                 letterSpacing: "0.02em",
               }}
-              style={{
-                background: "#fff",
-                color: "#1E3A5F",
-              }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.boxShadow = "0 8px 32px rgba(255,255,255,0.25)";
                 e.currentTarget.style.transform = "translateY(-1px)";

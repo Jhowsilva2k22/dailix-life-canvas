@@ -161,10 +161,6 @@ const Cadastro = () => {
               background: "linear-gradient(135deg, #1E3A5F, #00B4D8)",
               boxShadow: "0 4px 16px rgba(0,180,216,0.3)",
             }}
-            style={{
-              background: "linear-gradient(135deg, #1E3A5F, #00B4D8)",
-              boxShadow: "0 4px 16px rgba(0,180,216,0.3)",
-            }}
           >
             {submitting ? "Criando conta..." : "Criar conta"}
           </button>
