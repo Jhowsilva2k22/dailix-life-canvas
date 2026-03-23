@@ -251,7 +251,7 @@ const DashboardContent = () => {
         </section>
 
         {/* Hábitos */}
-        <section>
+        <section className="mb-10">
           <h2 className="font-display text-xl font-bold mb-4" style={{ color: "#0F172A" }}>
             Hábitos de hoje
           </h2>
@@ -274,6 +274,72 @@ const DashboardContent = () => {
             </button>
           </div>
         </section>
+
+        {/* Por onde começar — só aparece quando tudo vazio */}
+        {todayTasks.length === 0 && (
+          <section>
+            <h2 className="font-display text-xl font-bold mb-4" style={{ color: "#0F172A" }}>
+              Por onde começar
+            </h2>
+            <div className="grid md:grid-cols-3 gap-4">
+              {[
+                {
+                  icon: Target,
+                  title: "Defina sua primeira tarefa",
+                  desc: "Pequenos passos constroem grandes resultados.",
+                  cta: "Criar tarefa",
+                  action: () => setShowTaskModal(true),
+                },
+                {
+                  icon: Repeat,
+                  title: "Crie um hábito",
+                  desc: "Consistência é mais poderosa que intensidade.",
+                  cta: "Criar hábito",
+                  action: () => {},
+                },
+                {
+                  icon: Play,
+                  title: "Assista um vídeo",
+                  desc: "Conteúdo selecionado para te ajudar a evoluir.",
+                  cta: "Ver conteúdo",
+                  action: () => {},
+                },
+              ].map((card) => (
+                <div
+                  key={card.title}
+                  className="p-6 rounded-xl transition-all duration-200 cursor-pointer"
+                  style={{
+                    background: "#FFFFFF",
+                    border: "1px solid #E2E8F0",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                    e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.08)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                >
+                  <card.icon size={24} style={{ color: "#00B4D8" }} className="mb-3" />
+                  <h3 className="font-display text-base font-bold mb-1" style={{ color: "#0F172A" }}>
+                    {card.title}
+                  </h3>
+                  <p className="text-sm mb-4" style={{ color: "#64748B" }}>
+                    {card.desc}
+                  </p>
+                  <button
+                    onClick={card.action}
+                    className="text-sm font-medium transition-colors"
+                    style={{ color: "#00B4D8" }}
+                  >
+                    {card.cta}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
       </div>
 
       {showTaskModal && (
