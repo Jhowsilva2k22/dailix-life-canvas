@@ -66,10 +66,10 @@ const Cadastro = () => {
         }}
       >
         <h1 className="font-display text-2xl font-bold" style={{ color: "#0F172A" }}>
-          Criar sua conta
+          Seu espaço começa aqui.
         </h1>
         <p className="text-sm mt-1 mb-8" style={{ color: "#64748B" }}>
-          Comece gratis. Sem cartao.
+          Organização, foco e bem-estar — tudo em um só lugar. Grátis para começar.
         </p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
