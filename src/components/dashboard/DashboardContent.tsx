@@ -189,15 +189,18 @@ const DashboardContent = () => {
   });
 
   const pendingToday = todayTasks.filter((t) => !t.concluida).length;
-  const goalText = profile.first_goal
-    ? profile.first_goal.length > 28 ? profile.first_goal.slice(0, 28) + "..." : profile.first_goal
-    : "Nenhuma";
+  const goalTitle = activeGoal
+    ? activeGoal.titulo.length > 28 ? activeGoal.titulo.slice(0, 28) + "..." : activeGoal.titulo
+    : profile.first_goal
+      ? profile.first_goal.length > 28 ? profile.first_goal.slice(0, 28) + "..." : profile.first_goal
+      : "Nenhuma";
+  const goalProgress = activeGoal?.progresso ?? 0;
   const modulesCount = profile.modules?.length || 0;
 
   const summaryCards = [
     { icon: CheckSquare, iconColor: "#00B4D8", label: "TAREFAS HOJE", value: String(pendingToday), sub: "pendentes" },
     { icon: Flame, iconColor: "#F59E0B", label: "SEQUENCIA", value: String(maxStreak), sub: "dias seguidos" },
-    { icon: Target, iconColor: "#00B4D8", label: "META DO MES", value: goalText, isText: true, sub: "definida por voce" },
+    { icon: Target, iconColor: "#00B4D8", label: "META ATIVA", value: goalTitle, isText: true, sub: `${goalProgress}% concluido`, hasProgress: true, progress: goalProgress },
     { icon: TrendingUp, iconColor: "#10B981", label: "MODULOS ATIVOS", value: String(modulesCount), sub: "areas organizadas" },
   ];
 
