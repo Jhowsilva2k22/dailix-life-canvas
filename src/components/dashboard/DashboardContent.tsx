@@ -370,37 +370,49 @@ const DashboardContent = () => {
                 <Plus size={16} /> Adicionar tarefa
               </button>
             </div>
-          ) : (
-            <div className="space-y-2">
-              {todayTasks.map((task) => (
-                <div key={task.id} className="flex items-center gap-3 p-4" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 12 }}>
-                  <button
-                    onClick={() => toggleTask(task.id, task.concluida)}
-                    className="w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors"
-                    style={{ borderColor: task.concluida ? "#00B4D8" : "#CBD5E1", background: task.concluida ? "#00B4D8" : "transparent" }}
-                  >
-                    {task.concluida && (
-                      <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                    )}
-                  </button>
-                  <div className="flex-1 min-w-0">
-                    <p style={{ color: task.concluida ? "#94A3B8" : "#0F172A", textDecoration: task.concluida ? "line-through" : "none", fontSize: 14, fontWeight: 400 }}>{task.titulo}</p>
-                    {task.descricao && <p className="truncate mt-0.5" style={{ color: "#94A3B8", fontSize: 12, fontWeight: 300 }}>{task.descricao}</p>}
-                  </div>
-                  <span className="px-2 py-0.5 rounded-full" style={{
-                    fontSize: 10, fontWeight: 400,
-                    background: task.prioridade === "alta" ? "rgba(239,68,68,0.1)" : task.prioridade === "baixa" ? "rgba(34,197,94,0.1)" : "rgba(245,158,11,0.1)",
-                    color: task.prioridade === "alta" ? "#EF4444" : task.prioridade === "baixa" ? "#22C55E" : "#F59E0B",
-                  }}>
-                    {task.prioridade}
-                  </span>
+          ) : (() => {
+            const pendingTasks = todayTasks.filter((t) => !t.concluida);
+            const doneTasks = todayTasks.filter((t) => t.concluida);
+            const renderTask = (task: Task, dimmed = false) => (
+              <div key={task.id} className="flex items-center gap-3 p-4" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 12, opacity: dimmed ? 0.5 : 1 }}>
+                <button
+                  onClick={() => toggleTask(task.id, task.concluida)}
+                  className="w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors"
+                  style={{ borderColor: task.concluida ? "#00B4D8" : "#CBD5E1", background: task.concluida ? "#00B4D8" : "transparent" }}
+                >
+                  {task.concluida && (
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                  )}
+                </button>
+                <div className="flex-1 min-w-0">
+                  <p style={{ color: task.concluida ? "#94A3B8" : "#0F172A", textDecoration: task.concluida ? "line-through" : "none", fontSize: 14, fontWeight: 400 }}>{task.titulo}</p>
+                  {task.descricao && <p className="truncate mt-0.5" style={{ color: "#94A3B8", fontSize: 12, fontWeight: 300 }}>{task.descricao}</p>}
                 </div>
-              ))}
-              <button onClick={() => setShowTaskModal(true)} className="inline-flex items-center gap-1.5 rounded-lg transition-colors mt-2" style={{ color: "#00B4D8", fontSize: 13, fontWeight: 400, padding: "8px 16px" }}>
-                <Plus size={16} /> Adicionar tarefa
-              </button>
-            </div>
-          )}
+                <span className="px-2 py-0.5 rounded-full" style={{
+                  fontSize: 10, fontWeight: 400,
+                  background: task.prioridade === "alta" ? "rgba(239,68,68,0.1)" : task.prioridade === "baixa" ? "rgba(34,197,94,0.1)" : "rgba(245,158,11,0.1)",
+                  color: task.prioridade === "alta" ? "#EF4444" : task.prioridade === "baixa" ? "#22C55E" : "#F59E0B",
+                }}>
+                  {task.prioridade}
+                </span>
+              </div>
+            );
+            return (
+              <div className="space-y-2">
+                {pendingTasks.map((t) => renderTask(t, false))}
+                {doneTasks.length > 0 && (
+                  <>
+                    <div className="my-3" style={{ borderTop: "1px solid #E2E8F0" }} />
+                    <p style={{ fontSize: 12, color: "#94A3B8", fontWeight: 300 }}>{doneTasks.length} concluída{doneTasks.length > 1 ? "s" : ""} hoje</p>
+                    {doneTasks.map((t) => renderTask(t, true))}
+                  </>
+                )}
+                <button onClick={() => setShowTaskModal(true)} className="inline-flex items-center gap-1.5 rounded-lg transition-colors mt-2" style={{ color: "#00B4D8", fontSize: 13, fontWeight: 400, padding: "8px 16px" }}>
+                  <Plus size={16} /> Adicionar tarefa
+                </button>
+              </div>
+            );
+          })()}
         </section>
 
         {/* Habitos de hoje */}
