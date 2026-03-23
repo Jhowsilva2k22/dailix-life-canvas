@@ -119,6 +119,7 @@ const PricingSection = () => {
               </ul>
 
               <button
+                onClick={() => navigate("/cadastro")}
                 className="w-full py-3 text-sm font-semibold rounded-[10px] transition-all duration-200 active:scale-[0.97]"
                 style={
                   p.highlight

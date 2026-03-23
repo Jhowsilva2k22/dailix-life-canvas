@@ -35,6 +35,7 @@ const CTASection = () => {
               Produtividade, familia, negocios e bem-estar — organizados do seu jeito, no seu ritmo.
             </p>
             <button
+              onClick={() => navigate("/cadastro")}
               className="inline-flex items-center gap-2 px-7 py-3.5 text-sm font-semibold rounded-[10px] transition-all duration-200 active:scale-[0.97]"
               style={{
                 background: "#fff",

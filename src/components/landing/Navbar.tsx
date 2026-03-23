@@ -109,10 +109,11 @@ const Navbar = () => {
               </a>
             ))}
             <div className="flex flex-col gap-2 pt-2" style={{ borderTop: "1px solid rgba(0,0,0,0.06)" }}>
-              <button className="py-2 text-sm font-medium" style={{ color: "#64748B" }}>
+              <button onClick={() => { setOpen(false); navigate("/login"); }} className="py-2 text-sm font-medium" style={{ color: "#64748B" }}>
                 Entrar
               </button>
               <button
+                onClick={() => { setOpen(false); navigate("/cadastro"); }}
                 className="py-2.5 text-sm font-semibold text-white rounded-[10px]"
                 style={{
                   background: "linear-gradient(135deg, #1E3A5F, #00B4D8)",
