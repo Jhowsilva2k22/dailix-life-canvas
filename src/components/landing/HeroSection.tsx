@@ -1,4 +1,4 @@
-import { Check, ArrowRight, Target, Users, Briefcase, Heart } from "lucide-react";
+import { Check, ArrowRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 const benefits = [
