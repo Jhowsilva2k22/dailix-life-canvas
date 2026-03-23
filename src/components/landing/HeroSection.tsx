@@ -167,6 +167,7 @@ const HeroSection = () => {
                 Ver demo
               </button>
             </div>
+          </div>
         </div>
       </div>
     </section>
