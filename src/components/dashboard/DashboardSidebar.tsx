@@ -96,7 +96,7 @@ const DashboardSidebar = ({ activeItem, onNavigate }: DashboardSidebarProps) => 
             </div>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-white truncate">{displayName || "Usuário"}</p>
+            <p className="truncate" style={{ fontSize: 13, fontWeight: 400, color: "rgba(255,255,255,0.7)" }}>{displayName || "Usuário"}</p>
             <span
               className="text-[11px] font-medium px-2 py-0.5"
               style={{ background: "rgba(0,180,216,0.15)", color: "#00B4D8", borderRadius: 6 }}
