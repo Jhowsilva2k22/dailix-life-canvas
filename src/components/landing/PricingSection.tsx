@@ -97,7 +97,7 @@ const PricingSection = () => {
                 transform: p.highlight ? "scale(1.04)" : "scale(1)",
               }}
             >
-              <h3 className="font-display text-[22px] font-bold mb-2" style={{ color: "#0F172A" }}>
+              <h3 className="font-display text-[22px] font-bold tracking-tight mb-2" style={{ color: "#0F172A" }}>
                 {p.name}
               </h3>
               <div className="flex items-baseline gap-1 mb-6">
