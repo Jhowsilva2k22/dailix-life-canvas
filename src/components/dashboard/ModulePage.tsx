@@ -76,8 +76,19 @@ const ModulePage = ({ moduleKey }: ModulePageProps) => {
             Comece agora e organize essa área da sua vida.
           </p>
           <button
-            className="inline-flex items-center gap-1.5 px-6 py-3 text-sm font-semibold rounded-xl text-white transition-opacity"
-            style={{ background: "linear-gradient(135deg, #1E3A5F, #00B4D8)" }}
+            className="inline-flex items-center gap-1.5 transition-colors"
+            style={{
+              background: "transparent",
+              border: "1px solid #1E3A5F",
+              color: "#1E3A5F",
+              borderRadius: 8,
+              padding: "10px 24px",
+              fontSize: 13,
+              fontWeight: 400,
+              letterSpacing: "0.03em",
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(30,58,95,0.04)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
           >
             {config.actionLabel}
           </button>
