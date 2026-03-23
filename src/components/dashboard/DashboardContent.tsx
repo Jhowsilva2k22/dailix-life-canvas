@@ -57,6 +57,7 @@ const DashboardContent = () => {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [completedHabitsToday, setCompletedHabitsToday] = useState<Set<string>>(new Set());
   const [maxStreak, setMaxStreak] = useState(0);
+  const [activeGoal, setActiveGoal] = useState<GoalWithProgress | null>(null);
   const [showTaskModal, setShowTaskModal] = useState(false);
   const revealRef = useScrollReveal();
 
