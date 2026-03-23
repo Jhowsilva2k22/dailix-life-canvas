@@ -44,7 +44,9 @@ const DashboardSidebar = ({ activeItem, onNavigate }: DashboardSidebarProps) => 
                   className="flex items-center gap-3 transition-all text-left relative"
                   style={{
                     padding: "10px 16px",
-                    color: isActive ? "#00B4D8" : "rgba(255,255,255,0.45)",
+                    fontSize: 13,
+                    fontWeight: 400,
+                    color: isActive ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.45)",
                     background: isActive ? "rgba(0,180,216,0.08)" : "transparent",
                     borderRadius: 8,
                   }}
