@@ -73,7 +73,35 @@ const DashboardContent = () => {
       .then(({ data }) => { if (data) setProfile(data); });
     fetchTasks();
     fetchHabits();
+    fetchActiveGoal();
   }, [user]);
+
+  const fetchActiveGoal = async () => {
+    if (!user) return;
+    const { data: goalsData } = await supabase
+      .from("goals")
+      .select("id, titulo, progresso, status")
+      .eq("user_id", user.id)
+      .eq("status", "ativa")
+      .order("created_at", { ascending: false })
+      .limit(1);
+    if (goalsData && goalsData.length > 0) {
+      const goal = goalsData[0];
+      // Calculate real progress from linked tasks
+      const { data: linkedTasks } = await supabase
+        .from("tasks")
+        .select("concluida")
+        .eq("user_id", user.id)
+        .eq("goal_id", goal.id);
+      if (linkedTasks && linkedTasks.length > 0) {
+        const done = linkedTasks.filter((t: any) => t.concluida).length;
+        const progress = Math.round((done / linkedTasks.length) * 100);
+        setActiveGoal({ ...goal, progresso: progress } as GoalWithProgress);
+      } else {
+        setActiveGoal(goal as GoalWithProgress);
+      }
+    }
+  };
 
   const fetchTasks = async () => {
     if (!user) return;
