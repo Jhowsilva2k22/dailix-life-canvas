@@ -92,7 +92,7 @@ const HeroSection = () => {
 
             {/* Headline */}
             <h1
-              className={`font-display text-[2.5rem] md:text-[3.25rem] lg:text-[3.5rem] font-extrabold transition-all duration-700 delay-100 ${
+              className={`font-display text-[2.5rem] md:text-[3.25rem] lg:text-[3.5rem] font-bold tracking-tight transition-all duration-700 delay-100 ${
                 visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
               }`}
               style={{ color: "#0F172A", lineHeight: 1.1 }}
