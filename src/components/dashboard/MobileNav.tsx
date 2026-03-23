@@ -45,7 +45,7 @@ const MobileNav = ({ activeItem, onNavigate }: MobileNavProps) => {
         <span className="font-display text-base font-bold text-white">Dailix</span>
         <div className="relative" ref={menuRef}>
           <button onClick={() => setMenuOpen((v) => !v)}>
-            <UserAvatar avatarUrl={avatarUrl} displayName={displayName} size={42} />
+            <UserAvatar avatarUrl={avatarUrl} displayName={displayName} size={40} />
           </button>
 
           {menuOpen && (

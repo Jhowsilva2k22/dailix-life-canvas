@@ -20,7 +20,7 @@ const SettingsPage = () => {
   return (
     <div className="flex-1 min-h-screen md:ml-[240px]" style={{ background: "#F1F5F9" }}>
       <div className="max-w-2xl mx-auto px-4 md:px-8 pt-20 md:pt-8 pb-24 md:pb-10">
-        <h1 className="font-display text-2xl md:text-[28px] font-bold mb-8" style={{ color: "#0F172A" }}>
+        <h1 className="font-display mb-8" style={{ color: "#0F172A", fontSize: 24, fontWeight: 400, letterSpacing: "0.01em" }}>
           Configurações
         </h1>
 
