@@ -1,28 +1,15 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { LogOut } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { useAvatar } from "@/contexts/AvatarContext";
+import UserAvatar from "./UserAvatar";
+import AvatarUploadModal from "./AvatarUploadModal";
 
 const SettingsPage = () => {
   const { user, signOut } = useAuth();
-  const [profile, setProfile] = useState<{
-    display_name: string | null;
-    email: string | null;
-    plano: string;
-  }>({ display_name: null, email: null, plano: "free" });
+  const { avatarUrl, displayName, plano } = useAvatar();
   const [confirmLogout, setConfirmLogout] = useState(false);
-
-  useEffect(() => {
-    if (!user) return;
-    supabase
-      .from("profiles")
-      .select("display_name, email, plano")
-      .eq("user_id", user.id)
-      .single()
-      .then(({ data }) => {
-        if (data) setProfile(data);
-      });
-  }, [user]);
+  const [showAvatarUpload, setShowAvatarUpload] = useState(false);
 
   const planLabels: Record<string, string> = {
     free: "Gratuito",
@@ -38,113 +25,75 @@ const SettingsPage = () => {
         </h1>
 
         {/* Profile section */}
-        <div
-          className="p-8 mb-6"
-          style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 16 }}
-        >
-          <div className="flex items-center gap-4 mb-6">
-            <div
-              className="flex items-center justify-center font-display font-bold flex-shrink-0"
-              style={{
-                width: 56,
-                height: 56,
-                borderRadius: 12,
-                background: "#1E3A5F",
-                color: "white",
-                fontSize: 22,
-              }}
-            >
-              {(profile.display_name || "U").charAt(0).toUpperCase()}
-            </div>
-            <div>
+        <div className="p-8 mb-6" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 16 }}>
+          <div className="flex items-start gap-4 mb-4">
+            <UserAvatar avatarUrl={avatarUrl} displayName={displayName} size={72} />
+            <div className="pt-1">
               <p className="font-display text-xl font-bold" style={{ color: "#0F172A" }}>
-                {profile.display_name || "Usuário"}
+                {displayName || "Usuário"}
               </p>
               <p className="text-sm" style={{ color: "#64748B" }}>
-                {profile.email || user?.email || "—"}
+                {user?.email || "—"}
               </p>
             </div>
           </div>
-          <button
-            className="text-sm font-medium transition-colors"
-            style={{ color: "#00B4D8" }}
-          >
-            Editar nome
-          </button>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setShowAvatarUpload(true)}
+              className="text-sm font-medium transition-colors"
+              style={{ color: "#00B4D8" }}
+            >
+              Alterar foto
+            </button>
+            <button className="text-sm font-medium transition-colors" style={{ color: "#00B4D8" }}>
+              Editar nome
+            </button>
+          </div>
         </div>
 
         {/* Plan section */}
-        <div
-          className="p-8 mb-6"
-          style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 16 }}
-        >
+        <div className="p-8 mb-6" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 16 }}>
           <h2 className="font-display text-base font-bold mb-4" style={{ color: "#0F172A" }}>
             Plano atual
           </h2>
           <div className="flex items-center gap-3 mb-3">
             <span
               className="text-[11px] font-medium px-2 py-0.5"
-              style={{
-                background: "rgba(0,180,216,0.15)",
-                color: "#00B4D8",
-                borderRadius: 6,
-              }}
+              style={{ background: "rgba(0,180,216,0.15)", color: "#00B4D8", borderRadius: 6 }}
             >
-              {planLabels[profile.plano] || profile.plano}
+              {planLabels[plano] || plano}
             </span>
           </div>
-          {profile.plano === "free" ? (
-            <button
-              className="text-sm font-medium transition-colors"
-              style={{ color: "#00B4D8" }}
-            >
+          {plano === "free" ? (
+            <button className="text-sm font-medium transition-colors" style={{ color: "#00B4D8" }}>
               Fazer upgrade
             </button>
           ) : (
-            <button
-              className="text-sm font-medium transition-colors"
-              style={{ color: "#00B4D8" }}
-            >
+            <button className="text-sm font-medium transition-colors" style={{ color: "#00B4D8" }}>
               Gerenciar assinatura
             </button>
           )}
         </div>
 
         {/* Danger zone */}
-        <div
-          className="p-8"
-          style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 16 }}
-        >
+        <div className="p-8" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 16 }}>
           {!confirmLogout ? (
             <button
               onClick={() => setConfirmLogout(true)}
               className="flex items-center gap-2 text-sm font-medium px-4 py-2 rounded-lg transition-colors"
-              style={{
-                color: "#EF4444",
-                border: "1px solid rgba(239,68,68,0.3)",
-              }}
+              style={{ color: "#EF4444", border: "1px solid rgba(239,68,68,0.3)" }}
             >
               <LogOut size={16} />
               Sair da conta
             </button>
           ) : (
             <div className="flex flex-col gap-3">
-              <p className="text-sm" style={{ color: "#0F172A" }}>
-                Tem certeza que deseja sair?
-              </p>
+              <p className="text-sm" style={{ color: "#0F172A" }}>Tem certeza que deseja sair?</p>
               <div className="flex items-center gap-3">
-                <button
-                  onClick={signOut}
-                  className="text-sm font-medium px-4 py-2 rounded-lg text-white"
-                  style={{ background: "#EF4444" }}
-                >
+                <button onClick={signOut} className="text-sm font-medium px-4 py-2 rounded-lg text-white" style={{ background: "#EF4444" }}>
                   Sim, sair
                 </button>
-                <button
-                  onClick={() => setConfirmLogout(false)}
-                  className="text-sm font-medium px-4 py-2 rounded-lg"
-                  style={{ color: "#64748B" }}
-                >
+                <button onClick={() => setConfirmLogout(false)} className="text-sm font-medium px-4 py-2 rounded-lg" style={{ color: "#64748B" }}>
                   Cancelar
                 </button>
               </div>
@@ -152,6 +101,8 @@ const SettingsPage = () => {
           )}
         </div>
       </div>
+
+      {showAvatarUpload && <AvatarUploadModal onClose={() => setShowAvatarUpload(false)} />}
     </div>
   );
 };

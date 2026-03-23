@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { AvatarProvider } from "@/contexts/AvatarContext";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
@@ -46,7 +47,9 @@ const App = () => (
               path="/dashboard/*"
               element={
                 <ProtectedRoute>
-                  <Dashboard />
+                  <AvatarProvider>
+                    <Dashboard />
+                  </AvatarProvider>
                 </ProtectedRoute>
               }
             />
