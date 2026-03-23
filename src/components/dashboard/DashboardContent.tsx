@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CheckSquare, Flame, Target, TrendingUp, Plus } from "lucide-react";
+import { CheckSquare, Flame, Target, TrendingUp, Plus, Repeat, Play } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import AddTaskModal from "./AddTaskModal";
