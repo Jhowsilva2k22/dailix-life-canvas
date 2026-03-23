@@ -202,7 +202,7 @@ const HeroSection = () => {
                   borderRadius: 16,
                   border: "1px solid rgba(255,255,255,0.08)",
                   boxShadow:
-                    "0 0 0 1px rgba(0,180,216,0.1), 0 20px 60px rgba(0,0,0,0.3), 0 0 80px rgba(0,180,216,0.08)",
+                    "0 25px 60px rgba(0,0,0,0.25), 0 0 80px rgba(0,180,216,0.08)",
                 }}
               >
                 {/* Inner glow */}
@@ -215,50 +215,53 @@ const HeroSection = () => {
 
                 {/* macOS header */}
                 <div
-                  className="flex items-center h-10 px-4 relative"
+                  className="flex items-center relative"
                   style={{
+                    height: 40,
+                    paddingLeft: 16,
                     background: "rgba(255,255,255,0.03)",
                     borderBottom: "1px solid rgba(255,255,255,0.06)",
                   }}
                 >
-                  <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 rounded-full" style={{ background: "#FF5F57" }} />
-                    <div className="w-3 h-3 rounded-full" style={{ background: "#FEBC2E" }} />
-                    <div className="w-3 h-3 rounded-full" style={{ background: "#28C840" }} />
+                  <div className="flex items-center" style={{ gap: 6 }}>
+                    <div className="rounded-full" style={{ width: 12, height: 12, background: "#FF5F57" }} />
+                    <div className="rounded-full" style={{ width: 12, height: 12, background: "#FEBC2E" }} />
+                    <div className="rounded-full" style={{ width: 12, height: 12, background: "#28C840" }} />
                   </div>
                   <span
                     className="absolute left-1/2 -translate-x-1/2 text-[13px]"
-                    style={{ color: "rgba(255,255,255,0.6)" }}
+                    style={{ color: "rgba(255,255,255,0.5)" }}
                   >
                     Dailix
                   </span>
                 </div>
 
                 {/* 2x2 Grid */}
-                <div className="grid grid-cols-2 gap-3 p-4">
+                <div className="grid grid-cols-2" style={{ padding: 12, gap: 8 }}>
                   {mockupCards.map((c) => (
                     <div
                       key={c.label}
-                      className="p-4"
                       style={{
+                        padding: 12,
                         background: "rgba(255,255,255,0.04)",
                         border: "1px solid rgba(255,255,255,0.08)",
-                        borderRadius: 10,
+                        borderRadius: 8,
                       }}
                     >
-                      <c.icon className="mb-2" style={{ color: "#00B4D8", width: 20, height: 20 }} />
-                      <p className="text-sm font-bold mb-3" style={{ color: "rgba(255,255,255,0.9)" }}>
+                      <c.icon className="mb-2" style={{ color: "#00B4D8", width: 18, height: 18 }} />
+                      <p className="font-bold mb-3" style={{ color: "rgba(255,255,255,0.9)", fontSize: 13 }}>
                         {c.label}
                       </p>
                       <div
-                        className="w-full rounded-sm overflow-hidden"
-                        style={{ height: 4, background: "rgba(255,255,255,0.08)" }}
+                        className="w-full overflow-hidden"
+                        style={{ height: 3, borderRadius: 2, background: "rgba(255,255,255,0.08)" }}
                       >
                         <div
-                          className="h-full rounded-sm"
+                          className="h-full"
                           style={{
                             width: `${c.progress}%`,
-                            background: "rgba(0,180,216,0.6)",
+                            borderRadius: 2,
+                            background: "rgba(0,180,216,0.5)",
                           }}
                         />
                       </div>
