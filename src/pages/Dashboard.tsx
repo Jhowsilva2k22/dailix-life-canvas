@@ -36,9 +36,11 @@ const Dashboard = () => {
       case "inicio":
         return <DashboardContent />;
       case "foco":
+        return <FocoPage />;
+      case "bem-estar":
+        return <BemEstarPage />;
       case "familia":
       case "negocios":
-      case "bem-estar":
         return <ModulePage moduleKey={activeItem} />;
       case "configuracoes":
         return <SettingsPage />;
