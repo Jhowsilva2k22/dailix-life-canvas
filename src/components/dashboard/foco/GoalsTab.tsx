@@ -279,16 +279,26 @@ const GoalsTabInner = () => {
     );
   }
 
+  /* ---- Priority badge helper ---- */
+  const prioBadge = (p: string) => {
+    const map: Record<string, { bg: string; color: string; label: string }> = {
+      alta: { bg: "rgba(239,68,68,0.1)", color: "#EF4444", label: "Alta" },
+      media: { bg: "rgba(245,158,11,0.1)", color: "#F59E0B", label: "Média" },
+      baixa: { bg: "rgba(16,185,129,0.1)", color: "#10B981", label: "Baixa" },
+    };
+    return map[p] ?? map.media;
+  };
+
   /* ---- List ---- */
   return (
-    <div className="relative pb-20">
+    <div>
+      {headerRow}
       <div className="space-y-4" data-reveal>
         {goals.map((goal) => {
           const badge = statusBadge(goal.status);
           const tasks = subTasks[goal.id] || [];
           const progress = tasks.length > 0 ? calcProgress(tasks) : goal.progresso;
           const doneCount = tasks.filter((t) => t.concluida).length;
-          const isExpanded = expanded.has(goal.id);
 
           return (
             <div key={goal.id} className="transition-all duration-200" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 14, boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
@@ -300,8 +310,8 @@ const GoalsTabInner = () => {
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="px-2 py-0.5 rounded-md" style={{ fontSize: 10, fontWeight: 400, background: badge.bg, color: badge.color }}>{badge.label}</span>
-                    <button onClick={() => { setEditing(goal); setShowModal(true); }} className="md:opacity-0 md:group-hover:opacity-100 p-1" style={{ color: "#94A3B8" }}><Pencil size={14} /></button>
-                    <button onClick={() => setConfirmDelete(goal.id)} className="md:opacity-0 md:group-hover:opacity-100 p-1" style={{ color: "#94A3B8" }}><Trash2 size={14} /></button>
+                    <button onClick={() => { setEditing(goal); setShowModal(true); }} className="p-1" style={{ color: "#94A3B8" }}><Pencil size={14} /></button>
+                    <button onClick={() => setConfirmDelete(goal.id)} className="p-1" style={{ color: "#94A3B8" }}><Trash2 size={14} /></button>
                   </div>
                 </div>
 
@@ -313,7 +323,6 @@ const GoalsTabInner = () => {
                   <span style={{ fontSize: 12, fontWeight: 400, color: "#0F172A", minWidth: 52, textAlign: "right" }}>{progress}% concluido</span>
                 </div>
 
-                {/* Task counter */}
                 {tasks.length > 0 && (
                   <p style={{ fontSize: 13, color: "#94A3B8", fontWeight: 300 }}>
                     {doneCount} de {tasks.length} tarefas concluidas
@@ -325,52 +334,50 @@ const GoalsTabInner = () => {
                     Prazo: {new Date(goal.data_limite + "T12:00:00").toLocaleDateString("pt-BR")}
                   </p>
                 )}
-
-                {/* Expand toggle */}
-                <button onClick={() => toggleExpand(goal.id)} className="inline-flex items-center gap-1 mt-3 transition-colors" style={{ color: "#00B4D8", fontSize: 13, fontWeight: 400 }}>
-                  {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-                  {isExpanded ? "Ocultar tarefas" : `Ver tarefas (${tasks.length})`}
-                </button>
               </div>
 
-              {/* Expanded sub-tasks */}
-              {isExpanded && (
-                <div className="px-5 pb-5 pt-0">
-                  <div className="border-t" style={{ borderColor: "#E2E8F0" }} />
-                  <div className="mt-3 space-y-2">
-                    {tasks.map((task) => (
-                      <div key={task.id} className="flex items-center gap-3 py-2">
-                        <button
-                          onClick={() => toggleSubTask(goal.id, task.id, task.concluida)}
-                          className="w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors"
-                          style={{ borderColor: task.concluida ? "#00B4D8" : "#CBD5E1", background: task.concluida ? "#00B4D8" : "transparent" }}
-                        >
-                          {task.concluida && <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>}
-                        </button>
-                        <p style={{ color: task.concluida ? "#94A3B8" : "#0F172A", textDecoration: task.concluida ? "line-through" : "none", fontSize: 13, fontWeight: 400, flex: 1 }}>{task.titulo}</p>
-                      </div>
-                    ))}
-                  </div>
-                  <InlineAddTask goalId={goal.id} onAdded={(task) => {
-                    setSubTasks((prev) => ({ ...prev, [goal.id]: [...(prev[goal.id] || []), task] }));
-                    // Update progress
-                    const updated = [...(subTasks[goal.id] || []), task];
-                    const newProgress = calcProgress(updated);
-                    supabase.from("goals").update({ progresso: newProgress }).eq("id", goal.id);
-                    setGoals((prev) => prev.map((g) => g.id === goal.id ? { ...g, progresso: newProgress } : g));
-                  }} />
+              {/* Sub-tasks — always visible */}
+              <div className="px-5 pb-5 pt-0">
+                <div className="border-t" style={{ borderColor: "#E2E8F0" }} />
+                <div className="mt-3 space-y-2">
+                  {tasks.length === 0 ? (
+                    <p style={{ color: "#94A3B8", fontSize: 13, fontWeight: 300, fontStyle: "italic" }}>
+                      Adicione tarefas para acompanhar o progresso desta meta.
+                    </p>
+                  ) : (
+                    tasks.map((task) => {
+                      const pb = prioBadge(task.prioridade);
+                      return (
+                        <div key={task.id} className="flex items-center gap-3 py-2">
+                          <button
+                            onClick={() => toggleSubTask(goal.id, task.id, task.concluida)}
+                            className="w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors"
+                            style={{ borderColor: task.concluida ? "#00B4D8" : "#CBD5E1", background: task.concluida ? "#00B4D8" : "transparent" }}
+                          >
+                            {task.concluida && <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+                          </button>
+                          <p style={{ color: task.concluida ? "#94A3B8" : "#0F172A", textDecoration: task.concluida ? "line-through" : "none", fontSize: 13, fontWeight: 400, flex: 1 }}>{task.titulo}</p>
+                          <span className="px-1.5 py-0.5 rounded" style={{ fontSize: 10, fontWeight: 400, background: pb.bg, color: pb.color }}>{pb.label}</span>
+                        </div>
+                      );
+                    })
+                  )}
                 </div>
-              )}
+                <InlineAddTask goalId={goal.id} onAdded={(task) => {
+                  setSubTasks((prev) => ({ ...prev, [goal.id]: [...(prev[goal.id] || []), task] }));
+                  const updated = [...(subTasks[goal.id] || []), task];
+                  const newProgress = calcProgress(updated);
+                  supabase.from("goals").update({ progresso: newProgress }).eq("id", goal.id);
+                  setGoals((prev) => prev.map((g) => g.id === goal.id ? { ...g, progresso: newProgress } : g));
+                }} />
+              </div>
             </div>
           );
         })}
       </div>
 
-      <FloatingButton onClick={() => { setEditing(null); setShowModal(true); }} />
-
       {showModal && <GoalModal goal={editing} onClose={() => { setShowModal(false); setEditing(null); }} onSaved={handleSaved} />}
 
-      {/* Delete confirmation */}
       {confirmDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.4)" }} onClick={() => setConfirmDelete(null)}>
           <div className="w-full max-w-sm rounded-2xl p-6" style={{ background: "#FFFFFF", boxShadow: "0 8px 32px rgba(0,0,0,0.12)" }} onClick={(e) => e.stopPropagation()}>
