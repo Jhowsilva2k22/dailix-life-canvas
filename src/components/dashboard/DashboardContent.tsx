@@ -12,6 +12,13 @@ interface Profile {
   modules: string[] | null;
 }
 
+interface GoalWithProgress {
+  id: string;
+  titulo: string;
+  progresso: number;
+  status: string;
+}
+
 interface Task {
   id: string;
   titulo: string;
