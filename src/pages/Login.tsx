@@ -45,10 +45,10 @@ const Login = () => {
         }}
       >
         <h1 className="font-display text-2xl font-bold" style={{ color: "#0F172A" }}>
-          Bem-vindo de volta
+          De volta ao seu espaço.
         </h1>
         <p className="text-sm mt-1 mb-8" style={{ color: "#64748B" }}>
-          Acesse sua conta Dailix
+          Tudo organizado do jeito que você deixou.
         </p>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
