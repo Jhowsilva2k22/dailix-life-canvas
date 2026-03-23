@@ -5,6 +5,8 @@ import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import DashboardContent from "@/components/dashboard/DashboardContent";
 import MobileNav from "@/components/dashboard/MobileNav";
 import ModulePage from "@/components/dashboard/ModulePage";
+import FocoPage from "@/components/dashboard/foco/FocoPage";
+import BemEstarPage from "@/components/dashboard/bemestar/BemEstarPage";
 import SettingsPage from "@/components/dashboard/SettingsPage";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
