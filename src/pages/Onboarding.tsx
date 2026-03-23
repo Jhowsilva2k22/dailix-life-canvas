@@ -220,7 +220,7 @@ const Onboarding = () => {
                       >
                         {m.num}
                       </span>
-                      <p className="font-display text-base font-bold mt-1 text-white">
+                      <p className="font-display text-base mt-1 text-white" style={{ fontWeight: 400 }}>
                         {m.label}
                       </p>
                       <p className="text-[13px] mt-0.5" style={{ color: "rgba(255,255,255,0.45)" }}>
