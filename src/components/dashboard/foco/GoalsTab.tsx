@@ -224,13 +224,6 @@ const GoalsTabInner = () => {
     setEditing(null);
   };
 
-  const toggleExpand = (id: string) => {
-    setExpanded((prev) => {
-      const s = new Set(prev);
-      s.has(id) ? s.delete(id) : s.add(id);
-      return s;
-    });
-  };
 
   /* ---- Loading ---- */
   if (loading) {
