@@ -175,6 +175,27 @@ const Cadastro = () => {
           Continuar com Google
         </button>
 
+        <button
+          type="button"
+          onClick={async () => {
+            const { error } = await lovable.auth.signInWithOAuth("apple", {
+              redirect_uri: window.location.origin,
+            });
+            if (error) toast.error("Erro ao entrar com Apple.");
+          }}
+          className="w-full flex items-center justify-center gap-3 py-3 text-sm font-medium rounded-[10px] transition-all duration-200 active:scale-[0.97] mt-3"
+          style={{
+            background: "#000000",
+            border: "1px solid #000000",
+            color: "#FFFFFF",
+          }}
+        >
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+            <path d="M13.105 9.457c-.02-2.077 1.695-3.076 1.772-3.124-1.964-2.871-2.778-2.871-3.403-2.91-.54-.053-1.412.32-1.82.32-.428 0-1.057-.313-1.748-.303-.882.013-1.72.52-2.172 1.3-.944 1.633-.24 4.03.66 5.35.455.647.985 1.37 1.68 1.344.684-.027.937-.433 1.76-.433.812 0 1.044.433 1.753.42.732-.013 1.19-.647 1.628-1.3.524-.747.732-1.48.745-1.52-.02-.006-1.418-.547-1.432-2.144h-.023zM11.752 4.34c.364-.453.616-1.06.548-1.687-.532.027-1.198.367-1.576.807-.337.393-.64 1.04-.56 1.64.597.047 1.213-.3 1.588-.76z" fill="white"/>
+          </svg>
+          Continuar com Apple
+        </button>
+
         <p className="text-center text-sm mt-4" style={{ color: "#64748B" }}>
           Ja tem conta?{" "}
           <Link to="/login" className="font-medium" style={{ color: "#00B4D8" }}>
