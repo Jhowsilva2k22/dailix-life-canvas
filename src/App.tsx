@@ -47,7 +47,9 @@ const App = () => (
               path="/dashboard/*"
               element={
                 <ProtectedRoute>
-                  <Dashboard />
+                  <AvatarProvider>
+                    <Dashboard />
+                  </AvatarProvider>
                 </ProtectedRoute>
               }
             />
