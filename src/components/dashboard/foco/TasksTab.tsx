@@ -44,37 +44,57 @@ const TasksTab = () => {
 
   const fetchTasks = async () => {
     if (!user) return;
-    let query = supabase
-      .from("tasks")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
+    try {
+      let query = supabase
+        .from("tasks")
+        .select("*")
+        .eq("user_id", user.id)
+        .order("created_at", { ascending: false });
 
-    if (filter === "hoje") {
-      const today = new Date().toISOString().split("T")[0];
-      query = query.or(`prazo.eq.${today},prazo.is.null`);
-    } else if (filter === "semana") {
-      const start = getStartOfWeek();
-      const end = new Date();
-      end.setDate(end.getDate() + (7 - end.getDay()));
-      query = query.or(`prazo.gte.${start},prazo.is.null`);
+      if (filter === "hoje") {
+        const today = new Date().toISOString().split("T")[0];
+        query = query.or(`prazo.eq.${today},prazo.is.null`);
+      } else if (filter === "semana") {
+        const start = getStartOfWeek();
+        query = query.or(`prazo.gte.${start},prazo.is.null`);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+      if (data) setTasks(data as Task[]);
+    } catch {
+      toast.error("Algo deu errado. Tente novamente.");
     }
-
-    const { data } = await query;
-    if (data) setTasks(data as Task[]);
   };
 
   useEffect(() => { fetchTasks(); }, [user, filter]);
 
   const toggleTask = async (id: string, concluida: boolean) => {
-    await supabase.from("tasks").update({ concluida: !concluida }).eq("id", id);
+    // Optimistic update
     setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, concluida: !concluida } : t)));
+    const { error } = await supabase.from("tasks").update({ concluida: !concluida }).eq("id", id);
+    if (error) {
+      setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, concluida } : t)));
+      toast.error("Algo deu errado. Tente novamente.");
+    }
   };
 
   const deleteTask = async (id: string) => {
-    await supabase.from("tasks").delete().eq("id", id);
+    const backup = tasks;
+    // Optimistic
     setTasks((prev) => prev.filter((t) => t.id !== id));
-    toast.success("Tarefa removida.");
+    toast.success("Removido");
+    const { error } = await supabase.from("tasks").delete().eq("id", id);
+    if (error) {
+      setTasks(backup);
+      toast.error("Algo deu errado. Tente novamente.");
+    }
+  };
+
+  const handleTaskSaved = () => {
+    setShowModal(false);
+    fetchTasks();
+    toast.success("Tarefa criada");
   };
 
   const pending = tasks.filter((t) => !t.concluida).length;
@@ -186,7 +206,7 @@ const TasksTab = () => {
       {showModal && (
         <AddTaskModal
           onClose={() => setShowModal(false)}
-          onSaved={() => { setShowModal(false); fetchTasks(); }}
+          onSaved={handleTaskSaved}
         />
       )}
     </div>
