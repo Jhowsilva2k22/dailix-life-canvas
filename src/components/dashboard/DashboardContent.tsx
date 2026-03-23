@@ -195,7 +195,7 @@ const DashboardContent = () => {
         {/* Por onde começar */}
         {todayTasks.length === 0 && (
           <section className="mb-10">
-            <h2 className="font-display text-lg font-bold mb-4" style={{ color: "#0F172A" }}>
+            <h2 className="font-display mb-4" style={{ color: "#0F172A", fontSize: 16, fontWeight: 500, letterSpacing: "0.01em" }}>
               Por onde começar
             </h2>
             <div className="grid md:grid-cols-3 gap-4">
