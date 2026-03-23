@@ -1,4 +1,4 @@
-import { Check, ArrowRight, Target, Users, Briefcase, Heart } from "lucide-react";
+import { Check, ArrowRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 const benefits = [
@@ -7,12 +7,6 @@ const benefits = [
   "Insights educacionais integrados",
 ];
 
-const mockupCards = [
-  { icon: Target, label: "Foco", progress: 75 },
-  { icon: Users, label: "Familia", progress: 60 },
-  { icon: Briefcase, label: "Negocios", progress: 45 },
-  { icon: Heart, label: "Bem-estar", progress: 80 },
-];
 
 const HeroSection = () => {
   const ref = useRef<HTMLDivElement>(null);
@@ -76,7 +70,7 @@ const HeroSection = () => {
 
       {/* Content */}
       <div className="container relative z-10">
-        <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
+        <div className="max-w-[60%] max-md:max-w-full">
           {/* Left column */}
           <div className="flex flex-col gap-6">
             {/* Badge */}
@@ -172,103 +166,6 @@ const HeroSection = () => {
               >
                 Ver demo
               </button>
-            </div>
-          </div>
-
-          {/* Right column — Mockup */}
-          <div
-            className={`hidden md:block transition-all duration-1000 delay-300 ${
-              visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
-            }`}
-          >
-            <div
-              className="mockup-container"
-              style={{
-                transform: "perspective(1200px) rotateY(-8deg) rotateX(3deg)",
-                transition: "transform 0.6s ease",
-                filter: "drop-shadow(0 30px 60px rgba(0,0,0,0.18))",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = "perspective(1200px) rotateY(-4deg) rotateX(1deg)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = "perspective(1200px) rotateY(-8deg) rotateX(3deg)";
-              }}
-            >
-              <div
-                className="relative overflow-hidden"
-                style={{
-                  background: "#0F172A",
-                  borderRadius: 16,
-                  border: "1px solid rgba(255,255,255,0.08)",
-                  boxShadow:
-                    "0 25px 60px rgba(0,0,0,0.25), 0 0 80px rgba(0,180,216,0.08)",
-                }}
-              >
-                {/* Inner glow */}
-                <div
-                  className="absolute top-0 right-0 w-48 h-48 pointer-events-none"
-                  style={{
-                    background: "radial-gradient(circle at top right, rgba(0,180,216,0.15), transparent 70%)",
-                  }}
-                />
-
-                {/* macOS header */}
-                <div
-                  className="flex items-center relative"
-                  style={{
-                    height: 40,
-                    paddingLeft: 16,
-                    background: "rgba(255,255,255,0.03)",
-                    borderBottom: "1px solid rgba(255,255,255,0.06)",
-                  }}
-                >
-                  <div className="flex items-center" style={{ gap: 6 }}>
-                    <div className="rounded-full" style={{ width: 12, height: 12, background: "#FF5F57" }} />
-                    <div className="rounded-full" style={{ width: 12, height: 12, background: "#FEBC2E" }} />
-                    <div className="rounded-full" style={{ width: 12, height: 12, background: "#28C840" }} />
-                  </div>
-                  <span
-                    className="absolute left-1/2 -translate-x-1/2 text-[13px]"
-                    style={{ color: "rgba(255,255,255,0.5)" }}
-                  >
-                    Dailix
-                  </span>
-                </div>
-
-                {/* 2x2 Grid */}
-                <div className="grid grid-cols-2" style={{ padding: 12, gap: 8 }}>
-                  {mockupCards.map((c) => (
-                    <div
-                      key={c.label}
-                      style={{
-                        padding: 12,
-                        background: "rgba(255,255,255,0.04)",
-                        border: "1px solid rgba(255,255,255,0.08)",
-                        borderRadius: 8,
-                      }}
-                    >
-                      <c.icon className="mb-2" style={{ color: "#00B4D8", width: 18, height: 18 }} />
-                      <p className="font-bold mb-3" style={{ color: "rgba(255,255,255,0.9)", fontSize: 13 }}>
-                        {c.label}
-                      </p>
-                      <div
-                        className="w-full overflow-hidden"
-                        style={{ height: 3, borderRadius: 2, background: "rgba(255,255,255,0.08)" }}
-                      >
-                        <div
-                          className="h-full"
-                          style={{
-                            width: `${c.progress}%`,
-                            borderRadius: 2,
-                            background: "rgba(0,180,216,0.5)",
-                          }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
           </div>
         </div>
