@@ -88,12 +88,28 @@ export default {
           from: { opacity: "0" },
           to: { opacity: "1" },
         },
+        "mesh-drift-1": {
+          "0%, 100%": { transform: "translate(0, 0)" },
+          "50%": { transform: "translate(20px, -20px)" },
+        },
+        "mesh-drift-2": {
+          "0%, 100%": { transform: "translate(0, 0)" },
+          "50%": { transform: "translate(-20px, 20px)" },
+        },
+        "mesh-drift-3": {
+          "0%, 100%": { transform: "translate(0, 0)" },
+          "25%": { transform: "translate(15px, 15px)" },
+          "75%": { transform: "translate(-15px, -10px)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-up": "fade-up 0.6s cubic-bezier(0.16,1,0.3,1) forwards",
         "fade-in": "fade-in 0.5s ease-out forwards",
+        "mesh-1": "mesh-drift-1 8s ease-in-out infinite",
+        "mesh-2": "mesh-drift-2 12s ease-in-out infinite",
+        "mesh-3": "mesh-drift-3 10s ease-in-out infinite",
       },
     },
   },
