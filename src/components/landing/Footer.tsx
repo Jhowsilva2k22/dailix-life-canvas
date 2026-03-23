@@ -1,15 +1,35 @@
-import { LayoutDashboard } from "lucide-react";
+const footerLinks = [
+  { label: "Recursos", href: "#features" },
+  { label: "Planos", href: "#pricing" },
+  { label: "Termos", href: "#" },
+  { label: "Privacidade", href: "#" },
+];
 
 const Footer = () => (
-  <footer className="border-t py-10">
-    <div className="container flex flex-col md:flex-row items-center justify-between gap-4">
-      <div className="flex items-center gap-2">
-        <LayoutDashboard className="h-5 w-5 text-accent" />
-        <span className="font-semibold text-foreground">Dailix</span>
+  <footer style={{ background: "#0F172A" }}>
+    <div className="container py-12">
+      <div className="flex flex-col md:flex-row items-center justify-between gap-6 mb-8">
+        <span className="text-lg font-bold text-white">Dailix</span>
+        <div className="flex items-center gap-6">
+          {footerLinks.map((l) => (
+            <a
+              key={l.label}
+              href={l.href}
+              className="text-sm transition-colors duration-200"
+              style={{ color: "rgba(255,255,255,0.5)" }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = "#fff")}
+              onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.5)")}
+            >
+              {l.label}
+            </a>
+          ))}
+        </div>
       </div>
-      <p className="text-sm text-muted-foreground">
-        {new Date().getFullYear()} Dailix. Todos os direitos reservados.
-      </p>
+      <div style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }} className="pt-6">
+        <p className="text-sm text-center" style={{ color: "rgba(255,255,255,0.4)" }}>
+          {new Date().getFullYear()} Dailix. Todos os direitos reservados.
+        </p>
+      </div>
     </div>
   </footer>
 );
