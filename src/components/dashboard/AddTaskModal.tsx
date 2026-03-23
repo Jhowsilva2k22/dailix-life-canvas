@@ -35,7 +35,6 @@ const AddTaskModal = ({ onClose, onSaved }: AddTaskModalProps) => {
       return;
     }
 
-    toast.success("Tarefa criada!");
     onSaved();
   };
 
