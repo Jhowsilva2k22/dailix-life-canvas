@@ -29,11 +29,19 @@ const priorityBadge = (p: string) => {
   return map[p] || map.media;
 };
 
-const getStartOfWeek = () => {
-  const d = new Date();
-  const day = d.getDay();
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-  return new Date(d.setDate(diff)).toISOString().split("T")[0];
+const priorityOrder: Record<string, number> = { alta: 0, media: 1, baixa: 2 };
+
+const sortTasks = (list: Task[], mode: string) => {
+  return [...list].sort((a, b) => {
+    if (mode === "todas") {
+      // pending first, then by priority
+      if (a.concluida !== b.concluida) return a.concluida ? 1 : -1;
+    }
+    // no-date first, then by priority
+    if (!a.prazo && b.prazo) return -1;
+    if (a.prazo && !b.prazo) return 1;
+    return (priorityOrder[a.prioridade] ?? 1) - (priorityOrder[b.prioridade] ?? 1);
+  });
 };
 
 const TasksTab = () => {
@@ -45,23 +53,28 @@ const TasksTab = () => {
   const fetchTasks = async () => {
     if (!user) return;
     try {
+      const today = new Date().toISOString().split("T")[0];
+
       let query = supabase
         .from("tasks")
         .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
+        .eq("user_id", user.id);
 
       if (filter === "hoje") {
-        const today = new Date().toISOString().split("T")[0];
         query = query.or(`prazo.eq.${today},prazo.is.null`);
       } else if (filter === "semana") {
-        const start = getStartOfWeek();
-        query = query.or(`prazo.gte.${start},prazo.is.null`);
+        const end = new Date();
+        end.setDate(end.getDate() + 7);
+        const endStr = end.toISOString().split("T")[0];
+        query = query
+          .eq("concluida", false)
+          .or(`and(prazo.gte.${today},prazo.lte.${endStr}),prazo.is.null`);
       }
+      // "todas" → no extra filters
 
       const { data, error } = await query;
       if (error) throw error;
-      if (data) setTasks(data as Task[]);
+      if (data) setTasks(sortTasks(data as Task[], filter));
     } catch {
       toast.error("Algo deu errado. Tente novamente.");
     }
