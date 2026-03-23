@@ -243,6 +243,11 @@ const DashboardContent = () => {
               <p className={`truncate leading-tight ${card.isText ? "text-base" : ""}`} style={{ color: "#0F172A", fontSize: card.isText ? 16 : 32, fontWeight: 300 }}>
                 {card.value}
               </p>
+              {(card as any).hasProgress && (
+                <div className="mt-2 h-1.5 rounded-full overflow-hidden" style={{ background: "#E2E8F0" }}>
+                  <div className="h-full rounded-full transition-all duration-700" style={{ width: `${(card as any).progress}%`, background: "linear-gradient(90deg, #1E3A5F, #00B4D8)" }} />
+                </div>
+              )}
               <p className="mt-0.5" style={{ color: "#94A3B8", fontSize: 12, fontWeight: 300 }}>
                 {card.sub}
               </p>
