@@ -60,6 +60,7 @@ const Navbar = () => {
             Entrar
           </button>
           <button
+            onClick={() => navigate("/cadastro")}
             className="px-5 py-2 text-sm font-semibold text-white rounded-[10px] transition-all duration-200 active:scale-[0.97]"
             style={{
               background: "linear-gradient(135deg, #1E3A5F, #00B4D8)",
