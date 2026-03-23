@@ -18,34 +18,51 @@ export type Database = {
         Row: {
           created_at: string
           display_name: string | null
+          email: string | null
           first_goal: string | null
           id: string
           modules: string[] | null
           onboarding_completed: boolean
+          plano: string
+          titular_id: string | null
           updated_at: string
           user_id: string
         }
         Insert: {
           created_at?: string
           display_name?: string | null
+          email?: string | null
           first_goal?: string | null
           id?: string
           modules?: string[] | null
           onboarding_completed?: boolean
+          plano?: string
+          titular_id?: string | null
           updated_at?: string
           user_id: string
         }
         Update: {
           created_at?: string
           display_name?: string | null
+          email?: string | null
           first_goal?: string | null
           id?: string
           modules?: string[] | null
           onboarding_completed?: boolean
+          plano?: string
+          titular_id?: string | null
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "profiles_titular_id_fkey"
+            columns: ["titular_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
