@@ -52,7 +52,7 @@ const ModulePage = ({ moduleKey }: ModulePageProps) => {
     <div className="flex-1 min-h-screen md:ml-[240px]" style={{ background: "#F1F5F9" }}>
       <div className="max-w-4xl mx-auto px-4 md:px-8 pt-20 md:pt-8 pb-24 md:pb-10">
         <div className="mb-2">
-          <h1 className="font-display text-2xl md:text-[28px] font-bold" style={{ color: "#0F172A" }}>
+          <h1 className="font-display" style={{ color: "#0F172A", fontSize: 24, fontWeight: 400, letterSpacing: "0.01em" }}>
             {config.title}
           </h1>
           <p className="text-base mt-1" style={{ color: "#64748B" }}>
