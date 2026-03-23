@@ -454,13 +454,6 @@ const InlineAddTask = ({ goalId, onAdded }: { goalId: string; onAdded: (t: SubTa
   );
 };
 
-/* ---- Floating Button ---- */
-const FloatingButton = ({ onClick }: { onClick: () => void }) => (
-  <button onClick={onClick} className="fixed bottom-6 right-6 md:absolute md:bottom-0 md:right-0 flex items-center gap-2 text-white transition-transform hover:-translate-y-0.5 z-40" style={{ background: "linear-gradient(135deg, #1E3A5F, #00B4D8)", borderRadius: 50, padding: "12px 20px", fontSize: 13, fontWeight: 400, boxShadow: "0 4px 16px rgba(0,0,0,0.15)" }}>
-    <Plus size={16} /> Nova meta
-  </button>
-);
-
 /* ---- Goal Modal (no progress slider) ---- */
 const GoalModal = ({ goal, onClose, onSaved }: { goal: Goal | null; onClose: () => void; onSaved: (g: Goal, isEdit: boolean) => void }) => {
   const { user } = useAuth();
