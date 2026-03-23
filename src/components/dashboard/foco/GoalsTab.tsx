@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,35 +26,38 @@ const GoalsTab = () => {
   const { user } = useAuth();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<Goal | null>(null);
 
-  const fetchGoals = async () => {
+  const fetchGoals = useCallback(async () => {
     if (!user) { setLoading(false); return; }
     try {
-      const { data, error } = await supabase
+      setError(false);
+      const { data, error: err } = await supabase
         .from("goals")
         .select("*")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
-      if (error) throw error;
+      if (err) throw err;
       setGoals((data as Goal[]) || []);
     } catch {
+      setError(true);
       toast.error("Algo deu errado. Tente novamente.");
       setGoals([]);
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
 
-  useEffect(() => { fetchGoals(); }, [user]);
+  useEffect(() => { fetchGoals(); }, [fetchGoals]);
 
   const deleteGoal = async (id: string) => {
     const backup = goals;
     setGoals((prev) => prev.filter((g) => g.id !== id));
     toast.success("Removido");
-    const { error } = await supabase.from("goals").delete().eq("id", id);
-    if (error) {
+    const { error: err } = await supabase.from("goals").delete().eq("id", id);
+    if (err) {
       setGoals(backup);
       toast.error("Algo deu errado. Tente novamente.");
     }
@@ -67,6 +70,7 @@ const GoalsTab = () => {
       setGoals((prev) => [savedGoal, ...prev]);
     }
     setShowModal(false);
+    setEditing(null);
   };
 
   if (loading) {
@@ -77,8 +81,27 @@ const GoalsTab = () => {
     );
   }
 
+  if (error) {
+    return (
+      <div
+        data-reveal
+        style={{ background: "rgba(239,68,68,0.03)", border: "1px dashed rgba(239,68,68,0.2)", borderRadius: 14 }}
+        className="flex flex-col items-center justify-center py-16"
+      >
+        <p style={{ color: "#64748B", fontSize: 14, fontWeight: 300 }}>Erro ao carregar metas.</p>
+        <button
+          onClick={fetchGoals}
+          className="inline-flex items-center gap-1.5 mt-3 transition-colors"
+          style={{ color: "#00B4D8", fontSize: 13, fontWeight: 400, padding: "8px 16px" }}
+        >
+          Tentar novamente
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div>
+    <div className="relative pb-20">
       {goals.length === 0 ? (
         <div
           data-reveal
@@ -92,7 +115,7 @@ const GoalsTab = () => {
             style={{ color: "#00B4D8", fontSize: 13, fontWeight: 400, padding: "8px 16px" }}
           >
             <Plus size={16} />
-            Criar meta
+            Nova meta
           </button>
         </div>
       ) : (
@@ -137,7 +160,7 @@ const GoalsTab = () => {
                       style={{ width: `${goal.progresso}%`, background: "linear-gradient(90deg, #1E3A5F, #00B4D8)" }}
                     />
                   </div>
-                  <span style={{ fontSize: 12, fontWeight: 400, color: "#0F172A", minWidth: 32, textAlign: "right" as const }}>{goal.progresso}%</span>
+                  <span style={{ fontSize: 12, fontWeight: 400, color: "#0F172A", minWidth: 32, textAlign: "right" }}>{goal.progresso}%</span>
                 </div>
                 {goal.data_limite && (
                   <p className="mt-2" style={{ fontSize: 12, color: "#94A3B8", fontWeight: 300 }}>
@@ -147,21 +170,30 @@ const GoalsTab = () => {
               </div>
             );
           })}
-          <button
-            onClick={() => { setEditing(null); setShowModal(true); }}
-            className="inline-flex items-center gap-1.5 mt-2 transition-colors"
-            style={{ color: "#00B4D8", fontSize: 13, fontWeight: 400, padding: "8px 16px" }}
-          >
-            <Plus size={16} />
-            Nova meta
-          </button>
         </div>
       )}
+
+      {/* Floating button */}
+      <button
+        onClick={() => { setEditing(null); setShowModal(true); }}
+        className="fixed bottom-6 right-6 md:absolute md:bottom-0 md:right-0 flex items-center gap-2 text-white transition-transform hover:-translate-y-0.5 z-40"
+        style={{
+          background: "linear-gradient(135deg, #1E3A5F, #00B4D8)",
+          borderRadius: 50,
+          padding: "12px 20px",
+          fontSize: 13,
+          fontWeight: 400,
+          boxShadow: "0 4px 16px rgba(0,0,0,0.15)",
+        }}
+      >
+        <Plus size={16} />
+        Nova meta
+      </button>
 
       {showModal && (
         <GoalModal
           goal={editing}
-          onClose={() => setShowModal(false)}
+          onClose={() => { setShowModal(false); setEditing(null); }}
           onSaved={handleSaved}
         />
       )}
