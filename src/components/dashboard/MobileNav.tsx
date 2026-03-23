@@ -1,7 +1,9 @@
-import { Home, Target, Users, Briefcase, Heart, Settings, LogOut } from "lucide-react";
+import { Home, Target, Users, Briefcase, Heart, Settings, LogOut, Camera } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
-import { useEffect, useState, useRef } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { useAvatar } from "@/contexts/AvatarContext";
+import { useState, useRef, useEffect } from "react";
+import UserAvatar from "./UserAvatar";
+import AvatarUploadModal from "./AvatarUploadModal";
 
 const navItems = [
   { label: "Início", icon: Home, path: "inicio" },
@@ -17,24 +19,11 @@ interface MobileNavProps {
 }
 
 const MobileNav = ({ activeItem, onNavigate }: MobileNavProps) => {
-  const { user, signOut } = useAuth();
-  const [displayName, setDisplayName] = useState("");
-  const [plano, setPlano] = useState("free");
+  const { signOut } = useAuth();
+  const { avatarUrl, displayName, plano } = useAvatar();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [showAvatarUpload, setShowAvatarUpload] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!user) return;
-    supabase
-      .from("profiles")
-      .select("display_name, plano")
-      .eq("user_id", user.id)
-      .single()
-      .then(({ data }) => {
-        if (data?.display_name) setDisplayName(data.display_name);
-        if (data?.plano) setPlano(data.plano);
-      });
-  }, [user]);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -55,19 +44,8 @@ const MobileNav = ({ activeItem, onNavigate }: MobileNavProps) => {
       >
         <span className="font-display text-base font-bold text-white">Dailix</span>
         <div className="relative" ref={menuRef}>
-          <button
-            onClick={() => setMenuOpen((v) => !v)}
-            className="flex items-center justify-center text-xs font-bold font-display"
-            style={{
-              width: 42,
-              height: 42,
-              borderRadius: 12,
-              background: "#1E3A5F",
-              color: "white",
-              fontSize: 16,
-            }}
-          >
-            {(displayName || "U").charAt(0).toUpperCase()}
+          <button onClick={() => setMenuOpen((v) => !v)}>
+            <UserAvatar avatarUrl={avatarUrl} displayName={displayName} size={42} />
           </button>
 
           {menuOpen && (
@@ -89,16 +67,22 @@ const MobileNav = ({ activeItem, onNavigate }: MobileNavProps) => {
                 </p>
                 <span
                   className="text-[11px] font-medium px-2 py-0.5 inline-block mt-1"
-                  style={{
-                    background: "rgba(0,180,216,0.15)",
-                    color: "#00B4D8",
-                    borderRadius: 6,
-                  }}
+                  style={{ background: "rgba(0,180,216,0.15)", color: "#00B4D8", borderRadius: 6 }}
                 >
                   {plano}
                 </span>
               </div>
               <div style={{ height: 1, background: "rgba(255,255,255,0.08)", margin: "4px 0" }} />
+              <button
+                onClick={() => { setMenuOpen(false); setShowAvatarUpload(true); }}
+                className="flex items-center gap-2 w-full px-3 py-2 text-sm rounded-lg transition-colors"
+                style={{ color: "rgba(255,255,255,0.6)" }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = "rgba(255,255,255,0.05)"; e.currentTarget.style.color = "rgba(255,255,255,0.9)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "rgba(255,255,255,0.6)"; }}
+              >
+                <Camera size={16} />
+                Alterar foto
+              </button>
               <button
                 onClick={() => { setMenuOpen(false); onNavigate("configuracoes"); }}
                 className="flex items-center gap-2 w-full px-3 py-2 text-sm rounded-lg transition-colors"
@@ -126,34 +110,20 @@ const MobileNav = ({ activeItem, onNavigate }: MobileNavProps) => {
 
       <nav
         className="md:hidden fixed bottom-0 left-0 right-0 z-30 flex items-center justify-around h-16"
-        style={{
-          background: "#FFFFFF",
-          borderTop: "1px solid #E2E8F0",
-          boxShadow: "0 -2px 10px rgba(0,0,0,0.04)",
-        }}
+        style={{ background: "#FFFFFF", borderTop: "1px solid #E2E8F0", boxShadow: "0 -2px 10px rgba(0,0,0,0.04)" }}
       >
         {navItems.map((item) => {
           const isActive = activeItem === item.path;
           return (
-            <button
-              key={item.path}
-              onClick={() => onNavigate(item.path)}
-              className="flex flex-col items-center gap-1 py-1.5 px-2"
-            >
-              <item.icon
-                size={20}
-                style={{ color: isActive ? "#00B4D8" : "#94A3B8" }}
-              />
-              <span
-                className="text-[10px] font-medium"
-                style={{ color: isActive ? "#00B4D8" : "#94A3B8" }}
-              >
-                {item.label}
-              </span>
+            <button key={item.path} onClick={() => onNavigate(item.path)} className="flex flex-col items-center gap-1 py-1.5 px-2">
+              <item.icon size={20} style={{ color: isActive ? "#00B4D8" : "#94A3B8" }} />
+              <span className="text-[10px] font-medium" style={{ color: isActive ? "#00B4D8" : "#94A3B8" }}>{item.label}</span>
             </button>
           );
         })}
       </nav>
+
+      {showAvatarUpload && <AvatarUploadModal onClose={() => setShowAvatarUpload(false)} />}
     </>
   );
 };
