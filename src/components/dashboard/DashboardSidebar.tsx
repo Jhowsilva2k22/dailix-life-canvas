@@ -41,7 +41,7 @@ const DashboardSidebar = ({ activeItem, onNavigate }: DashboardSidebarProps) => 
                 <button
                   key={item.path}
                   onClick={() => onNavigate(item.path)}
-                  className="flex items-center gap-3 text-sm font-medium transition-all text-left relative"
+                  className="flex items-center gap-3 transition-all text-left relative"
                   style={{
                     padding: "10px 16px",
                     color: isActive ? "#00B4D8" : "rgba(255,255,255,0.45)",
