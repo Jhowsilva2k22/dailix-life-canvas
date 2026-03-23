@@ -60,7 +60,7 @@ const AddTaskModal = ({ onClose, onSaved }: AddTaskModalProps) => {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-6">
-          <h3 className="font-display text-lg font-bold" style={{ color: "#0F172A" }}>
+          <h3 className="font-display text-lg" style={{ color: "#0F172A", fontWeight: 400 }}>
             Nova tarefa
           </h3>
           <button onClick={onClose} className="p-1" style={{ color: "#94A3B8" }}>
