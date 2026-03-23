@@ -252,17 +252,28 @@ const GoalsTabInner = () => {
     );
   }
 
+  /* ---- Header with inline button ---- */
+  const headerRow = (
+    <div className="flex items-center justify-between mb-4">
+      <h2 style={{ color: "#0F172A", fontSize: 16, fontWeight: 500 }}>Metas</h2>
+      <button
+        onClick={() => { setEditing(null); setShowModal(true); }}
+        className="inline-flex items-center gap-1 transition-colors hover:opacity-80"
+        style={{ border: "1px solid #1E3A5F", color: "#1E3A5F", background: "transparent", borderRadius: 8, padding: "8px 16px", fontSize: 13, fontWeight: 400 }}
+      >
+        <Plus size={14} /> Nova meta
+      </button>
+    </div>
+  );
+
   /* ---- Empty ---- */
   if (goals.length === 0) {
     return (
-      <div className="relative pb-20">
+      <div>
+        {headerRow}
         <div data-reveal style={{ background: "rgba(0,180,216,0.03)", border: "1px dashed rgba(0,180,216,0.2)", borderRadius: 14 }} className="flex flex-col items-center justify-center py-16">
           <p style={{ color: "#94A3B8", fontSize: 14, fontWeight: 300 }}>Nenhuma meta criada ainda.</p>
-          <button onClick={() => { setEditing(null); setShowModal(true); }} className="inline-flex items-center gap-1.5 mt-3 transition-colors" style={{ color: "#00B4D8", fontSize: 13, fontWeight: 400, padding: "8px 16px" }}>
-            <Plus size={16} /> Nova meta
-          </button>
         </div>
-        <FloatingButton onClick={() => { setEditing(null); setShowModal(true); }} />
         {showModal && <GoalModal goal={null} onClose={() => { setShowModal(false); setEditing(null); }} onSaved={handleSaved} />}
       </div>
     );
