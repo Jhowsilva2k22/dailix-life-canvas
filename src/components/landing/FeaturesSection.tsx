@@ -1,11 +1,4 @@
-import {
-  Target,
-  Users,
-  Briefcase,
-  Heart,
-  Play,
-  Lightbulb,
-} from "lucide-react";
+import { Target, Users, Briefcase, Heart } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 const features = [
@@ -29,16 +22,6 @@ const features = [
     title: "Bem-estar",
     desc: "Acompanhe sono, exercicios e saude mental com metricas que fazem sentido.",
   },
-  {
-    icon: Play,
-    title: "Video Curado",
-    desc: "Conteudo em video selecionado para cada area da sua vida, sem ruido.",
-  },
-  {
-    icon: Lightbulb,
-    title: "Insights",
-    desc: "Aprenda com dados educacionais integrados que te ajudam a tomar melhores decisoes.",
-  },
 ];
 
 const FeaturesSection = () => {
@@ -47,7 +30,9 @@ const FeaturesSection = () => {
 
   useEffect(() => {
     const observer = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) setVisible(true); },
+      ([entry]) => {
+        if (entry.isIntersecting) setVisible(true);
+      },
       { threshold: 0.15 }
     );
     if (ref.current) observer.observe(ref.current);
@@ -55,32 +40,59 @@ const FeaturesSection = () => {
   }, []);
 
   return (
-    <section id="features" className="py-20 md:py-28" ref={ref}>
+    <section
+      id="features"
+      className="py-20 md:py-28"
+      ref={ref}
+      style={{ background: "linear-gradient(180deg, #EFF6FF, #E0F2FE)" }}
+    >
       <div className="container">
-        <div className="text-center max-w-2xl mx-auto mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-            Tudo que voce precisa, onde precisa
+        <div
+          className={`text-center max-w-2xl mx-auto mb-16 transition-all duration-700 ${
+            visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
+          }`}
+        >
+          <h2 className="text-[2rem] md:text-[2.5rem] font-bold mb-4" style={{ color: "#0F172A" }}>
+            Quatro areas. Uma plataforma.
           </h2>
-          <p className="text-muted-foreground text-lg">
-            Seis pilares para organizar cada dimensao da sua vida com clareza e foco.
+          <p style={{ fontSize: 18, color: "#64748B" }}>
+            Tudo que voce precisa para organizar cada parte da sua vida.
           </p>
         </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-2 gap-6">
           {features.map((f, i) => (
             <div
               key={f.title}
-              className={`group rounded-2xl bg-card border p-6 transition-all duration-300 hover:shadow-elevated hover:-translate-y-1 ${
-                visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+              className={`group transition-all duration-500 ${
+                visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
               }`}
               style={{
-                transitionDelay: visible ? `${i * 80}ms` : "0ms",
-                transitionProperty: "opacity, transform, box-shadow",
+                transitionDelay: visible ? `${i * 100 + 200}ms` : "0ms",
+                background: "rgba(255,255,255,0.7)",
+                backdropFilter: "blur(16px)",
+                WebkitBackdropFilter: "blur(16px)",
+                border: "1px solid rgba(255,255,255,0.9)",
+                borderRadius: 16,
+                padding: 32,
+                boxShadow: "0 4px 24px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.8)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-4px)";
+                e.currentTarget.style.boxShadow =
+                  "0 8px 40px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.8)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow =
+                  "0 4px 24px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.8)";
               }}
             >
-              <f.icon className="h-6 w-6 text-accent mb-4" />
-              <h3 className="text-base font-semibold text-foreground mb-2">{f.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
+              <f.icon style={{ color: "#00B4D8", width: 28, height: 28, marginBottom: 16 }} />
+              <h3 className="text-xl font-bold mb-2" style={{ color: "#0F172A" }}>
+                {f.title}
+              </h3>
+              <p style={{ fontSize: 15, color: "#64748B", lineHeight: 1.6 }}>{f.desc}</p>
             </div>
           ))}
         </div>

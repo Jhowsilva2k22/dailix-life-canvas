@@ -88,18 +88,21 @@ export default {
           from: { opacity: "0" },
           to: { opacity: "1" },
         },
-        "mesh-drift-1": {
-          "0%, 100%": { transform: "translate(0, 0)" },
-          "50%": { transform: "translate(20px, -20px)" },
+        "orb-float-1": {
+          "0%": { transform: "translate(0, 0)" },
+          "100%": { transform: "translate(-40px, 30px)" },
         },
-        "mesh-drift-2": {
-          "0%, 100%": { transform: "translate(0, 0)" },
-          "50%": { transform: "translate(-20px, 20px)" },
+        "orb-float-2": {
+          "0%": { transform: "translate(0, 0)" },
+          "100%": { transform: "translate(30px, -40px)" },
         },
-        "mesh-drift-3": {
-          "0%, 100%": { transform: "translate(0, 0)" },
-          "25%": { transform: "translate(15px, 15px)" },
-          "75%": { transform: "translate(-15px, -10px)" },
+        "orb-float-3": {
+          "0%": { transform: "translate(0, 0)" },
+          "100%": { transform: "translate(-20px, 20px)" },
+        },
+        "gradient-shift": {
+          "0%, 100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
         },
       },
       animation: {
@@ -107,9 +110,10 @@ export default {
         "accordion-up": "accordion-up 0.2s ease-out",
         "fade-up": "fade-up 0.6s cubic-bezier(0.16,1,0.3,1) forwards",
         "fade-in": "fade-in 0.5s ease-out forwards",
-        "mesh-1": "mesh-drift-1 8s ease-in-out infinite",
-        "mesh-2": "mesh-drift-2 12s ease-in-out infinite",
-        "mesh-3": "mesh-drift-3 10s ease-in-out infinite",
+        "orb-1": "orb-float-1 12s ease-in-out infinite alternate",
+        "orb-2": "orb-float-2 16s ease-in-out infinite alternate-reverse",
+        "orb-3": "orb-float-3 20s ease-in-out infinite alternate",
+        "gradient-shift": "gradient-shift 4s ease infinite",
       },
     },
   },
