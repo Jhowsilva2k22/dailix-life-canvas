@@ -299,8 +299,10 @@ const Onboarding = () => {
                 <button
                   onClick={handleFinish}
                   disabled={submitting}
-                  className="inline-flex items-center gap-2 px-6 py-3 text-sm font-semibold text-white rounded-[10px] transition-all duration-200 active:scale-[0.97] disabled:opacity-60"
+                  className="inline-flex items-center gap-2 px-6 py-3 text-sm text-white rounded-[10px] transition-all duration-200 active:scale-[0.97] disabled:opacity-60"
                   style={{
+                    fontWeight: 400,
+                    letterSpacing: "0.02em",
                     background: "linear-gradient(135deg, #1E3A5F, #00B4D8)",
                     boxShadow: "0 4px 16px rgba(0,180,216,0.3)",
                   }}
