@@ -145,9 +145,11 @@ const AddTaskModal = ({ onClose, onSaved }: AddTaskModalProps) => {
         <button
           onClick={handleSave}
           disabled={!titulo.trim() || saving}
-          className="w-full mt-6 py-3 text-sm font-semibold text-white rounded-xl transition-opacity disabled:opacity-50"
+          className="w-full mt-6 py-3 text-sm text-white rounded-lg transition-opacity disabled:opacity-50"
           style={{
             background: "linear-gradient(135deg, #1E3A5F, #00B4D8)",
+            fontWeight: 400,
+            letterSpacing: "0.02em",
           }}
         >
           {saving ? "Salvando..." : "Salvar tarefa"}
