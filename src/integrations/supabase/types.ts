@@ -64,6 +64,39 @@ export type Database = {
           },
         ]
       }
+      tasks: {
+        Row: {
+          concluida: boolean
+          created_at: string
+          descricao: string | null
+          id: string
+          prazo: string | null
+          prioridade: string
+          titulo: string
+          user_id: string
+        }
+        Insert: {
+          concluida?: boolean
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          prazo?: string | null
+          prioridade?: string
+          titulo: string
+          user_id: string
+        }
+        Update: {
+          concluida?: boolean
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          prazo?: string | null
+          prioridade?: string
+          titulo?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
