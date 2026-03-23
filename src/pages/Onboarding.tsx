@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-import { Target, Users, Briefcase, Heart, ArrowRight, ArrowLeft } from "lucide-react";
+import { ArrowRight, ArrowLeft } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/contexts/AuthContext";
@@ -8,10 +8,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const modules = [
-  { id: "foco", label: "Foco", icon: Target, desc: "Tarefas e produtividade" },
-  { id: "familia", label: "Família", icon: Users, desc: "Rotinas e organização" },
-  { id: "negocios", label: "Negócios", icon: Briefcase, desc: "Projetos e contatos" },
-  { id: "bem-estar", label: "Bem-estar", icon: Heart, desc: "Hábitos e saúde" },
+  { id: "foco", num: "01", label: "Foco", desc: "Tarefas e produtividade" },
+  { id: "familia", num: "02", label: "Família", desc: "Rotinas e organização" },
+  { id: "negocios", num: "03", label: "Negócios", desc: "Projetos e contatos" },
+  { id: "bem-estar", num: "04", label: "Bem-estar", desc: "Hábitos e saúde" },
 ];
 
 const Onboarding = () => {
@@ -99,7 +99,7 @@ const Onboarding = () => {
           {step === 1 && (
             <div className="flex flex-col gap-6">
               <div>
-                <h2 className="text-2xl font-bold" style={{ color: "#0F172A" }}>
+                <h2 className="font-display text-2xl font-bold" style={{ color: "#0F172A" }}>
                   Configure seu espaço
                 </h2>
                 <p className="text-sm mt-1" style={{ color: "#64748B" }}>
@@ -132,7 +132,7 @@ const Onboarding = () => {
           {step === 2 && (
             <div className="flex flex-col gap-6">
               <div>
-                <h2 className="text-2xl font-bold" style={{ color: "#0F172A" }}>
+                <h2 className="font-display text-2xl font-bold" style={{ color: "#0F172A" }}>
                   Escolha suas áreas
                 </h2>
                 <p className="text-sm mt-1" style={{ color: "#64748B" }}>
@@ -159,18 +159,20 @@ const Onboarding = () => {
                           : "none",
                       }}
                     >
-                      <m.icon
-                        className="mb-2"
+                      <span
                         style={{
-                          width: 24,
-                          height: 24,
-                          color: selected ? "#00B4D8" : "#64748B",
+                          fontSize: 11,
+                          letterSpacing: "0.1em",
+                          color: "#00B4D8",
+                          fontWeight: 500,
                         }}
-                      />
-                      <p className="text-sm font-semibold" style={{ color: "#0F172A" }}>
+                      >
+                        {m.num}
+                      </span>
+                      <p className="font-display text-lg font-bold mt-1" style={{ color: "#0F172A" }}>
                         {m.label}
                       </p>
-                      <p className="text-xs mt-0.5" style={{ color: "#94A3B8" }}>
+                      <p className="text-[13px] mt-0.5" style={{ color: "#64748B" }}>
                         {m.desc}
                       </p>
                     </button>
@@ -210,7 +212,7 @@ const Onboarding = () => {
           {step === 3 && (
             <div className="flex flex-col gap-6">
               <div>
-                <h2 className="text-2xl font-bold" style={{ color: "#0F172A" }}>
+                <h2 className="font-display text-2xl font-bold" style={{ color: "#0F172A" }}>
                   Defina sua primeira meta
                 </h2>
                 <p className="text-sm mt-1" style={{ color: "#64748B" }}>

@@ -68,7 +68,7 @@ const PricingSection = () => {
             visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
           }`}
         >
-          <h2 className="text-[2rem] md:text-[2.5rem] font-bold mb-4" style={{ color: "#0F172A" }}>
+          <h2 className="font-display text-[2rem] md:text-[2.5rem] font-bold mb-4" style={{ color: "#0F172A" }}>
             Planos simples, sem surpresas.
           </h2>
           <p style={{ fontSize: 18, color: "#64748B" }}>
@@ -95,7 +95,7 @@ const PricingSection = () => {
                 transform: p.highlight ? "scale(1.04)" : "scale(1)",
               }}
             >
-              <h3 className="text-[22px] font-bold mb-2" style={{ color: "#0F172A" }}>
+              <h3 className="font-display text-[22px] font-bold mb-2" style={{ color: "#0F172A" }}>
                 {p.name}
               </h3>
               <div className="flex items-baseline gap-1 mb-6">

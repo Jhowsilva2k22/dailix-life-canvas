@@ -65,7 +65,7 @@ const Cadastro = () => {
           boxShadow: "0 4px 24px rgba(0,0,0,0.06)",
         }}
       >
-        <h1 className="text-2xl font-bold" style={{ color: "#0F172A" }}>
+        <h1 className="font-display text-2xl font-bold" style={{ color: "#0F172A" }}>
           Criar sua conta
         </h1>
         <p className="text-sm mt-1 mb-8" style={{ color: "#64748B" }}>

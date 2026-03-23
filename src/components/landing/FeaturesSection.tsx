@@ -52,7 +52,7 @@ const FeaturesSection = () => {
             visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"
           }`}
         >
-          <h2 className="text-[2rem] md:text-[2.5rem] font-bold mb-4" style={{ color: "#0F172A" }}>
+          <h2 className="font-display text-[2rem] md:text-[2.5rem] font-bold mb-4" style={{ color: "#0F172A" }}>
             Quatro areas. Uma plataforma.
           </h2>
           <p style={{ fontSize: 18, color: "#64748B" }}>
@@ -89,7 +89,7 @@ const FeaturesSection = () => {
               }}
             >
               <f.icon style={{ color: "#00B4D8", width: 28, height: 28, marginBottom: 16 }} />
-              <h3 className="text-xl font-bold mb-2" style={{ color: "#0F172A" }}>
+              <h3 className="font-display text-xl font-bold mb-2" style={{ color: "#0F172A" }}>
                 {f.title}
               </h3>
               <p style={{ fontSize: 15, color: "#64748B", lineHeight: 1.6 }}>{f.desc}</p>
