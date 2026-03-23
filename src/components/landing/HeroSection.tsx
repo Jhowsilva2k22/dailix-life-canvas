@@ -138,16 +138,10 @@ const HeroSection = () => {
                 onClick={() => navigate("/cadastro")}
                 className="inline-flex items-center gap-2 px-7 py-3.5 text-sm text-white rounded-[10px] transition-all duration-200 active:scale-[0.97]"
                 style={{
-                  ...{
-                    background: "linear-gradient(135deg, #1E3A5F, #00B4D8)",
-                    boxShadow: "0 8px 32px rgba(0,180,216,0.35)",
-                  },
-                  fontWeight: 400,
-                  letterSpacing: "0.02em",
-                }}
-                style={{
                   background: "linear-gradient(135deg, #1E3A5F, #00B4D8)",
                   boxShadow: "0 8px 32px rgba(0,180,216,0.35)",
+                  fontWeight: 400,
+                  letterSpacing: "0.02em",
                 }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.boxShadow = "0 12px 40px rgba(0,180,216,0.5)";
