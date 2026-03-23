@@ -14,6 +14,113 @@ export type Database = {
   }
   public: {
     Tables: {
+      goals: {
+        Row: {
+          created_at: string
+          data_limite: string | null
+          descricao: string | null
+          id: string
+          progresso: number
+          status: string
+          titulo: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data_limite?: string | null
+          descricao?: string | null
+          id?: string
+          progresso?: number
+          status?: string
+          titulo: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data_limite?: string | null
+          descricao?: string | null
+          id?: string
+          progresso?: number
+          status?: string
+          titulo?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      habit_logs: {
+        Row: {
+          concluido: boolean
+          created_at: string
+          data: string
+          habit_id: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          concluido?: boolean
+          created_at?: string
+          data?: string
+          habit_id: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          concluido?: boolean
+          created_at?: string
+          data?: string
+          habit_id?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "habit_logs_habit_id_fkey"
+            columns: ["habit_id"]
+            isOneToOne: false
+            referencedRelation: "habits"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      habits: {
+        Row: {
+          ativo: boolean
+          categoria: string
+          created_at: string
+          descricao: string | null
+          frequencia: string
+          id: string
+          streak: number
+          titulo: string
+          user_id: string
+        }
+        Insert: {
+          ativo?: boolean
+          categoria?: string
+          created_at?: string
+          descricao?: string | null
+          frequencia?: string
+          id?: string
+          streak?: number
+          titulo: string
+          user_id: string
+        }
+        Update: {
+          ativo?: boolean
+          categoria?: string
+          created_at?: string
+          descricao?: string | null
+          frequencia?: string
+          id?: string
+          streak?: number
+          titulo?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

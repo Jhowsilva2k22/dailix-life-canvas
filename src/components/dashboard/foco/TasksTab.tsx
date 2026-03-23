@@ -1,0 +1,194 @@
+import { useEffect, useState } from "react";
+import { Plus, Trash2 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import AddTaskModal from "../AddTaskModal";
+
+interface Task {
+  id: string;
+  titulo: string;
+  descricao: string | null;
+  prazo: string | null;
+  prioridade: string;
+  concluida: boolean;
+}
+
+const filters = [
+  { key: "hoje", label: "Hoje" },
+  { key: "semana", label: "Esta semana" },
+  { key: "todas", label: "Todas" },
+];
+
+const priorityBadge = (p: string) => {
+  const map: Record<string, { bg: string; color: string }> = {
+    alta: { bg: "rgba(239,68,68,0.1)", color: "#EF4444" },
+    media: { bg: "rgba(245,158,11,0.1)", color: "#F59E0B" },
+    baixa: { bg: "rgba(16,185,129,0.1)", color: "#10B981" },
+  };
+  return map[p] || map.media;
+};
+
+const getStartOfWeek = () => {
+  const d = new Date();
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  return new Date(d.setDate(diff)).toISOString().split("T")[0];
+};
+
+const TasksTab = () => {
+  const { user } = useAuth();
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [filter, setFilter] = useState("hoje");
+  const [showModal, setShowModal] = useState(false);
+
+  const fetchTasks = async () => {
+    if (!user) return;
+    let query = supabase
+      .from("tasks")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+
+    if (filter === "hoje") {
+      const today = new Date().toISOString().split("T")[0];
+      query = query.or(`prazo.eq.${today},prazo.is.null`);
+    } else if (filter === "semana") {
+      const start = getStartOfWeek();
+      const end = new Date();
+      end.setDate(end.getDate() + (7 - end.getDay()));
+      query = query.or(`prazo.gte.${start},prazo.is.null`);
+    }
+
+    const { data } = await query;
+    if (data) setTasks(data as Task[]);
+  };
+
+  useEffect(() => { fetchTasks(); }, [user, filter]);
+
+  const toggleTask = async (id: string, concluida: boolean) => {
+    await supabase.from("tasks").update({ concluida: !concluida }).eq("id", id);
+    setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, concluida: !concluida } : t)));
+  };
+
+  const deleteTask = async (id: string) => {
+    await supabase.from("tasks").delete().eq("id", id);
+    setTasks((prev) => prev.filter((t) => t.id !== id));
+    toast.success("Tarefa removida.");
+  };
+
+  const pending = tasks.filter((t) => !t.concluida).length;
+  const done = tasks.filter((t) => t.concluida).length;
+
+  return (
+    <div>
+      {/* Filters + counters */}
+      <div className="flex items-center justify-between mb-4" data-reveal style={{ transitionDelay: "160ms" }}>
+        <div className="flex gap-2">
+          {filters.map((f) => (
+            <button
+              key={f.key}
+              onClick={() => setFilter(f.key)}
+              className="px-3 py-1.5 rounded-lg transition-colors"
+              style={{
+                fontSize: 12,
+                fontWeight: 400,
+                background: filter === f.key ? "rgba(0,180,216,0.08)" : "transparent",
+                color: filter === f.key ? "#00B4D8" : "#94A3B8",
+                border: filter === f.key ? "1px solid rgba(0,180,216,0.2)" : "1px solid transparent",
+              }}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+        <div className="flex gap-3" style={{ fontSize: 12, color: "#94A3B8", fontWeight: 300 }}>
+          <span>{pending} pendentes</span>
+          <span>{done} concluidas</span>
+        </div>
+      </div>
+
+      {/* Task list */}
+      {tasks.length === 0 ? (
+        <div
+          data-reveal
+          style={{ transitionDelay: "240ms", background: "rgba(0,180,216,0.03)", border: "1px dashed rgba(0,180,216,0.2)", borderRadius: 14 }}
+          className="flex flex-col items-center justify-center py-16"
+        >
+          <p style={{ color: "#94A3B8", fontSize: 14, fontWeight: 300 }}>Nenhuma tarefa encontrada.</p>
+          <button
+            onClick={() => setShowModal(true)}
+            className="inline-flex items-center gap-1.5 mt-3 transition-colors"
+            style={{ color: "#00B4D8", fontSize: 13, fontWeight: 400, padding: "8px 16px" }}
+          >
+            <Plus size={16} />
+            Adicionar tarefa
+          </button>
+        </div>
+      ) : (
+        <div className="space-y-2" data-reveal style={{ transitionDelay: "240ms" }}>
+          {tasks.map((task) => {
+            const badge = priorityBadge(task.prioridade);
+            return (
+              <div
+                key={task.id}
+                className="flex items-center gap-3 p-4 group transition-all duration-200"
+                style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 12 }}
+              >
+                <button
+                  onClick={() => toggleTask(task.id, task.concluida)}
+                  className="w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors"
+                  style={{ borderColor: task.concluida ? "#00B4D8" : "#CBD5E1", background: task.concluida ? "#00B4D8" : "transparent" }}
+                >
+                  {task.concluida && (
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                      <path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  )}
+                </button>
+                <div className="flex-1 min-w-0">
+                  <p style={{ color: task.concluida ? "#94A3B8" : "#0F172A", textDecoration: task.concluida ? "line-through" : "none", fontSize: 14, fontWeight: 400 }}>
+                    {task.titulo}
+                  </p>
+                  {task.descricao && (
+                    <p className="truncate mt-0.5" style={{ color: "#94A3B8", fontSize: 12, fontWeight: 300 }}>{task.descricao}</p>
+                  )}
+                </div>
+                {task.prazo && (
+                  <span style={{ fontSize: 12, color: "#94A3B8", fontWeight: 300 }}>{new Date(task.prazo + "T12:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}</span>
+                )}
+                <span className="px-2 py-0.5 rounded-full" style={{ fontSize: 10, fontWeight: 400, background: badge.bg, color: badge.color }}>
+                  {task.prioridade}
+                </span>
+                <button
+                  onClick={() => deleteTask(task.id)}
+                  className="opacity-0 group-hover:opacity-100 transition-opacity p-1"
+                  style={{ color: "#94A3B8" }}
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            );
+          })}
+          <button
+            onClick={() => setShowModal(true)}
+            className="inline-flex items-center gap-1.5 mt-2 transition-colors"
+            style={{ color: "#00B4D8", fontSize: 13, fontWeight: 400, padding: "8px 16px" }}
+          >
+            <Plus size={16} />
+            Nova tarefa
+          </button>
+        </div>
+      )}
+
+      {showModal && (
+        <AddTaskModal
+          onClose={() => setShowModal(false)}
+          onSaved={() => { setShowModal(false); fetchTasks(); }}
+        />
+      )}
+    </div>
+  );
+};
+
+export default TasksTab;
