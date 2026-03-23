@@ -54,9 +54,19 @@ const HeroSection = () => {
         </div>
       </div>
 
-      <div className="absolute top-0 left-0 w-full h-full -z-10">
-        <div className="absolute top-20 left-1/4 w-96 h-96 bg-accent/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-72 h-72 bg-primary/5 rounded-full blur-3xl" />
+      <div className="absolute inset-0 -z-10 bg-background overflow-hidden">
+        <div
+          className="absolute top-[10%] right-[10%] w-[500px] h-[500px] rounded-full blur-3xl animate-mesh-1"
+          style={{ background: "radial-gradient(circle, rgba(0,180,216,0.07) 0%, transparent 70%)" }}
+        />
+        <div
+          className="absolute bottom-[10%] left-[5%] w-[600px] h-[600px] rounded-full blur-3xl animate-mesh-2"
+          style={{ background: "radial-gradient(circle, rgba(30,58,95,0.05) 0%, transparent 70%)" }}
+        />
+        <div
+          className="absolute top-[40%] left-[40%] w-[450px] h-[450px] rounded-full blur-3xl animate-mesh-3"
+          style={{ background: "radial-gradient(circle, rgba(0,180,216,0.04) 0%, transparent 70%)" }}
+        />
       </div>
     </section>
   );
