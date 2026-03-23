@@ -270,12 +270,13 @@ const DashboardContent = () => {
       ? profile.first_goal.length > 28 ? profile.first_goal.slice(0, 28) + "..." : profile.first_goal
       : "Nenhuma";
   const goalProgress = activeGoal?.progresso ?? 0;
+  const goalHasLinkedTasks = activeGoal?.hasLinkedTasks ?? false;
   const modulesCount = profile.modules?.length || 0;
 
   const summaryCards = [
     { icon: CheckSquare, iconColor: "#00B4D8", label: "TAREFAS HOJE", value: String(pendingToday), sub: "pendentes" },
     { icon: Flame, iconColor: "#F59E0B", label: "SEQUENCIA", value: String(maxStreak), sub: "dias seguidos" },
-    { icon: Target, iconColor: "#00B4D8", label: "META ATIVA", value: goalTitle, isText: true, sub: `${goalProgress}% concluido`, hasProgress: true, progress: goalProgress },
+    { icon: Target, iconColor: "#00B4D8", label: "META ATIVA", value: goalTitle, isText: true, sub: goalHasLinkedTasks ? `${goalProgress}% concluido` : "Sem tarefas vinculadas", hasProgress: goalHasLinkedTasks, progress: goalProgress },
     { icon: TrendingUp, iconColor: "#10B981", label: "MODULOS ATIVOS", value: String(modulesCount), sub: "areas organizadas" },
   ];
 
