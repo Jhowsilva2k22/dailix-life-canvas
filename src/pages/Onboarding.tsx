@@ -159,18 +159,20 @@ const Onboarding = () => {
                           : "none",
                       }}
                     >
-                      <m.icon
-                        className="mb-2"
+                      <span
                         style={{
-                          width: 24,
-                          height: 24,
-                          color: selected ? "#00B4D8" : "#64748B",
+                          fontSize: 11,
+                          letterSpacing: "0.1em",
+                          color: "#00B4D8",
+                          fontWeight: 500,
                         }}
-                      />
-                      <p className="text-sm font-semibold" style={{ color: "#0F172A" }}>
+                      >
+                        {m.num}
+                      </span>
+                      <p className="font-display text-lg font-bold mt-1" style={{ color: "#0F172A" }}>
                         {m.label}
                       </p>
-                      <p className="text-xs mt-0.5" style={{ color: "#94A3B8" }}>
+                      <p className="text-[13px] mt-0.5" style={{ color: "#64748B" }}>
                         {m.desc}
                       </p>
                     </button>
