@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { CheckSquare, Flame, Target, TrendingUp, Plus, Repeat, Play } from "lucide-react";
+import { CheckSquare, Flame, Target, TrendingUp, Plus } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import AddTaskModal from "./AddTaskModal";
@@ -74,8 +74,8 @@ const DashboardContent = () => {
 
   const pendingToday = todayTasks.filter((t) => !t.concluida).length;
   const goalText = profile.first_goal
-    ? profile.first_goal.length > 30
-      ? profile.first_goal.slice(0, 30) + "…"
+    ? profile.first_goal.length > 28
+      ? profile.first_goal.slice(0, 28) + "…"
       : profile.first_goal
     : "Nenhuma";
   const modulesCount = profile.modules?.length || 0;
@@ -84,42 +84,67 @@ const DashboardContent = () => {
     {
       icon: CheckSquare,
       iconColor: "#00B4D8",
-      label: "Tarefas hoje",
+      label: "TAREFAS HOJE",
       value: String(pendingToday),
       sub: "pendentes",
     },
     {
       icon: Flame,
       iconColor: "#F59E0B",
-      label: "Sequência",
+      label: "SEQUÊNCIA",
       value: "0",
       sub: "dias seguidos",
     },
     {
       icon: Target,
       iconColor: "#00B4D8",
-      label: "Meta do mês",
+      label: "META DO MÊS",
       value: goalText,
+      isText: true,
       sub: "definida por você",
     },
     {
       icon: TrendingUp,
       iconColor: "#10B981",
-      label: "Módulos ativos",
+      label: "MÓDULOS ATIVOS",
       value: String(modulesCount),
       sub: "áreas organizadas",
     },
   ];
 
+  const gettingStartedCards = [
+    {
+      num: "01",
+      title: "Defina sua primeira tarefa",
+      desc: "Pequenos passos constroem grandes resultados.",
+      cta: "Criar tarefa",
+      action: () => setShowTaskModal(true),
+    },
+    {
+      num: "02",
+      title: "Crie um hábito",
+      desc: "Consistência supera intensidade.",
+      cta: "Criar hábito",
+      action: () => {},
+    },
+    {
+      num: "03",
+      title: "Explore seu conteúdo",
+      desc: "Vídeos selecionados para cada área da sua vida.",
+      cta: "Ver conteúdo",
+      action: () => {},
+    },
+  ];
+
   return (
-    <div className="flex-1 min-h-screen md:ml-[240px]" style={{ background: "#F8FAFC" }}>
-      <div className="max-w-5xl mx-auto px-4 md:px-8 pt-20 md:pt-8 pb-24 md:pb-10">
+    <div className="flex-1 min-h-screen md:ml-[240px]" style={{ background: "#F1F5F9" }}>
+      <div style={{ maxWidth: 1200 }} className="mx-auto px-4 md:px-8 pt-20 md:pt-8 pb-24 md:pb-10">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="font-display text-2xl md:text-[32px] font-bold" style={{ color: "#0F172A" }}>
+          <h1 className="font-display text-2xl md:text-[30px] font-bold" style={{ color: "#0F172A" }}>
             {getGreeting(profile.display_name || "Usuário")}
           </h1>
-          <p className="text-sm mt-1 capitalize" style={{ color: "#64748B" }}>
+          <p className="text-sm mt-1 capitalize" style={{ color: "#94A3B8" }}>
             {todayStr}
           </p>
         </div>
@@ -129,42 +154,111 @@ const DashboardContent = () => {
           {summaryCards.map((card) => (
             <div
               key={card.label}
-              className="p-5 rounded-xl"
+              className="p-5 transition-all duration-200 cursor-default"
               style={{
                 background: "#FFFFFF",
                 border: "1px solid #E2E8F0",
+                borderRadius: 14,
                 boxShadow: "0 1px 3px rgba(0,0,0,0.04)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = "translateY(-2px)";
+                e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.06)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.04)";
               }}
             >
               <card.icon size={20} style={{ color: card.iconColor }} className="mb-3" />
-              <p className="text-xs font-medium mb-1" style={{ color: "#64748B" }}>
+              <p
+                className="text-xs font-medium mb-1"
+                style={{ color: "#94A3B8", letterSpacing: "0.06em" }}
+              >
                 {card.label}
               </p>
-              <p className="font-display text-2xl md:text-[32px] font-bold truncate leading-tight" style={{ color: "#0F172A" }}>
+              <p
+                className={`font-display font-bold truncate leading-tight ${
+                  card.isText ? "text-base" : "text-3xl md:text-[36px]"
+                }`}
+                style={{ color: "#0F172A" }}
+              >
                 {card.value}
               </p>
-              <p className="text-[11px] mt-0.5" style={{ color: "#94A3B8" }}>
+              <p className="text-[13px] mt-0.5" style={{ color: "#94A3B8" }}>
                 {card.sub}
               </p>
             </div>
           ))}
         </div>
 
+        {/* Por onde começar */}
+        {todayTasks.length === 0 && (
+          <section className="mb-10">
+            <h2 className="font-display text-lg font-bold mb-4" style={{ color: "#0F172A" }}>
+              Por onde começar
+            </h2>
+            <div className="grid md:grid-cols-3 gap-4">
+              {gettingStartedCards.map((card) => (
+                <div
+                  key={card.num}
+                  className="p-6 transition-all duration-200 cursor-pointer"
+                  style={{
+                    background: "#FFFFFF",
+                    border: "1px solid #E2E8F0",
+                    borderRadius: 12,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = "translateY(-2px)";
+                    e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.06)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = "translateY(0)";
+                    e.currentTarget.style.boxShadow = "none";
+                  }}
+                  onClick={card.action}
+                >
+                  <span
+                    style={{
+                      fontSize: 11,
+                      letterSpacing: "0.1em",
+                      color: "#00B4D8",
+                      fontWeight: 500,
+                    }}
+                  >
+                    {card.num}
+                  </span>
+                  <h3 className="font-display text-base font-bold mt-2 mb-1" style={{ color: "#0F172A" }}>
+                    {card.title}
+                  </h3>
+                  <p className="text-sm mb-4" style={{ color: "#64748B" }}>
+                    {card.desc}
+                  </p>
+                  <span className="text-sm font-medium" style={{ color: "#1E3A5F" }}>
+                    {card.cta}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
         {/* Hoje */}
         <section className="mb-10">
-          <h2 className="font-display text-xl font-bold mb-4" style={{ color: "#0F172A" }}>
+          <h2 className="font-display text-lg font-bold mb-4" style={{ color: "#0F172A" }}>
             Hoje
           </h2>
 
           {todayTasks.length === 0 ? (
             <div
-              className="flex flex-col items-center justify-center py-8 rounded-xl"
+              className="flex flex-col items-center justify-center py-8"
               style={{
                 background: "rgba(0,180,216,0.03)",
                 border: "1px dashed rgba(0,180,216,0.2)",
+                borderRadius: 12,
               }}
             >
-              <p className="text-sm font-medium" style={{ color: "#0F172A" }}>
+              <p className="text-sm" style={{ color: "#94A3B8" }}>
                 Nenhuma tarefa para hoje ainda.
               </p>
               <button
@@ -181,10 +275,11 @@ const DashboardContent = () => {
               {todayTasks.map((task) => (
                 <div
                   key={task.id}
-                  className="flex items-center gap-3 p-4 rounded-xl"
+                  className="flex items-center gap-3 p-4"
                   style={{
                     background: "#FFFFFF",
                     border: "1px solid #E2E8F0",
+                    borderRadius: 12,
                   }}
                 >
                   <button
@@ -252,17 +347,18 @@ const DashboardContent = () => {
 
         {/* Hábitos */}
         <section className="mb-10">
-          <h2 className="font-display text-xl font-bold mb-4" style={{ color: "#0F172A" }}>
+          <h2 className="font-display text-lg font-bold mb-4" style={{ color: "#0F172A" }}>
             Hábitos de hoje
           </h2>
           <div
-            className="flex flex-col items-center justify-center py-8 rounded-xl"
+            className="flex flex-col items-center justify-center py-8"
             style={{
               background: "rgba(0,180,216,0.03)",
               border: "1px dashed rgba(0,180,216,0.2)",
+              borderRadius: 12,
             }}
           >
-            <p className="text-sm font-medium" style={{ color: "#0F172A" }}>
+            <p className="text-sm" style={{ color: "#94A3B8" }}>
               Nenhum hábito configurado.
             </p>
             <button
@@ -274,72 +370,6 @@ const DashboardContent = () => {
             </button>
           </div>
         </section>
-
-        {/* Por onde começar — só aparece quando tudo vazio */}
-        {todayTasks.length === 0 && (
-          <section>
-            <h2 className="font-display text-xl font-bold mb-4" style={{ color: "#0F172A" }}>
-              Por onde começar
-            </h2>
-            <div className="grid md:grid-cols-3 gap-4">
-              {[
-                {
-                  icon: Target,
-                  title: "Defina sua primeira tarefa",
-                  desc: "Pequenos passos constroem grandes resultados.",
-                  cta: "Criar tarefa",
-                  action: () => setShowTaskModal(true),
-                },
-                {
-                  icon: Repeat,
-                  title: "Crie um hábito",
-                  desc: "Consistência é mais poderosa que intensidade.",
-                  cta: "Criar hábito",
-                  action: () => {},
-                },
-                {
-                  icon: Play,
-                  title: "Assista um vídeo",
-                  desc: "Conteúdo selecionado para te ajudar a evoluir.",
-                  cta: "Ver conteúdo",
-                  action: () => {},
-                },
-              ].map((card) => (
-                <div
-                  key={card.title}
-                  className="p-6 rounded-xl transition-all duration-200 cursor-pointer"
-                  style={{
-                    background: "#FFFFFF",
-                    border: "1px solid #E2E8F0",
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = "translateY(-2px)";
-                    e.currentTarget.style.boxShadow = "0 8px 24px rgba(0,0,0,0.08)";
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = "translateY(0)";
-                    e.currentTarget.style.boxShadow = "none";
-                  }}
-                >
-                  <card.icon size={24} style={{ color: "#00B4D8" }} className="mb-3" />
-                  <h3 className="font-display text-base font-bold mb-1" style={{ color: "#0F172A" }}>
-                    {card.title}
-                  </h3>
-                  <p className="text-sm mb-4" style={{ color: "#64748B" }}>
-                    {card.desc}
-                  </p>
-                  <button
-                    onClick={card.action}
-                    className="text-sm font-medium transition-colors"
-                    style={{ color: "#00B4D8" }}
-                  >
-                    {card.cta}
-                  </button>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
       </div>
 
       {showTaskModal && (

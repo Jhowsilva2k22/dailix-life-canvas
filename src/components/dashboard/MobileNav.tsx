@@ -41,8 +41,14 @@ const MobileNav = ({ activeItem, onNavigate }: MobileNavProps) => {
       >
         <span className="font-display text-base font-bold text-white">Dailix</span>
         <div
-          className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold"
-          style={{ background: "rgba(0,180,216,0.2)", color: "#00B4D8" }}
+          className="flex items-center justify-center text-xs font-bold font-display"
+          style={{
+            width: 36,
+            height: 36,
+            borderRadius: 10,
+            background: "#1E3A5F",
+            color: "white",
+          }}
         >
           {(displayName || "U").charAt(0).toUpperCase()}
         </div>
