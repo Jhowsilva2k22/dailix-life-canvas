@@ -72,7 +72,6 @@ const GoalsTabInner = () => {
   const [fetchError, setFetchError] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<Goal | null>(null);
-  const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
 
   const fetchGoals = useCallback(async () => {
