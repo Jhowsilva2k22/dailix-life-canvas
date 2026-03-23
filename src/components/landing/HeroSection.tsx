@@ -12,6 +12,7 @@ const benefits = [
 const HeroSection = () => {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 100);
