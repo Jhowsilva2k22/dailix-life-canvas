@@ -104,6 +104,49 @@ const HabitsTab = () => {
   useEffect(() => { fetchHabits(); fetchTodayLogs(); }, [fetchHabits, fetchTodayLogs]);
   useEffect(() => { if (habits.length > 0) refreshStreaks(); }, [habits.length]);
 
+  // Realtime subscriptions
+  useEffect(() => {
+    if (!user) return;
+    const channel = supabase
+      .channel('habits-realtime')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'habits',
+        filter: `user_id=eq.${user.id}`,
+      }, (payload) => {
+        if (payload.eventType === 'INSERT') {
+          setHabits((prev) => [payload.new as Habit, ...prev]);
+        } else if (payload.eventType === 'UPDATE') {
+          const h = payload.new as Habit;
+          setHabits((prev) => prev.map((old) => old.id === h.id ? h : old));
+        } else if (payload.eventType === 'DELETE') {
+          const old = payload.old as { id: string };
+          setHabits((prev) => prev.filter((h) => h.id !== old.id));
+        }
+      })
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'habit_logs',
+        filter: `user_id=eq.${user.id}`,
+      }, (payload) => {
+        if (payload.eventType === 'INSERT') {
+          const log = payload.new as any;
+          if (log.data === today && log.concluido) {
+            setCompletedToday((prev) => new Set(prev).add(log.habit_id));
+          }
+        } else if (payload.eventType === 'DELETE') {
+          const log = payload.old as any;
+          if (log.data === today) {
+            setCompletedToday((prev) => { const s = new Set(prev); s.delete(log.habit_id); return s; });
+          }
+        }
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [user, today]);
+
   const toggleHabit = async (habitId: string) => {
     if (!user) return;
     const isCompleted = completedToday.has(habitId);

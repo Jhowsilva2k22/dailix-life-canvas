@@ -116,6 +116,58 @@ const GoalsTabInner = () => {
 
   useEffect(() => { fetchGoals(); }, [fetchGoals]);
 
+  // Realtime: goals
+  useEffect(() => {
+    if (!user) return;
+    const channel = supabase
+      .channel('goals-realtime')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'goals',
+        filter: `user_id=eq.${user.id}`,
+      }, (payload) => {
+        if (payload.eventType === 'INSERT') {
+          const g = payload.new as Goal;
+          setGoals((prev) => [g, ...prev]);
+          setSubTasks((prev) => ({ ...prev, [g.id]: [] }));
+        } else if (payload.eventType === 'UPDATE') {
+          const g = payload.new as Goal;
+          setGoals((prev) => prev.map((old) => old.id === g.id ? g : old));
+        } else if (payload.eventType === 'DELETE') {
+          const old = payload.old as { id: string };
+          setGoals((prev) => prev.filter((g) => g.id !== old.id));
+        }
+      })
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'tasks',
+        filter: `user_id=eq.${user.id}`,
+      }, (payload) => {
+        // Update sub-tasks when tasks with goal_id change
+        const task = (payload.eventType === 'DELETE' ? payload.old : payload.new) as any;
+        if (!task.goal_id) return;
+        const goalId = task.goal_id;
+        if (payload.eventType === 'INSERT') {
+          const st: SubTask = { id: task.id, titulo: task.titulo, concluida: task.concluida, prioridade: task.prioridade };
+          setSubTasks((prev) => ({ ...prev, [goalId]: [...(prev[goalId] || []), st] }));
+        } else if (payload.eventType === 'UPDATE') {
+          setSubTasks((prev) => ({
+            ...prev,
+            [goalId]: (prev[goalId] || []).map((t) => t.id === task.id ? { id: task.id, titulo: task.titulo, concluida: task.concluida, prioridade: task.prioridade } : t),
+          }));
+        } else if (payload.eventType === 'DELETE') {
+          setSubTasks((prev) => ({
+            ...prev,
+            [goalId]: (prev[goalId] || []).filter((t) => t.id !== task.id),
+          }));
+        }
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [user]);
+
   const toggleSubTask = async (goalId: string, taskId: string, current: boolean) => {
     // Optimistic
     setSubTasks((prev) => {

@@ -82,6 +82,33 @@ const TasksTab = () => {
 
   useEffect(() => { fetchTasks(); }, [user, filter]);
 
+  // Realtime subscription
+  useEffect(() => {
+    if (!user) return;
+    const channel = supabase
+      .channel('tasks-realtime')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'tasks',
+        filter: `user_id=eq.${user.id}`,
+      }, (payload) => {
+        const { eventType } = payload;
+        if (eventType === 'INSERT') {
+          const newTask = payload.new as Task;
+          setTasks((prev) => sortTasks([newTask, ...prev], filter));
+        } else if (eventType === 'UPDATE') {
+          const updated = payload.new as Task;
+          setTasks((prev) => sortTasks(prev.map((t) => t.id === updated.id ? updated : t), filter));
+        } else if (eventType === 'DELETE') {
+          const old = payload.old as { id: string };
+          setTasks((prev) => prev.filter((t) => t.id !== old.id));
+        }
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [user, filter]);
+
   const toggleTask = async (id: string, concluida: boolean) => {
     // Optimistic update
     setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, concluida: !concluida } : t)));

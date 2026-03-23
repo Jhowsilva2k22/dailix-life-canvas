@@ -76,6 +76,81 @@ const DashboardContent = () => {
     fetchActiveGoal();
   }, [user]);
 
+  // Realtime subscriptions
+  useEffect(() => {
+    if (!user) return;
+    const channel = supabase
+      .channel('dashboard-realtime')
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'tasks',
+        filter: `user_id=eq.${user.id}`,
+      }, (payload) => {
+        if (payload.eventType === 'INSERT') {
+          setTasks((prev) => [payload.new as Task, ...prev]);
+        } else if (payload.eventType === 'UPDATE') {
+          const t = payload.new as Task;
+          setTasks((prev) => prev.map((old) => old.id === t.id ? t : old));
+        } else if (payload.eventType === 'DELETE') {
+          const old = payload.old as { id: string };
+          setTasks((prev) => prev.filter((t) => t.id !== old.id));
+        }
+        // Refresh active goal progress when tasks change
+        fetchActiveGoal();
+      })
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'habit_logs',
+        filter: `user_id=eq.${user.id}`,
+      }, (payload) => {
+        const todayDate = new Date().toISOString().split("T")[0];
+        if (payload.eventType === 'INSERT') {
+          const log = payload.new as any;
+          if (log.data === todayDate && log.concluido) {
+            setCompletedHabitsToday((prev) => new Set(prev).add(log.habit_id));
+          }
+        } else if (payload.eventType === 'DELETE') {
+          const log = payload.old as any;
+          if (log.data === todayDate) {
+            setCompletedHabitsToday((prev) => { const s = new Set(prev); s.delete(log.habit_id); return s; });
+          }
+        }
+      })
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'habits',
+        filter: `user_id=eq.${user.id}`,
+      }, (payload) => {
+        if (payload.eventType === 'INSERT') {
+          setHabits((prev) => [payload.new as Habit, ...prev]);
+        } else if (payload.eventType === 'UPDATE') {
+          const h = payload.new as Habit;
+          setHabits((prev) => prev.map((old) => old.id === h.id ? h : old));
+        } else if (payload.eventType === 'DELETE') {
+          const old = payload.old as { id: string };
+          setHabits((prev) => prev.filter((h) => h.id !== old.id));
+        }
+        // Recalc max streak
+        setHabits((prev) => {
+          setMaxStreak(prev.reduce((max, h) => Math.max(max, h.streak || 0), 0));
+          return prev;
+        });
+      })
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'goals',
+        filter: `user_id=eq.${user.id}`,
+      }, () => {
+        fetchActiveGoal();
+      })
+      .subscribe();
+    return () => { supabase.removeChannel(channel); };
+  }, [user]);
+
   const fetchActiveGoal = async () => {
     if (!user) return;
     const { data: goalsData } = await supabase
