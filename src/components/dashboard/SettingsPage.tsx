@@ -29,7 +29,7 @@ const SettingsPage = () => {
           <div className="flex items-start gap-4 mb-4">
             <UserAvatar avatarUrl={avatarUrl} displayName={displayName} size={72} />
             <div className="pt-1">
-              <p className="font-display text-xl font-bold" style={{ color: "#0F172A" }}>
+              <p className="font-display text-xl" style={{ color: "#0F172A", fontWeight: 400 }}>
                 {displayName || "Usuário"}
               </p>
               <p className="text-sm" style={{ color: "#64748B" }}>
