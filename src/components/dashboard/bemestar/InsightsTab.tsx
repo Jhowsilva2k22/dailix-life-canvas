@@ -34,7 +34,8 @@ const categoryMeta: Record<string, { label: string; icon: React.ElementType }> =
 const INITIAL_SHOW = 3;
 const LOAD_MORE = 3;
 
-const InsightsTab = ({ isActive = true, onReadyChange }: InsightsTabProps) => {
+const InsightsTab = ({ isActive = true, onReadyChange, highlightId = null, onHighlightConsumed }: InsightsTabProps) => {
+  const { isHighlighted } = useSearchHighlight(highlightId);
   const [insights, setInsights] = useState<Insight[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
