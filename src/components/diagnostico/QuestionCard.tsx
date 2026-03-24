@@ -31,7 +31,7 @@ const QuestionCard = ({ question, stepNumber, totalSteps, onAnswer }: Props) => 
             Diagnóstico de Execução
           </span>
           <span
-            className="text-[12px] tabular-nums"
+            className="text-[13px] md:text-[12px] tabular-nums"
             style={{ color: "rgba(255,255,255,0.3)", fontWeight: 300 }}
           >
             {stepNumber} de {totalSteps}

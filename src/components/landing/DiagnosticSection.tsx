@@ -32,7 +32,7 @@ const DiagnosticSection = () => {
             }}
           >
             <span
-              className="text-[11px] tracking-[0.14em] uppercase mb-5 block"
+              className="text-[12px] md:text-[11px] tracking-[0.14em] uppercase mb-5 block"
               style={{ color: "rgba(0,180,216,0.6)", fontWeight: 400 }}
             >
               Diagnóstico

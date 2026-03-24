@@ -92,7 +92,7 @@ const DiagnosticResult = ({ principal, secundario }: Props) => {
         }}
       >
         <span
-          className="text-[11px] tracking-[0.1em] uppercase block mb-2"
+          className="text-[12px] md:text-[11px] tracking-[0.1em] uppercase block mb-2"
           style={{ color: "rgba(255,255,255,0.3)", fontWeight: 400 }}
         >
           Padrão secundário identificado

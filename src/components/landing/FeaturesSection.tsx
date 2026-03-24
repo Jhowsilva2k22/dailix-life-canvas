@@ -79,7 +79,7 @@ const FeaturesSection = () => {
             >
               <span
                 className="font-display block mb-3"
-                style={{ fontSize: 11, letterSpacing: "0.1em", color: "rgba(0,180,216,0.5)", fontWeight: 400 }}
+                style={{ fontSize: 12, letterSpacing: "0.1em", color: "rgba(0,180,216,0.5)", fontWeight: 400 }}
               >
                 {p.num}
               </span>
