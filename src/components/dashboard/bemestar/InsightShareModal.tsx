@@ -131,7 +131,7 @@ const InsightShareModal = ({ insight, onClose }: InsightShareModalProps) => {
             })}
           </div>
 
-          {/* Preview container */}
+          {/* Preview container (scaled for display only) */}
           <div className="flex justify-center px-5 py-5">
             <div
               className="overflow-hidden rounded-xl"
@@ -142,7 +142,6 @@ const InsightShareModal = ({ insight, onClose }: InsightShareModalProps) => {
               }}
             >
               <div
-                ref={canvasRef}
                 style={{
                   width: cfg.w,
                   height: cfg.h,
@@ -152,6 +151,23 @@ const InsightShareModal = ({ insight, onClose }: InsightShareModalProps) => {
               >
                 <InsightCanvas insight={insight} format={format} />
               </div>
+            </div>
+          </div>
+
+          {/* Offscreen full-size node for export only */}
+          <div
+            style={{
+              position: "fixed",
+              left: "-9999px",
+              top: 0,
+              pointerEvents: "none",
+            }}
+          >
+            <div
+              ref={exportRef}
+              style={{ width: cfg.w, height: cfg.h }}
+            >
+              <InsightCanvas insight={insight} format={format} />
             </div>
           </div>
 
