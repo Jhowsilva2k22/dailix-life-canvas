@@ -129,25 +129,24 @@ const PushNotificationToggle = () => {
 
     const vapidOk = vapidResult.status === "fulfilled" && vapidResult.value.success;
     const fcmOk = fcmResult.status === "fulfilled" && fcmResult.value.success;
+    const permission = Notification.permission;
 
     if (vapidOk || fcmOk) {
-      setState("active");
+      await detectState();
       toast.success("Notificações ativadas");
     } else {
-      // Re-check actual system permission before assuming denied
-      const currentPerm = getPushPermission();
-      if (currentPerm === "denied") {
+      if (permission === "denied") {
         setState("denied");
         setShowDenied(true);
-      } else if (currentPerm === "granted") {
-        // Permission is granted but registration failed — not a block
+      } else if (permission === "granted") {
         setState("inactive-with-permission");
-        const errorMsg = vapidResult.status === "fulfilled" ? vapidResult.value.error : "Erro";
-        toast.error(errorMsg || "Erro ao registrar canal de notificações");
+        toast.error("Permissão ativa, mas não foi possível concluir a ativação neste aparelho. Tente novamente.");
       } else {
         setState("inactive");
         toast.error("Erro ao ativar notificações");
       }
+
+      await detectState();
     }
 
     setBusy(false);
