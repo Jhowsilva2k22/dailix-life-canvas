@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useSearchHighlight } from "@/hooks/useSearchHighlight";
-import { Plus, Trash2, Pencil, Heart, Activity } from "lucide-react";
+import { Plus, Trash2, Pencil, Heart } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
