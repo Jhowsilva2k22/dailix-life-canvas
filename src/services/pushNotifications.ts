@@ -51,7 +51,7 @@ export async function subscribeToPush(userId: string): Promise<{ success: boolea
 
     const sub = await reg.pushManager.subscribe({
       userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
+      applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) as any,
     });
 
     const key = sub.getKey("p256dh");
