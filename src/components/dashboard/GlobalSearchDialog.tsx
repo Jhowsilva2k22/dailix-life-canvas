@@ -113,18 +113,6 @@ export default function GlobalSearchDialog({ open, onClose, onSelect }: Props) {
               lineHeight: "1.5",
             }}
           />
-          <style dangerouslySetInnerHTML={{ __html: `
-            .search-dialog-content input::placeholder {
-              color: #64748B !important;
-              -webkit-text-fill-color: #64748B !important;
-              opacity: 1 !important;
-            }
-            .search-dialog-content input::selection {
-              background: rgba(0, 180, 216, 0.35);
-              color: #F1F5F9;
-              -webkit-text-fill-color: #F1F5F9;
-            }
-          `}} />
           {loading && <Loader2 size={16} className="animate-spin flex-shrink-0" style={{ color: "var(--dash-text-muted)" }} />}
           {/* Mobile close button */}
           <button
