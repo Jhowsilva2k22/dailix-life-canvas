@@ -288,7 +288,7 @@ const InsightCanvas = ({
           />
           <span
             style={{
-              fontSize: 20,
+              fontSize: 22,
               fontWeight: 400,
               letterSpacing: "0.12em",
               textTransform: "uppercase" as const,
