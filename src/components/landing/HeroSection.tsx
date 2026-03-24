@@ -46,7 +46,7 @@ const HeroSection = () => {
             className={`mb-8 transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
           >
             <span
-              className="text-[11px] tracking-[0.14em] uppercase"
+              className="text-[12px] md:text-[11px] tracking-[0.14em] uppercase"
               style={{ color: "rgba(0,180,216,0.7)", fontWeight: 400 }}
             >
               Diagnóstico de Execução Dailix
