@@ -264,7 +264,7 @@ const InsightCanvas = ({
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
-          padding: isFeed ? "80px 72px" : "120px 72px",
+          padding: isFeed ? "100px 80px" : "140px 80px",
         }}
       >
         {/* Category pill */}
