@@ -33,6 +33,33 @@ const DashboardSidebar = ({ activeItem, onNavigate, onOpenSearch }: DashboardSid
         </div>
 
         <nav className="flex-1 flex flex-col px-3 mt-4">
+          {/* Search button */}
+          <button
+            onClick={onOpenSearch}
+            className="flex items-center gap-3 transition-all text-left mb-2"
+            style={{
+              padding: "10px 16px",
+              fontSize: 13,
+              fontWeight: 400,
+              color: "var(--dash-text-muted)",
+              background: "var(--dash-muted-surface)",
+              borderRadius: 10,
+              border: "1px solid var(--dash-border)",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = "var(--dash-text-secondary)";
+              e.currentTarget.style.background = "var(--dash-muted-surface-hover)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = "var(--dash-text-muted)";
+              e.currentTarget.style.background = "var(--dash-muted-surface)";
+            }}
+          >
+            <Search size={15} strokeWidth={1.5} />
+            <span className="flex-1">Buscar...</span>
+            <kbd style={{ fontSize: 10, color: "var(--dash-text-muted)", opacity: 0.7 }}>⌘K</kbd>
+          </button>
+
           <div className="flex flex-col gap-0.5">
             {navItems.map((item) => {
               const isActive = activeItem === item.path;
