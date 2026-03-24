@@ -113,7 +113,7 @@ export default function GlobalSearchDialog({ open, onClose, onSelect }: Props) {
               lineHeight: "1.5",
             }}
           />
-          <style>{`
+          <style dangerouslySetInnerHTML={{ __html: `
             .search-dialog-content input::placeholder {
               color: #64748B !important;
               -webkit-text-fill-color: #64748B !important;
@@ -124,8 +124,7 @@ export default function GlobalSearchDialog({ open, onClose, onSelect }: Props) {
               color: #F1F5F9;
               -webkit-text-fill-color: #F1F5F9;
             }
-          `}</style>
-          />
+          `}} />
           {loading && <Loader2 size={16} className="animate-spin flex-shrink-0" style={{ color: "var(--dash-text-muted)" }} />}
           {/* Mobile close button */}
           <button
