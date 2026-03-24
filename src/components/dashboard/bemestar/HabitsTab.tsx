@@ -1,10 +1,11 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useSearchHighlight } from "@/hooks/useSearchHighlight";
-import { Plus, Trash2, Flame, Pencil, Heart } from "lucide-react";
+import { Plus, Trash2, Flame, Pencil, Heart, Trophy } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import HabitModal from "./HabitModal";
+import { calculateStreak, localDateStr } from "@/utils/streakCalculator";
 
 interface HabitsTabProps {
   isActive?: boolean;
@@ -20,6 +21,8 @@ interface Habit {
   categoria: string;
   frequencia: string;
   streak: number;
+  best_streak: number;
+  last_completed_date: string | null;
   ativo: boolean;
 }
 
@@ -31,7 +34,11 @@ const categoryColors: Record<string, { bg: string; color: string; label: string 
   aprendizado: { bg: "var(--dash-accent-subtle)", color: "var(--dash-accent-muted)", label: "Aprendizado" },
 };
 
-const CheckIcon = () => <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+const CheckIcon = () => (
+  <svg width="10" height="10" viewBox="0 0 12 12" fill="none">
+    <path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
 
 const HabitsTab = ({ isActive = true, onReadyChange, highlightId = null, onHighlightConsumed }: HabitsTabProps) => {
   const { isHighlighted } = useSearchHighlight(highlightId);
@@ -42,96 +49,162 @@ const HabitsTab = ({ isActive = true, onReadyChange, highlightId = null, onHighl
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const today = new Date().toISOString().split("T")[0];
+  const streaksComputed = useRef(false);
+  const today = localDateStr();
 
   const fetchHabits = useCallback(async () => {
     if (!user) return;
     try {
-      const { data, error } = await supabase.from("habits").select("*").eq("user_id", user.id).eq("ativo", true).order("created_at", { ascending: false });
+      const { data, error } = await supabase
+        .from("habits")
+        .select("*")
+        .eq("user_id", user.id)
+        .eq("ativo", true)
+        .order("created_at", { ascending: false });
       if (error) throw error;
-      if (data) setHabits(data as Habit[]);
-    } catch { toast.error("Algo deu errado."); }
+      if (data) setHabits(data as unknown as Habit[]);
+    } catch {
+      toast.error("Algo deu errado.");
+    }
   }, [user]);
 
   const fetchTodayLogs = useCallback(async () => {
     if (!user) return;
     try {
-      const { data } = await supabase.from("habit_logs").select("habit_id").eq("user_id", user.id).eq("data", today).eq("concluido", true);
+      const { data } = await supabase
+        .from("habit_logs")
+        .select("habit_id")
+        .eq("user_id", user.id)
+        .eq("data", today)
+        .eq("concluido", true);
       if (data) setCompletedToday(new Set(data.map((l: any) => l.habit_id)));
-    } catch { /* silent */ }
+    } catch {
+      /* silent */
+    }
   }, [user, today]);
 
-  const calcStreak = useCallback(async (habitId: string): Promise<number> => {
-    if (!user) return 0;
-    const { data } = await supabase.from("habit_logs").select("data").eq("habit_id", habitId).eq("user_id", user.id).eq("concluido", true).order("data", { ascending: false }).limit(365);
-    if (!data || data.length === 0) return 0;
-    let streak = 0;
-    const d = new Date();
-    for (let i = 0; i < 365; i++) {
-      const dateStr = d.toISOString().split("T")[0];
-      if (data.some((l: any) => l.data === dateStr)) { streak++; } else if (i > 0) { break; } else { d.setDate(d.getDate() - 1); continue; }
-      d.setDate(d.getDate() - 1);
-    }
-    return streak;
-  }, [user]);
+  /** Recompute streak for a single habit from its full log history */
+  const recomputeStreak = useCallback(
+    async (habitId: string) => {
+      if (!user) return;
+      const { data } = await supabase
+        .from("habit_logs")
+        .select("data")
+        .eq("habit_id", habitId)
+        .eq("user_id", user.id)
+        .eq("concluido", true)
+        .order("data", { ascending: false })
+        .limit(730);
 
-  const refreshStreaks = useCallback(async () => {
-    const updated = await Promise.all(habits.map(async (h) => {
-      const streak = await calcStreak(h.id);
-      if (streak !== h.streak) await supabase.from("habits").update({ streak }).eq("id", h.id);
-      return { ...h, streak };
-    }));
-    setHabits(updated);
-  }, [habits, calcStreak]);
+      const dates = data?.map((l: any) => l.data as string) ?? [];
+      const result = calculateStreak(dates);
 
+      // Update DB
+      await supabase
+        .from("habits")
+        .update({
+          streak: result.currentStreak,
+          best_streak: result.bestStreak,
+          last_completed_date: result.lastCompletedDate,
+        })
+        .eq("id", habitId);
+
+      // Update local state
+      setHabits((prev) =>
+        prev.map((h) =>
+          h.id === habitId
+            ? { ...h, streak: result.currentStreak, best_streak: result.bestStreak, last_completed_date: result.lastCompletedDate }
+            : h
+        )
+      );
+    },
+    [user]
+  );
+
+  /** Recompute streaks for all habits (on mount) */
+  const refreshAllStreaks = useCallback(
+    async (habitList: Habit[]) => {
+      if (!user || habitList.length === 0) return;
+      await Promise.all(habitList.map((h) => recomputeStreak(h.id)));
+    },
+    [user, recomputeStreak]
+  );
+
+  // Initial load
   useEffect(() => {
     let cancelled = false;
-
     const load = async () => {
       if (!user) return;
       setLoading(true);
+      streaksComputed.current = false;
       await Promise.all([fetchHabits(), fetchTodayLogs()]);
       if (!cancelled) setLoading(false);
     };
-
     if (authLoading || !user) return;
     load();
-
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [authLoading, user, fetchHabits, fetchTodayLogs]);
+
+  // Compute streaks once after habits load
+  useEffect(() => {
+    if (habits.length > 0 && !streaksComputed.current) {
+      streaksComputed.current = true;
+      refreshAllStreaks(habits);
+    }
+  }, [habits.length, refreshAllStreaks]);
 
   useEffect(() => {
     if (isActive) onReadyChange?.(!authLoading && !loading);
   }, [isActive, authLoading, loading, onReadyChange]);
 
-  useEffect(() => { if (habits.length > 0) refreshStreaks(); }, [habits.length]);
-
+  // Realtime
   useEffect(() => {
     if (!user) return;
-    const channel = supabase.channel('habits-realtime')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'habits', filter: `user_id=eq.${user.id}` }, (payload) => {
-        if (payload.eventType === 'INSERT') setHabits((prev) => [payload.new as Habit, ...prev]);
-        else if (payload.eventType === 'UPDATE') { const h = payload.new as Habit; setHabits((prev) => prev.map((old) => old.id === h.id ? h : old)); }
-        else if (payload.eventType === 'DELETE') { const old = payload.old as { id: string }; setHabits((prev) => prev.filter((h) => h.id !== old.id)); }
+    const channel = supabase
+      .channel("habits-realtime")
+      .on("postgres_changes", { event: "*", schema: "public", table: "habits", filter: `user_id=eq.${user.id}` }, (payload) => {
+        if (payload.eventType === "INSERT") setHabits((prev) => [payload.new as Habit, ...prev]);
+        else if (payload.eventType === "UPDATE") {
+          const h = payload.new as Habit;
+          setHabits((prev) => prev.map((old) => (old.id === h.id ? h : old)));
+        } else if (payload.eventType === "DELETE") {
+          const old = payload.old as { id: string };
+          setHabits((prev) => prev.filter((h) => h.id !== old.id));
+        }
       })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'habit_logs', filter: `user_id=eq.${user.id}` }, (payload) => {
-        if (payload.eventType === 'INSERT') { const log = payload.new as any; if (log.data === today && log.concluido) setCompletedToday((prev) => new Set(prev).add(log.habit_id)); }
-        else if (payload.eventType === 'DELETE') { const log = payload.old as any; if (log.data === today) setCompletedToday((prev) => { const s = new Set(prev); s.delete(log.habit_id); return s; }); }
-      }).subscribe();
+      .on("postgres_changes", { event: "*", schema: "public", table: "habit_logs", filter: `user_id=eq.${user.id}` }, (payload) => {
+        if (payload.eventType === "INSERT") {
+          const log = payload.new as any;
+          if (log.data === today && log.concluido) setCompletedToday((prev) => new Set(prev).add(log.habit_id));
+        } else if (payload.eventType === "DELETE") {
+          const log = payload.old as any;
+          if (log.data === today) setCompletedToday((prev) => { const s = new Set(prev); s.delete(log.habit_id); return s; });
+        }
+      })
+      .subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [user, today]);
 
   const toggleHabit = async (habitId: string) => {
     if (!user) return;
     const isCompleted = completedToday.has(habitId);
+
+    // Optimistic UI
     if (isCompleted) setCompletedToday((prev) => { const s = new Set(prev); s.delete(habitId); return s; });
     else setCompletedToday((prev) => new Set(prev).add(habitId));
+
     try {
-      if (isCompleted) { const { error } = await supabase.from("habit_logs").delete().eq("habit_id", habitId).eq("user_id", user.id).eq("data", today); if (error) throw error; }
-      else { const { error } = await supabase.from("habit_logs").insert({ habit_id: habitId, user_id: user.id, data: today, concluido: true }); if (error) throw error; }
+      if (isCompleted) {
+        const { error } = await supabase.from("habit_logs").delete().eq("habit_id", habitId).eq("user_id", user.id).eq("data", today);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("habit_logs").insert({ habit_id: habitId, user_id: user.id, data: today, concluido: true });
+        if (error) throw error;
+      }
+      // Recompute streak after toggle
+      await recomputeStreak(habitId);
     } catch {
+      // Rollback
       if (isCompleted) setCompletedToday((prev) => new Set(prev).add(habitId));
       else setCompletedToday((prev) => { const s = new Set(prev); s.delete(habitId); return s; });
       toast.error("Algo deu errado.");
@@ -223,7 +296,11 @@ const HabitsTab = ({ isActive = true, onReadyChange, highlightId = null, onHighl
             const cat = categoryColors[habit.categoria] || categoryColors.saude;
             const done = completedToday.has(habit.id);
             return (
-              <div key={habit.id} data-search-id={habit.id} className={`flex items-center gap-3 px-5 py-4 group transition-all duration-500 ${isHighlighted(habit.id) ? "search-highlight" : ""}`} style={{ borderBottom: i < habits.length - 1 ? "1px solid var(--dash-border)" : "none" }}
+              <div
+                key={habit.id}
+                data-search-id={habit.id}
+                className={`flex items-center gap-3 px-5 py-4 group transition-all duration-500 ${isHighlighted(habit.id) ? "search-highlight" : ""}`}
+                style={{ borderBottom: i < habits.length - 1 ? "1px solid var(--dash-border)" : "none" }}
                 onMouseEnter={(e) => { e.currentTarget.style.background = "var(--dash-muted-surface)"; }}
                 onMouseLeave={(e) => { if (!isHighlighted(habit.id)) e.currentTarget.style.background = "transparent"; }}
               >
@@ -234,7 +311,6 @@ const HabitsTab = ({ isActive = true, onReadyChange, highlightId = null, onHighl
                     border: done ? "none" : "1.5px solid var(--dash-border-strong)",
                     background: done ? "var(--dash-accent)" : "transparent",
                     color: "var(--dash-text)",
-                    transform: done ? "scale(1)" : "scale(1)",
                   }}
                   onMouseEnter={(e) => { if (!done) e.currentTarget.style.borderColor = "var(--dash-accent)"; }}
                   onMouseLeave={(e) => { if (!done) e.currentTarget.style.borderColor = "var(--dash-border-strong)"; }}
@@ -242,15 +318,43 @@ const HabitsTab = ({ isActive = true, onReadyChange, highlightId = null, onHighl
                   {done && <CheckIcon />}
                 </button>
                 <div className="flex-1 min-w-0 cursor-pointer" onClick={() => openEdit(habit)}>
-                  <p style={{ color: done ? "var(--dash-text-muted)" : "var(--dash-text)", fontSize: 14, fontWeight: 400, textDecoration: done ? "line-through" : "none", opacity: done ? 0.6 : 1 }}>{habit.titulo}</p>
-                  {habit.descricao && <p className="truncate mt-0.5" style={{ color: "var(--dash-text-muted)", fontSize: 12, fontWeight: 300 }}>{habit.descricao}</p>}
+                  <p style={{ color: done ? "var(--dash-text-muted)" : "var(--dash-text)", fontSize: 14, fontWeight: 400, textDecoration: done ? "line-through" : "none", opacity: done ? 0.6 : 1 }}>
+                    {habit.titulo}
+                  </p>
+                  {habit.descricao && (
+                    <p className="truncate mt-0.5" style={{ color: "var(--dash-text-muted)", fontSize: 12, fontWeight: 300 }}>
+                      {habit.descricao}
+                    </p>
+                  )}
                 </div>
-                <span className="px-2 py-0.5 rounded flex-shrink-0" style={{ fontSize: 10, fontWeight: 400, background: cat.bg, color: cat.color }}>{cat.label}</span>
-                {habit.streak > 0 && (
-                  <span className="flex items-center gap-1 flex-shrink-0" style={{ fontSize: 12, color: "var(--dash-warning-text)", fontWeight: 400 }}>
-                    <Flame size={12} /> {habit.streak}
-                  </span>
+                <span className="px-2 py-0.5 rounded flex-shrink-0" style={{ fontSize: 10, fontWeight: 400, background: cat.bg, color: cat.color }}>
+                  {cat.label}
+                </span>
+
+                {/* Streak display */}
+                {(habit.streak > 0 || habit.best_streak > 0) && (
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    {habit.streak > 0 && (
+                      <span
+                        className="flex items-center gap-1"
+                        style={{ fontSize: 12, color: "var(--dash-warning-text)", fontWeight: 400 }}
+                        title={`Sequência atual: ${habit.streak} dia${habit.streak > 1 ? "s" : ""}`}
+                      >
+                        <Flame size={12} /> {habit.streak}
+                      </span>
+                    )}
+                    {habit.best_streak > 0 && habit.best_streak > habit.streak && (
+                      <span
+                        className="flex items-center gap-1"
+                        style={{ fontSize: 11, color: "var(--dash-text-muted)", fontWeight: 300 }}
+                        title={`Melhor sequência: ${habit.best_streak} dia${habit.best_streak > 1 ? "s" : ""}`}
+                      >
+                        <Trophy size={11} /> {habit.best_streak}
+                      </span>
+                    )}
+                  </div>
                 )}
+
                 <button onClick={() => openEdit(habit)} className="p-1 opacity-0 md:group-hover:opacity-60 transition-opacity" style={{ color: "var(--dash-text-muted)" }}>
                   <Pencil size={13} />
                 </button>
