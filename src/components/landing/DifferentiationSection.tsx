@@ -25,13 +25,13 @@ const DifferentiationSection = () => {
             className="font-display text-[1.75rem] md:text-[2.25rem] tracking-tight mb-8"
             style={{ color: "#fff", fontWeight: 400, lineHeight: 1.15 }}
           >
-            Produtividade de verdade não parece pressa.
+            Produtividade real não parece correria.
             <br />
             <span style={{ color: "rgba(0,180,216,0.8)" }}>Parece controle.</span>
           </h2>
 
           <p style={{ color: "rgba(255,255,255,0.4)", fontSize: 15, lineHeight: 1.8, fontWeight: 300, maxWidth: 520, margin: "0 auto" }}>
-            Dailix não foi criado para bombardear o usuário com estímulos. Foi criado para sustentar execução com estrutura, navegação estável e foco operacional.
+            Dailix não foi feito para te bombardear com estímulo. Foi feito para reduzir ruído, sustentar consistência e organizar sua execução em alto nível.
           </p>
         </div>
       </div>
