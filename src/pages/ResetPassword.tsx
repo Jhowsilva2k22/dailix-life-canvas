@@ -1,12 +1,11 @@
-import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import { Eye, EyeOff } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 
 const ResetPassword = () => {
-  const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -14,31 +13,30 @@ const ResetPassword = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const [validSession, setValidSession] = useState<boolean | null>(null);
+  const [recoveryConfirmed, setRecoveryConfirmed] = useState<boolean | null>(null);
+  const resolved = useRef(false);
 
   useEffect(() => {
-    // Check for recovery event from the URL hash/token
+    // Listen ONLY for PASSWORD_RECOVERY event — a normal session is NOT enough
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") {
-        setValidSession(true);
+      if (event === "PASSWORD_RECOVERY" && !resolved.current) {
+        resolved.current = true;
+        setRecoveryConfirmed(true);
       }
     });
 
-    // Also check if we already have a session (user clicked the link)
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        setValidSession(true);
-      } else {
-        // Wait a moment for the hash to be processed
-        setTimeout(() => {
-          supabase.auth.getSession().then(({ data: { session: s } }) => {
-            setValidSession(s ? true : false);
-          });
-        }, 1500);
+    // Fallback: if the hash is already consumed and no event fires within 3s, reject
+    const fallbackTimer = setTimeout(() => {
+      if (!resolved.current) {
+        resolved.current = true;
+        setRecoveryConfirmed(false);
       }
-    });
+    }, 3000);
 
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(fallbackTimer);
+    };
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -64,14 +62,13 @@ const ResetPassword = () => {
       return;
     }
 
-    // Sign out so user logs in fresh with new password
     await supabase.auth.signOut();
     setSuccess(true);
     setSubmitting(false);
   };
 
-  // Loading state
-  if (validSession === null) {
+  // Loading — waiting for recovery event
+  if (recoveryConfirmed === null) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4" style={{ background: "#F8FAFC" }}>
         <div
@@ -82,8 +79,8 @@ const ResetPassword = () => {
     );
   }
 
-  // Invalid/expired token
-  if (validSession === false) {
+  // No recovery context (direct access, normal session, expired link)
+  if (!recoveryConfirmed) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4" style={{ background: "#F8FAFC" }}>
         <div
@@ -106,7 +103,7 @@ const ResetPassword = () => {
           <div className="flex flex-col gap-3">
             <Link
               to="/recuperar-senha"
-              className="w-full py-3 text-sm text-white rounded-[10px] text-center"
+              className="w-full py-3 text-sm text-white rounded-[10px] text-center block"
               style={{
                 fontWeight: 400,
                 letterSpacing: "0.02em",
@@ -118,7 +115,7 @@ const ResetPassword = () => {
             </Link>
             <Link
               to="/login"
-              className="w-full py-3 text-sm text-center rounded-[10px]"
+              className="w-full py-3 text-sm text-center rounded-[10px] block"
               style={{ color: "#64748B" }}
             >
               Voltar ao login

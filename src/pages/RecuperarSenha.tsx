@@ -86,12 +86,13 @@ const RecuperarSenha = () => {
             )}
             <button
               type="button"
-              disabled={cooldown}
+              disabled={cooldown || submitting}
               onClick={() => {
+                if (cooldown || submitting) return;
                 setSent(false);
                 setEmail("");
               }}
-              className="mt-4 text-sm font-medium disabled:opacity-40"
+              className="mt-4 text-sm font-medium disabled:opacity-40 disabled:cursor-not-allowed"
               style={{ color: "#00B4D8" }}
             >
               Enviar novamente
