@@ -15,6 +15,7 @@ const navItems = [
 interface MobileNavProps {
   activeItem: string;
   onNavigate: (path: string) => void;
+  onOpenSearch?: () => void;
 }
 
 const MobileNav = ({ activeItem, onNavigate }: MobileNavProps) => {
