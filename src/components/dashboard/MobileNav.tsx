@@ -18,7 +18,7 @@ interface MobileNavProps {
   onOpenSearch?: () => void;
 }
 
-const MobileNav = ({ activeItem, onNavigate }: MobileNavProps) => {
+const MobileNav = ({ activeItem, onNavigate, onOpenSearch }: MobileNavProps) => {
   const { signOut } = useAuth();
   const { avatarUrl, displayName, plano } = useAvatar();
   const [menuOpen, setMenuOpen] = useState(false);
