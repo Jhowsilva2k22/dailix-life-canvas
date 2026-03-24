@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 
 const navLinks = [
+  { label: "Diagnóstico", href: "/diagnostico", isRoute: true },
   { label: "Pilares", href: "#pilares" },
   { label: "Produto", href: "#produto" },
 ];
