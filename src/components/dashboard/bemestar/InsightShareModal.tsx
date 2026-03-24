@@ -207,6 +207,20 @@ const InsightCanvas = ({
   const cfg = FORMAT_CONFIG[format];
   const isFeed = format === "feed";
 
+  const titleLen = insight.titulo.length;
+  const bodyLen = insight.texto.length;
+
+  // Adaptive sizing based on content length
+  const titleSize = isFeed
+    ? (titleLen > 60 ? 54 : titleLen > 35 ? 64 : 72)
+    : (titleLen > 60 ? 58 : titleLen > 35 ? 70 : 80);
+
+  const bodySize = isFeed
+    ? (bodyLen > 200 ? 30 : bodyLen > 120 ? 34 : 38)
+    : (bodyLen > 200 ? 34 : bodyLen > 120 ? 38 : 42);
+
+  const pad = isFeed ? 96 : 88;
+
   return (
     <div
       style={{
@@ -220,27 +234,27 @@ const InsightCanvas = ({
         fontFamily: "'Inter', system-ui, sans-serif",
       }}
     >
-      {/* Subtle gradient orbs */}
+      {/* Gradient orbs — larger for more atmosphere */}
       <div
         style={{
           position: "absolute",
-          top: isFeed ? -120 : -160,
-          right: -80,
-          width: 400,
-          height: 400,
+          top: isFeed ? -80 : -100,
+          right: -120,
+          width: 560,
+          height: 560,
           borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(0,180,216,0.08) 0%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(0,180,216,0.1) 0%, transparent 70%)",
         }}
       />
       <div
         style={{
           position: "absolute",
-          bottom: isFeed ? -100 : -140,
-          left: -60,
-          width: 350,
-          height: 350,
+          bottom: isFeed ? -60 : -80,
+          left: -100,
+          width: 480,
+          height: 480,
           borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(0,180,216,0.05) 0%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(0,180,216,0.06) 0%, transparent 70%)",
         }}
       />
 
@@ -251,64 +265,65 @@ const InsightCanvas = ({
           top: 0,
           left: 0,
           right: 0,
-          height: 3,
-          background: "linear-gradient(90deg, transparent, #00B4D8, transparent)",
-          opacity: 0.6,
+          height: 4,
+          background: "linear-gradient(90deg, transparent 5%, #00B4D8 50%, transparent 95%)",
+          opacity: 0.7,
         }}
       />
 
-      {/* Content area */}
+      {/* Content area — fills the canvas */}
       <div
         style={{
           flex: 1,
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
-          padding: isFeed ? "100px 80px" : "140px 80px",
+          padding: isFeed
+            ? `64px ${pad}px 48px`
+            : `120px ${pad}px 60px`,
         }}
       >
-        {/* Category pill */}
+        {/* Category */}
         <div
           style={{
             display: "inline-flex",
             alignItems: "center",
-            gap: 6,
-            marginBottom: isFeed ? 32 : 40,
+            gap: 10,
+            marginBottom: isFeed ? 36 : 48,
             alignSelf: "flex-start",
           }}
         >
           <div
             style={{
-              width: 6,
-              height: 6,
+              width: 8,
+              height: 8,
               borderRadius: "50%",
               background: "#00B4D8",
-              opacity: 0.7,
             }}
           />
           <span
             style={{
-              fontSize: 22,
-              fontWeight: 400,
-              letterSpacing: "0.12em",
+              fontSize: isFeed ? 24 : 28,
+              fontWeight: 500,
+              letterSpacing: "0.14em",
               textTransform: "uppercase" as const,
               color: "#00B4D8",
-              opacity: 0.8,
+              opacity: 0.85,
             }}
           >
             {insight.categoriaLabel}
           </span>
         </div>
 
-        {/* Title */}
+        {/* Title — bold, editorial */}
         <h2
           style={{
-            fontSize: isFeed ? 58 : 64,
-            fontWeight: 600,
-            lineHeight: 1.25,
+            fontSize: titleSize,
+            fontWeight: 700,
+            lineHeight: 1.18,
             color: "#F1F5F9",
-            marginBottom: isFeed ? 28 : 36,
-            letterSpacing: "-0.01em",
+            marginBottom: isFeed ? 36 : 48,
+            letterSpacing: "-0.02em",
           }}
         >
           {insight.titulo}
@@ -317,59 +332,59 @@ const InsightCanvas = ({
         {/* Divider */}
         <div
           style={{
-            width: 48,
-            height: 2,
+            width: 56,
+            height: 3,
             background: "#00B4D8",
-            opacity: 0.4,
-            marginBottom: isFeed ? 28 : 36,
+            opacity: 0.5,
+            marginBottom: isFeed ? 36 : 48,
+            borderRadius: 2,
           }}
         />
 
         {/* Body text */}
         <p
           style={{
-            fontSize: isFeed ? 28 : 32,
+            fontSize: bodySize,
             fontWeight: 300,
-            lineHeight: 1.7,
+            lineHeight: 1.65,
             color: "#94A3B8",
-            maxWidth: isFeed ? 900 : 920,
           }}
         >
           {insight.texto}
         </p>
       </div>
 
-      {/* Footer */}
+      {/* Footer — proportional to canvas */}
       <div
         style={{
-          padding: "0 80px 64px",
+          padding: isFeed ? `0 ${pad}px 56px` : `0 ${pad}px 72px`,
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
           <svg
-            width="24"
-            height="24"
+            width={isFeed ? 28 : 32}
+            height={isFeed ? 28 : 32}
             viewBox="0 0 24 24"
             fill="none"
             stroke="#00B4D8"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            style={{ opacity: 0.7 }}
+            style={{ opacity: 0.75 }}
           >
             <rect width="7" height="9" x="3" y="3" rx="1" />
             <rect width="7" height="5" x="14" y="3" rx="1" />
             <rect width="7" height="9" x="14" y="12" rx="1" />
             <rect width="7" height="5" x="3" y="16" rx="1" />
           </svg>
-          <span style={{ fontSize: 18, fontWeight: 500, color: "#475569", letterSpacing: "0.04em" }}>
+          <span style={{ fontSize: isFeed ? 22 : 26, fontWeight: 500, color: "#475569", letterSpacing: "0.04em" }}>
             via <span style={{ fontWeight: 600, color: "#64748B" }}>Dailix</span>
           </span>
         </div>
-        <span style={{ fontSize: 16, color: "#334155", fontWeight: 300 }}>
+        <span style={{ fontSize: isFeed ? 20 : 24, color: "#334155", fontWeight: 300 }}>
           dailix.app
         </span>
       </div>
