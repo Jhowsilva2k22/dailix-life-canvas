@@ -274,7 +274,7 @@ const InsightCanvas = ({
         }}
       />
 
-      {/* Top accent line */}
+      {/* Top editorial seal — logo + wordmark, very subtle */}
       <div
         style={{
           position: "absolute",
@@ -286,8 +286,44 @@ const InsightCanvas = ({
           opacity: 0.7,
         }}
       />
+      <div
+        style={{
+          padding: isFeed ? `48px ${pad}px 0` : `56px ${pad}px 0`,
+          display: "flex",
+          alignItems: "center",
+          gap: 10,
+        }}
+      >
+        <svg
+          width={isFeed ? 20 : 22}
+          height={isFeed ? 20 : 22}
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="#00B4D8"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          style={{ opacity: 0.35 }}
+        >
+          <rect width="7" height="9" x="3" y="3" rx="1" />
+          <rect width="7" height="5" x="14" y="3" rx="1" />
+          <rect width="7" height="9" x="14" y="12" rx="1" />
+          <rect width="7" height="5" x="3" y="16" rx="1" />
+        </svg>
+        <span
+          style={{
+            fontSize: isFeed ? 18 : 20,
+            fontWeight: 600,
+            color: "#334155",
+            letterSpacing: "0.06em",
+            opacity: 0.5,
+          }}
+        >
+          Dailix
+        </span>
+      </div>
 
-      {/* Content area — fills the canvas */}
+      {/* Content area */}
       <div
         style={{
           flex: 1,
@@ -295,8 +331,8 @@ const InsightCanvas = ({
           flexDirection: "column",
           justifyContent: "center",
           padding: isFeed
-            ? `64px ${pad}px 48px`
-            : `120px ${pad}px 60px`,
+            ? `32px ${pad}px 48px`
+            : `48px ${pad}px 60px`,
         }}
       >
         {/* Category */}
@@ -331,7 +367,7 @@ const InsightCanvas = ({
           </span>
         </div>
 
-        {/* Title — bold, editorial */}
+        {/* Title */}
         <h2
           style={{
             fontSize: titleSize,
@@ -357,7 +393,7 @@ const InsightCanvas = ({
           }}
         />
 
-        {/* Body text */}
+        {/* Body */}
         <p
           style={{
             fontSize: bodySize,
@@ -370,37 +406,37 @@ const InsightCanvas = ({
         </p>
       </div>
 
-      {/* Footer — proportional to canvas */}
+      {/* Footer — signature */}
       <div
         style={{
-          padding: isFeed ? `0 ${pad}px 56px` : `0 ${pad}px 72px`,
+          padding: isFeed ? `0 ${pad}px 52px` : `0 ${pad}px 68px`,
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <svg
-            width={isFeed ? 28 : 32}
-            height={isFeed ? 28 : 32}
+            width={isFeed ? 22 : 26}
+            height={isFeed ? 22 : 26}
             viewBox="0 0 24 24"
             fill="none"
             stroke="#00B4D8"
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            style={{ opacity: 0.75 }}
+            style={{ opacity: 0.6 }}
           >
             <rect width="7" height="9" x="3" y="3" rx="1" />
             <rect width="7" height="5" x="14" y="3" rx="1" />
             <rect width="7" height="9" x="14" y="12" rx="1" />
             <rect width="7" height="5" x="3" y="16" rx="1" />
           </svg>
-          <span style={{ fontSize: isFeed ? 22 : 26, fontWeight: 500, color: "#475569", letterSpacing: "0.04em" }}>
+          <span style={{ fontSize: isFeed ? 20 : 24, fontWeight: 500, color: "#475569", letterSpacing: "0.04em" }}>
             via <span style={{ fontWeight: 600, color: "#64748B" }}>Dailix</span>
           </span>
         </div>
-        <span style={{ fontSize: isFeed ? 20 : 24, color: "#334155", fontWeight: 300 }}>
+        <span style={{ fontSize: isFeed ? 18 : 22, color: "#3E5068", fontWeight: 400, letterSpacing: "0.02em" }}>
           dailix.app
         </span>
       </div>
