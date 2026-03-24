@@ -1,4 +1,4 @@
-import { Home, Target, Heart, Settings, LogOut, Camera } from "lucide-react";
+import { Home, Target, Heart, Settings, LogOut, Camera, Search } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { useState } from "react";
@@ -14,9 +14,10 @@ const navItems = [
 interface DashboardSidebarProps {
   activeItem: string;
   onNavigate: (path: string) => void;
+  onOpenSearch?: () => void;
 }
 
-const DashboardSidebar = ({ activeItem, onNavigate }: DashboardSidebarProps) => {
+const DashboardSidebar = ({ activeItem, onNavigate, onOpenSearch }: DashboardSidebarProps) => {
   const { signOut } = useAuth();
   const { avatarUrl, displayName, plano } = useAvatar();
   const [showAvatarUpload, setShowAvatarUpload] = useState(false);
@@ -32,6 +33,33 @@ const DashboardSidebar = ({ activeItem, onNavigate }: DashboardSidebarProps) => 
         </div>
 
         <nav className="flex-1 flex flex-col px-3 mt-4">
+          {/* Search button */}
+          <button
+            onClick={onOpenSearch}
+            className="flex items-center gap-3 transition-all text-left mb-2"
+            style={{
+              padding: "10px 16px",
+              fontSize: 13,
+              fontWeight: 400,
+              color: "var(--dash-text-muted)",
+              background: "var(--dash-muted-surface)",
+              borderRadius: 10,
+              border: "1px solid var(--dash-border)",
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = "var(--dash-text-secondary)";
+              e.currentTarget.style.background = "var(--dash-muted-surface-hover)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = "var(--dash-text-muted)";
+              e.currentTarget.style.background = "var(--dash-muted-surface)";
+            }}
+          >
+            <Search size={15} strokeWidth={1.5} />
+            <span className="flex-1">Buscar...</span>
+            <kbd style={{ fontSize: 10, color: "var(--dash-text-muted)", opacity: 0.7 }}>⌘K</kbd>
+          </button>
+
           <div className="flex flex-col gap-0.5">
             {navItems.map((item) => {
               const isActive = activeItem === item.path;

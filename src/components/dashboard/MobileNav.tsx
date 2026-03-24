@@ -1,4 +1,4 @@
-import { Home, Target, Heart, Settings, LogOut, Camera } from "lucide-react";
+import { Home, Target, Heart, Settings, LogOut, Camera, Search } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { useState, useRef, useEffect } from "react";
@@ -15,9 +15,10 @@ const navItems = [
 interface MobileNavProps {
   activeItem: string;
   onNavigate: (path: string) => void;
+  onOpenSearch?: () => void;
 }
 
-const MobileNav = ({ activeItem, onNavigate }: MobileNavProps) => {
+const MobileNav = ({ activeItem, onNavigate, onOpenSearch }: MobileNavProps) => {
   const { signOut } = useAuth();
   const { avatarUrl, displayName, plano } = useAvatar();
   const [menuOpen, setMenuOpen] = useState(false);
@@ -42,7 +43,11 @@ const MobileNav = ({ activeItem, onNavigate }: MobileNavProps) => {
         style={{ background: "var(--dash-sidebar)", borderBottom: "1px solid var(--dash-border)" }}
       >
         <span className="font-display text-base font-bold" style={{ color: "var(--dash-text)" }}>Dailix</span>
-        <div className="relative" ref={menuRef}>
+        <div className="flex items-center gap-2">
+          <button onClick={onOpenSearch} className="p-1.5" style={{ color: "var(--dash-text-muted)" }}>
+            <Search size={20} strokeWidth={1.5} />
+          </button>
+          <div className="relative" ref={menuRef}>
           <button onClick={() => setMenuOpen((v) => !v)}>
             <UserAvatar avatarUrl={avatarUrl} displayName={displayName} size={34} />
           </button>
@@ -87,6 +92,7 @@ const MobileNav = ({ activeItem, onNavigate }: MobileNavProps) => {
               </button>
             </div>
           )}
+        </div>
         </div>
       </header>
 
