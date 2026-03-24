@@ -199,9 +199,9 @@ const TasksTab = ({ isActive = true, onReadyChange, highlightId = null, onHighli
             {pending.map((task, i) => {
               const ps = priorityStyles[task.prioridade] || priorityStyles.media;
               return (
-                <div key={task.id} className="flex items-center gap-3 px-5 py-4 group transition-colors" style={{ borderBottom: i < pending.length - 1 || done.length > 0 ? "1px solid var(--dash-border)" : "none" }}
+                <div key={task.id} data-search-id={task.id} className={`flex items-center gap-3 px-5 py-4 group transition-all duration-500 ${isHighlighted(task.id) ? "search-highlight" : ""}`} style={{ borderBottom: i < pending.length - 1 || done.length > 0 ? "1px solid var(--dash-border)" : "none" }}
                   onMouseEnter={(e) => { e.currentTarget.style.background = "var(--dash-muted-surface)"; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                  onMouseLeave={(e) => { if (!isHighlighted(task.id)) e.currentTarget.style.background = "transparent"; }}
                 >
                   <button
                     onClick={() => toggleTask(task.id, task.concluida)}
