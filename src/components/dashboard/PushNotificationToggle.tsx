@@ -122,6 +122,16 @@ const PushNotificationToggle = () => {
     setBusy(true);
     setState("syncing");
 
+    // Register SW once before both channels to avoid race conditions
+    let swReg: ServiceWorkerRegistration | null = null;
+    try {
+      swReg = await navigator.serviceWorker.register("/sw.js");
+      await navigator.serviceWorker.ready;
+      console.log("[Push] Service worker ready");
+    } catch (e) {
+      console.error("[Push] SW registration failed:", e);
+    }
+
     const [vapidResult, fcmResult] = await Promise.allSettled([
       subscribeToPush(user.id),
       registerFCMToken(user.id),
@@ -129,12 +139,26 @@ const PushNotificationToggle = () => {
 
     const vapidOk = vapidResult.status === "fulfilled" && vapidResult.value.success;
     const fcmOk = fcmResult.status === "fulfilled" && fcmResult.value.success;
+
+    const vapidError = vapidResult.status === "fulfilled" ? vapidResult.value.error : (vapidResult as PromiseRejectedResult).reason;
+    const fcmError = fcmResult.status === "fulfilled" ? fcmResult.value.error : (fcmResult as PromiseRejectedResult).reason;
+
+    console.log("[Push] Activation results:", {
+      vapidOk,
+      fcmOk,
+      vapidError: vapidError || null,
+      fcmError: fcmError || null,
+      permission: Notification.permission,
+    });
+
     const permission = Notification.permission;
 
     if (vapidOk || fcmOk) {
       await detectState();
       toast.success("Notificações ativadas");
     } else {
+      console.warn("[Push] Both channels failed. VAPID:", vapidError, "| FCM:", fcmError);
+
       if (permission === "denied") {
         setState("denied");
         setShowDenied(true);
