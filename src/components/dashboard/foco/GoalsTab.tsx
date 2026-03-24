@@ -74,6 +74,7 @@ const GoalsTabInner = () => {
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<Goal | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   const fetchGoals = useCallback(async () => {
     if (!user) { setLoading(false); return; }
