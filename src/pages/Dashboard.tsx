@@ -26,7 +26,6 @@ const Dashboard = () => {
       .single()
       .then(({ data, error }) => {
         if (error) {
-          // If profile fetch fails, still show dashboard
           setReady(true);
           return;
         }
@@ -35,9 +34,6 @@ const Dashboard = () => {
         } else {
           setReady(true);
         }
-      })
-      .catch(() => {
-        setReady(true);
       });
   }, [user, navigate]);
 
