@@ -33,7 +33,8 @@ const categoryColors: Record<string, { bg: string; color: string; label: string 
 
 const CheckIcon = () => <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>;
 
-const HabitsTab = ({ isActive = true, onReadyChange }: HabitsTabProps) => {
+const HabitsTab = ({ isActive = true, onReadyChange, highlightId = null, onHighlightConsumed }: HabitsTabProps) => {
+  const { isHighlighted } = useSearchHighlight(highlightId);
   const { user, loading: authLoading } = useAuth();
   const [habits, setHabits] = useState<Habit[]>([]);
   const [completedToday, setCompletedToday] = useState<Set<string>>(new Set());
