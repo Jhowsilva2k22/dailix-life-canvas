@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
+import { useSearchHighlight } from "@/hooks/useSearchHighlight";
 import { supabase } from "@/integrations/supabase/client";
 import { Lightbulb, Sparkles, Brain, Moon, Target, Zap, Shield, ChevronDown, Share2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
