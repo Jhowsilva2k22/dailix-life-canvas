@@ -445,6 +445,7 @@ const DashboardContent = () => {
       </div>
 
       {showTaskModal && <AddTaskModal onClose={() => setShowTaskModal(false)} onSaved={handleTaskSaved} />}
+      </div>
     </div>
   );
 };
