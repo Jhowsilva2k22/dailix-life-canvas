@@ -167,6 +167,23 @@ const DashboardContent = () => {
   const pendingTasks = todayTasks.filter((t) => !t.concluida);
   const doneTasks = todayTasks.filter((t) => t.concluida);
 
+  const upcomingTasks = useMemo(() => {
+    return tasks
+      .filter((t) => !t.concluida && t.prazo && t.prazo > today)
+      .sort((a, b) => (a.prazo! > b.prazo! ? 1 : -1))
+      .slice(0, 3);
+  }, [tasks, today]);
+
+  const getRelativeDate = (dateStr: string) => {
+    const target = new Date(dateStr + "T00:00:00");
+    const now = new Date();
+    const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const diff = Math.round((target.getTime() - todayDate.getTime()) / (1000 * 60 * 60 * 24));
+    if (diff === 1) return "amanhã";
+    if (diff <= 7) return `em ${diff} dias`;
+    return target.toLocaleDateString("pt-BR", { day: "numeric", month: "short" });
+  };
+
   const goalTitle = activeGoal ? (activeGoal.titulo.length > 24 ? activeGoal.titulo.slice(0, 24) + "…" : activeGoal.titulo) : profile.first_goal ? (profile.first_goal.length > 24 ? profile.first_goal.slice(0, 24) + "…" : profile.first_goal) : "—";
   const goalProgress = activeGoal?.progresso ?? 0;
   const goalHasLinkedTasks = activeGoal?.hasLinkedTasks ?? false;
