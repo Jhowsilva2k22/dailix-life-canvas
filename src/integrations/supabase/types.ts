@@ -219,6 +219,84 @@ export type Database = {
           },
         ]
       }
+      push_dispatch_log: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          id: string
+          scheduled_for: string
+          sent_at: string | null
+          source_id: string
+          source_type: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          scheduled_for: string
+          sent_at?: string | null
+          source_id: string
+          source_type: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          scheduled_for?: string
+          sent_at?: string | null
+          source_id?: string
+          source_type?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          device_label: string | null
+          device_platform: string | null
+          endpoint: string
+          id: string
+          is_active: boolean
+          last_seen_at: string
+          p256dh: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          device_label?: string | null
+          device_platform?: string | null
+          endpoint: string
+          id?: string
+          is_active?: boolean
+          last_seen_at?: string
+          p256dh: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          device_label?: string | null
+          device_platform?: string | null
+          endpoint?: string
+          id?: string
+          is_active?: boolean
+          last_seen_at?: string
+          p256dh?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       tasks: {
         Row: {
           concluida: boolean
