@@ -12,6 +12,8 @@ import Cadastro from "./pages/Cadastro";
 import Onboarding from "./pages/Onboarding";
 import Dashboard from "./pages/Dashboard";
 import Welcome from "./pages/Welcome";
+import RecuperarSenha from "./pages/RecuperarSenha";
+import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
