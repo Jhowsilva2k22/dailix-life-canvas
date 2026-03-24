@@ -17,15 +17,19 @@ function detectPlatform(): string {
 
 export async function registerFCMToken(userId: string): Promise<{ success: boolean; error?: string }> {
   try {
-    const permission = await Notification.requestPermission();
+    const permission = Notification.permission;
     if (permission !== "granted") {
-      return { success: false, error: "Permissão negada" };
+      console.warn("[FCM] Permission not granted:", permission);
+      return { success: false, error: `Permissão: ${permission}` };
     }
 
+    console.log("[FCM] Getting token...");
     const token = await getFCMToken();
     if (!token) {
+      console.error("[FCM] getFCMToken() returned null");
       return { success: false, error: "Não foi possível obter token FCM" };
     }
+    console.log("[FCM] Token obtained, saving...");
 
     const { error } = await supabase.from("push_subscriptions" as any).upsert(
       {
