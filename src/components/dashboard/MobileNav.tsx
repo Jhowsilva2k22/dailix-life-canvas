@@ -93,6 +93,7 @@ const MobileNav = ({ activeItem, onNavigate, onOpenSearch }: MobileNavProps) => 
             </div>
           )}
         </div>
+        </div>
       </header>
 
       <nav
