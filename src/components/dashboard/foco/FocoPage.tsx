@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import TasksTab from "./TasksTab";
 import GoalsTab from "./GoalsTab";
@@ -11,12 +11,20 @@ const tabs = [
 
 const FocoPage = () => {
   const [activeTab, setActiveTab] = useState("tarefas");
-  const [activeTabReady, setActiveTabReady] = useState(false);
+  const [initialLoaded, setInitialLoaded] = useState(false);
   const revealRef = useScrollReveal();
+  const loadedTabs = useRef(new Set<string>());
+
+  const handleReadyChange = (tabKey: string, ready: boolean) => {
+    if (ready) {
+      loadedTabs.current.add(tabKey);
+      if (!initialLoaded) setInitialLoaded(true);
+    }
+  };
 
   return (
     <div ref={revealRef} className="relative flex-1 min-h-screen md:ml-[240px]" style={{ background: "var(--dash-bg)" }}>
-      {!activeTabReady && (
+      {!initialLoaded && (
         <div className="absolute inset-0 z-10" style={{ background: "var(--dash-bg)" }}>
           <SectionTransitionSkeleton />
         </div>
@@ -24,7 +32,7 @@ const FocoPage = () => {
 
       <div
         className="max-w-4xl mx-auto px-5 md:px-10 pt-20 md:pt-10 pb-24 md:pb-12"
-        style={{ visibility: activeTabReady ? "visible" : "hidden" }}
+        style={{ visibility: initialLoaded ? "visible" : "hidden" }}
       >
         <div className="mb-8" data-reveal>
           <h1 className="font-display" style={{ color: "var(--dash-text)", fontSize: 24, fontWeight: 400, letterSpacing: "0.01em" }}>
@@ -39,10 +47,7 @@ const FocoPage = () => {
           {tabs.map((tab) => (
             <button
               key={tab.key}
-              onClick={() => {
-                setActiveTabReady(false);
-                setActiveTab(tab.key);
-              }}
+              onClick={() => setActiveTab(tab.key)}
               className="px-4 py-3 transition-colors relative"
               style={{
                 fontSize: 13,
@@ -60,10 +65,10 @@ const FocoPage = () => {
         </div>
 
         <div style={{ display: activeTab === "tarefas" ? "block" : "none" }}>
-          <TasksTab isActive={activeTab === "tarefas"} onReadyChange={setActiveTabReady} />
+          <TasksTab isActive={activeTab === "tarefas"} onReadyChange={(ready) => handleReadyChange("tarefas", ready)} />
         </div>
         <div style={{ display: activeTab === "metas" ? "block" : "none" }}>
-          <GoalsTab isActive={activeTab === "metas"} onReadyChange={setActiveTabReady} />
+          <GoalsTab isActive={activeTab === "metas"} onReadyChange={(ready) => handleReadyChange("metas", ready)} />
         </div>
       </div>
     </div>
