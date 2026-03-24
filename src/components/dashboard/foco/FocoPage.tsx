@@ -30,6 +30,7 @@ const FocoPage = ({ searchFocus, onClearSearchFocus }: FocoPageProps) => {
     } else if (searchFocus.type === "goal") {
       setActiveTab("metas");
     }
+    setHighlightId(searchFocus.id);
     onClearSearchFocus?.();
   }, [searchFocus, onClearSearchFocus]);
 
