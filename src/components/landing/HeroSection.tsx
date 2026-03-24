@@ -49,7 +49,7 @@ const HeroSection = () => {
               className="text-[11px] tracking-[0.14em] uppercase"
               style={{ color: "rgba(0,180,216,0.7)", fontWeight: 400 }}
             >
-              Sistema pessoal de execução
+              Diagnóstico de Execução Dailix
             </span>
           </div>
 
@@ -60,11 +60,9 @@ const HeroSection = () => {
             }`}
             style={{ color: "#fff", lineHeight: 1.08, fontWeight: 400 }}
           >
-            Pare de organizar sua vida
+            Descubra o que está travando
             <br />
-            em pedaços. Centralize sua
-            <br />
-            execução em um único sistema.
+            sua execução.
           </h1>
 
           {/* Subheadline */}
@@ -74,7 +72,7 @@ const HeroSection = () => {
             }`}
             style={{ fontSize: 16, color: "rgba(255,255,255,0.5)", lineHeight: 1.7, fontWeight: 300 }}
           >
-            Tarefas, metas, hábitos e insights em um ambiente premium criado para quem precisa de clareza, constância e controle.
+            Um diagnóstico rápido para identificar o padrão que hoje está roubando sua clareza, constância ou controle.
           </p>
 
           {/* CTAs */}
@@ -84,7 +82,7 @@ const HeroSection = () => {
             }`}
           >
             <button
-              onClick={() => navigate("/cadastro")}
+              onClick={() => navigate("/diagnostico")}
               className="inline-flex items-center gap-2 px-7 py-3.5 text-sm rounded-lg transition-all duration-200 active:scale-[0.97]"
               style={{
                 background: "#00B4D8",
@@ -101,11 +99,11 @@ const HeroSection = () => {
                 e.currentTarget.style.boxShadow = "none";
               }}
             >
-              Começar agora
+              Fazer diagnóstico
               <ArrowRight className="h-4 w-4" />
             </button>
             <a
-              href="#diagnostico"
+              href="#pilares"
               className="inline-flex items-center px-7 py-3.5 text-sm rounded-lg transition-all duration-200"
               style={{
                 color: "rgba(255,255,255,0.6)",
@@ -121,7 +119,7 @@ const HeroSection = () => {
                 e.currentTarget.style.color = "rgba(255,255,255,0.6)";
               }}
             >
-              Ver acesso prioritário
+              Ver como funciona
             </a>
           </div>
         </div>
