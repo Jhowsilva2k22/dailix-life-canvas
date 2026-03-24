@@ -205,16 +205,14 @@ const DashboardContent = () => {
 
   const CheckIcon = () => <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>;
 
-  if (loading) {
-    return (
-      <div className="flex-1 min-h-screen md:ml-[240px]" style={{ background: "var(--dash-bg)" }}>
-        <SectionTransitionSkeleton showTabs={false} />
-      </div>
-    );
-  }
-
   return (
-    <div ref={revealRef} className="flex-1 min-h-screen md:ml-[240px]" style={{ background: "var(--dash-bg)" }}>
+    <div ref={revealRef} className="relative flex-1 min-h-screen md:ml-[240px]" style={{ background: "var(--dash-bg)" }}>
+      {loading && (
+        <div className="absolute inset-0 z-10" style={{ background: "var(--dash-bg)" }}>
+          <SectionTransitionSkeleton showTabs={false} />
+        </div>
+      )}
+      <div style={{ visibility: loading ? "hidden" : "visible" }}>
       <div style={{ maxWidth: 960 }} className="mx-auto px-5 md:px-10 pt-20 md:pt-10 pb-24 md:pb-12">
 
         {/* Greeting */}
