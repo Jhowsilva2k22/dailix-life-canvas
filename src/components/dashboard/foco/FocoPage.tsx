@@ -18,6 +18,7 @@ interface FocoPageProps {
 const FocoPage = ({ searchFocus, onClearSearchFocus }: FocoPageProps) => {
   const [activeTab, setActiveTab] = useState("tarefas");
   const [initialLoaded, setInitialLoaded] = useState(false);
+  const [highlightId, setHighlightId] = useState<string | null>(null);
   const revealRef = useScrollReveal();
   const loadedTabs = useRef(new Set<string>());
 
