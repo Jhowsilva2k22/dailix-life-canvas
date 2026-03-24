@@ -4,10 +4,10 @@ import { X, Download, MoreHorizontal } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 
-const SIGNUP_LINK = "https://dailix-life-canvas.lovable.app/cadastro";
+const CANONICAL_LINK = "https://dailix-life-canvas.lovable.app/cadastro";
 
 const SHARE_TEXT = (titulo: string) =>
-  `Olha esse insight que compartilhei pelo Dailix:\n\n"${titulo}"\n\nEntre aqui: ${SIGNUP_LINK}`;
+  `"${titulo}"\n\nCrie sua conta no Dailix\n${CANONICAL_LINK}`;
 
 interface InsightShareData {
   titulo: string;
