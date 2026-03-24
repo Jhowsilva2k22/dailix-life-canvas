@@ -340,7 +340,7 @@ const InsightCanvas = ({
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          style={{ opacity: 0.35 }}
+          style={{ opacity: 0.5 }}
         >
           <rect width="7" height="9" x="3" y="3" rx="1" />
           <rect width="7" height="5" x="14" y="3" rx="1" />
@@ -351,9 +351,8 @@ const InsightCanvas = ({
           style={{
             fontSize: isFeed ? 18 : 20,
             fontWeight: 600,
-            color: "#334155",
+            color: "#475569",
             letterSpacing: "0.06em",
-            opacity: 0.5,
           }}
         >
           Dailix
