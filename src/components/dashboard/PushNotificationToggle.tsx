@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Bell, BellOff, BellRing, Smartphone, Loader2, RefreshCw } from "lucide-react";
+import { Bell, BellOff, BellRing, Smartphone, Loader2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   getPushSupport,
@@ -15,11 +15,11 @@ import { toast } from "sonner";
 import NotificationSoftAskModal from "./NotificationSoftAskModal";
 import NotificationDeniedModal from "./NotificationDeniedModal";
 
-type PushState = "loading" | "active" | "inactive" | "inactive-with-permission" | "denied" | "unsupported" | "ios-pwa";
+type FinalPushState = "loading" | "active" | "inactive" | "syncing" | "denied" | "unsupported" | "ios-pwa";
 
 const PushNotificationToggle = () => {
   const { user } = useAuth();
-  const [state, setState] = useState<PushState>("loading");
+  const [state, setState] = useState<FinalPushState>("loading");
   const [busy, setBusy] = useState(false);
   const [showSoftAsk, setShowSoftAsk] = useState(false);
   const [showDenied, setShowDenied] = useState(false);
@@ -40,11 +40,11 @@ const PushNotificationToggle = () => {
       return;
     }
 
-    // Check VAPID subscription
+    // Check VAPID subscription locally
     const vapidSub = await getActiveSubscription();
     const vapidActive = !!vapidSub;
 
-    // Check FCM/any active subscription in database
+    // Check any active subscription in DB (covers FCM tokens too)
     let dbActive = false;
     if (user) {
       try {
@@ -60,8 +60,6 @@ const PushNotificationToggle = () => {
 
     if (vapidActive || dbActive) {
       setState("active");
-    } else if (perm === "granted") {
-      setState("inactive-with-permission");
     } else {
       setState("inactive");
     }
@@ -84,6 +82,8 @@ const PushNotificationToggle = () => {
   const doEnable = async () => {
     if (!user) return;
     setBusy(true);
+    setState("syncing");
+
     const [vapidResult, fcmResult] = await Promise.allSettled([
       subscribeToPush(user.id),
       registerFCMToken(user.id),
@@ -100,6 +100,7 @@ const PushNotificationToggle = () => {
         setState("denied");
         setShowDenied(true);
       } else {
+        setState("inactive");
         toast.error(errorMsg || "Erro ao ativar notificações");
       }
     }
@@ -128,6 +129,8 @@ const PushNotificationToggle = () => {
     toast.success("Notificações desativadas");
     setBusy(false);
   };
+
+  // --- Render ---
 
   if (state === "loading") {
     return (
@@ -170,69 +173,49 @@ const PushNotificationToggle = () => {
     );
   }
 
-  const getStatusLabel = () => {
-    switch (state) {
-      case "active": return "Notificações ativas";
-      case "inactive-with-permission": return "Permissão ativa, sincronização pendente";
-      case "denied": return "Permissão bloqueada";
-      default: return "Ativar notificações";
-    }
-  };
+  // Status label
+  const statusLabel =
+    state === "active" ? "Notificações ativas" :
+    state === "syncing" ? "Ativando notificações..." :
+    state === "denied" ? "Permissão bloqueada" :
+    "Notificações desativadas";
 
-  const getButtonLabel = () => {
-    if (busy) return <Loader2 size={14} className="animate-spin" />;
-    switch (state) {
-      case "active": return "Desativar";
-      case "inactive-with-permission": return "Sincronizar";
-      case "denied": return "Ver como ativar";
-      default: return "Ativar";
-    }
-  };
+  // Icon
+  const icon =
+    state === "active" ? <BellRing size={16} style={{ color: "var(--dash-success-text)" }} /> :
+    state === "syncing" ? <Loader2 size={16} className="animate-spin" style={{ color: "var(--dash-accent)" }} /> :
+    state === "denied" ? <BellOff size={16} style={{ color: "var(--dash-danger-text)" }} /> :
+    <Bell size={16} style={{ color: "var(--dash-text-muted)" }} />;
 
-  const getIcon = () => {
-    switch (state) {
-      case "active": return <BellRing size={16} style={{ color: "var(--dash-success-text)" }} />;
-      case "inactive-with-permission": return <RefreshCw size={16} style={{ color: "var(--dash-warning-text)" }} />;
-      case "denied": return <BellOff size={16} style={{ color: "var(--dash-danger-text)" }} />;
-      default: return <Bell size={16} style={{ color: "var(--dash-text-muted)" }} />;
-    }
-  };
+  // Button
+  const buttonLabel =
+    busy && state !== "syncing" ? <Loader2 size={14} className="animate-spin" /> :
+    state === "active" ? "Desativar notificações" :
+    state === "syncing" ? "Ativando..." :
+    state === "denied" ? "Ver como ativar" :
+    "Ativar notificações";
+
+  const buttonDisabled = busy || state === "syncing";
+
+  const borderColor =
+    state === "active" ? "var(--dash-border-strong)" :
+    state === "denied" ? "var(--dash-danger-text)" :
+    "var(--dash-accent)";
+
+  const bgColor =
+    state === "active" ? "transparent" :
+    state === "denied" ? "var(--dash-danger-bg)" :
+    "var(--dash-accent-subtle)";
+
+  const textColor =
+    state === "active" ? "var(--dash-text-muted)" :
+    state === "denied" ? "var(--dash-danger-text)" :
+    "var(--dash-accent)";
 
   const handleButtonClick = () => {
-    if (state === "active") {
-      handleDisable();
-    } else if (state === "denied") {
-      setShowDenied(true);
-    } else {
-      handleEnableClick();
-    }
-  };
-
-  const getBorderColor = () => {
-    switch (state) {
-      case "active": return "var(--dash-border-strong)";
-      case "inactive-with-permission": return "var(--dash-warning-text)";
-      case "denied": return "var(--dash-danger-text)";
-      default: return "var(--dash-accent)";
-    }
-  };
-
-  const getBgColor = () => {
-    switch (state) {
-      case "active": return "transparent";
-      case "inactive-with-permission": return "var(--dash-warning-bg, rgba(234,179,8,0.1))";
-      case "denied": return "var(--dash-danger-bg)";
-      default: return "var(--dash-accent-subtle)";
-    }
-  };
-
-  const getTextColor = () => {
-    switch (state) {
-      case "active": return "var(--dash-text-muted)";
-      case "inactive-with-permission": return "var(--dash-warning-text)";
-      case "denied": return "var(--dash-danger-text)";
-      default: return "var(--dash-accent)";
-    }
+    if (state === "active") handleDisable();
+    else if (state === "denied") setShowDenied(true);
+    else handleEnableClick();
   };
 
   return (
@@ -243,33 +226,26 @@ const PushNotificationToggle = () => {
         </p>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            {getIcon()}
-            <span style={{ color: "var(--dash-text)", fontSize: 14 }}>
-              {getStatusLabel()}
-            </span>
+            {icon}
+            <span style={{ color: "var(--dash-text)", fontSize: 14 }}>{statusLabel}</span>
           </div>
           <button
             onClick={handleButtonClick}
-            disabled={busy}
+            disabled={buttonDisabled}
             className="text-sm px-4 py-2 rounded-lg transition-all duration-150 disabled:opacity-50"
             style={{
-              border: `1px solid ${getBorderColor()}`,
-              background: getBgColor(),
-              color: getTextColor(),
+              border: `1px solid ${borderColor}`,
+              background: bgColor,
+              color: textColor,
               fontWeight: 400,
             }}
           >
-            {getButtonLabel()}
+            {buttonLabel}
           </button>
         </div>
         {state === "active" && (
           <p style={{ color: "var(--dash-text-muted)", fontSize: 11, marginTop: 8 }}>
             Você receberá lembretes mesmo com o app fechado
-          </p>
-        )}
-        {state === "inactive-with-permission" && (
-          <p style={{ color: "var(--dash-text-muted)", fontSize: 11, marginTop: 8 }}>
-            A permissão está ativa, mas o registro precisa ser concluído
           </p>
         )}
       </div>
