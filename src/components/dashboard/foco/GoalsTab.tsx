@@ -9,6 +9,8 @@ import GoalModal, { type Goal } from "./GoalModal";
 interface GoalsTabProps {
   isActive?: boolean;
   onReadyChange?: (ready: boolean) => void;
+  highlightId?: string | null;
+  onHighlightConsumed?: () => void;
 }
 
 interface SubTask {
