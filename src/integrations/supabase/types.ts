@@ -121,6 +121,45 @@ export type Database = {
         }
         Relationships: []
       }
+      insights: {
+        Row: {
+          ativo: boolean
+          categoria: string
+          created_at: string
+          id: string
+          ordem: number | null
+          publicado_em: string
+          texto: string
+          texto_curto: string | null
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          categoria?: string
+          created_at?: string
+          id?: string
+          ordem?: number | null
+          publicado_em?: string
+          texto: string
+          texto_curto?: string | null
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          categoria?: string
+          created_at?: string
+          id?: string
+          ordem?: number | null
+          publicado_em?: string
+          texto?: string
+          texto_curto?: string | null
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
