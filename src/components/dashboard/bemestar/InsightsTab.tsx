@@ -147,39 +147,27 @@ const InsightsTab = () => {
 
       {/* Category filters */}
       <div className="flex gap-2 flex-wrap">
-        <button
-          onClick={() => setActiveCategory(null)}
-          className="px-3 py-1.5 rounded-full transition-all"
-          style={{
-            fontSize: 12,
-            fontWeight: activeCategory === null ? 500 : 400,
-            color: activeCategory === null ? "var(--dash-accent)" : "var(--dash-text-muted)",
-            background: activeCategory === null ? "rgba(0,194,255,0.1)" : "transparent",
-            border: `1px solid ${activeCategory === null ? "rgba(0,194,255,0.2)" : "var(--dash-border)"}`,
-          }}
-        >
-          Todos
-        </button>
-        {categories.map((cat) => {
-          const meta = categoryMeta[cat];
-          const active = activeCategory === cat;
-          return (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(active ? null : cat)}
-              className="px-3 py-1.5 rounded-full transition-all"
-              style={{
-                fontSize: 12,
-                fontWeight: active ? 500 : 400,
-                color: active ? "var(--dash-accent)" : "var(--dash-text-muted)",
-                background: active ? "rgba(0,194,255,0.1)" : "transparent",
-                border: `1px solid ${active ? "rgba(0,194,255,0.2)" : "var(--dash-border)"}`,
-              }}
-            >
-              {meta?.label || cat}
-            </button>
-          );
-        })}
+        {[{ key: null, label: "Todos" }, ...categories.map((c) => ({ key: c, label: categoryMeta[c]?.label || c }))].map(
+          ({ key, label }) => {
+            const active = activeCategory === key;
+            return (
+              <button
+                key={label}
+                onClick={() => { setActiveCategory(key); setVisibleCount(INITIAL_SHOW); }}
+                className="px-3 py-1.5 rounded-full transition-all"
+                style={{
+                  fontSize: 12,
+                  fontWeight: active ? 500 : 400,
+                  color: active ? "var(--dash-accent)" : "var(--dash-text-muted)",
+                  background: active ? "hsl(var(--accent) / 0.1)" : "transparent",
+                  border: `1px solid ${active ? "hsl(var(--accent) / 0.2)" : "var(--dash-border)"}`,
+                }}
+              >
+                {label}
+              </button>
+            );
+          }
+        )}
       </div>
 
       {/* Insights list */}
