@@ -10,6 +10,7 @@ import {
   getActiveSubscription,
   type PushState,
 } from "@/services/pushNotifications";
+import { registerFCMToken, unregisterFCMToken } from "@/services/fcmPush";
 import { toast } from "sonner";
 
 const PushNotificationToggle = () => {
