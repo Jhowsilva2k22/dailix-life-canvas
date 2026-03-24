@@ -218,6 +218,31 @@
   animation: search-highlight-fade 2.5s ease-out forwards;
 }
 
+/* Inherit dashboard tokens inside search portal (rendered outside .dashboard-shell) */
+.search-dialog-content {
+  --dash-bg: #0C1222;
+  --dash-surface: #141B2D;
+  --dash-surface-elevated: #1A2438;
+  --dash-surface-hover: #1E293B;
+  --dash-sidebar: #0F172A;
+  --dash-text: #E2E8F0;
+  --dash-text-secondary: #94A3B8;
+  --dash-text-muted: #64748B;
+  --dash-border: rgba(255, 255, 255, 0.06);
+  --dash-border-strong: rgba(255, 255, 255, 0.1);
+  --dash-accent: #00B4D8;
+  --dash-accent-subtle: rgba(0, 180, 216, 0.1);
+  --dash-accent-muted: #22D3EE;
+  --dash-primary: #1E3A5F;
+  --dash-success-text: #34D399;
+  --dash-warning-text: #FBBF24;
+  --dash-danger-text: #F87171;
+  --dash-purple-text: #A78BFA;
+  --dash-muted-surface: rgba(255, 255, 255, 0.02);
+  --dash-muted-surface-hover: rgba(255, 255, 255, 0.04);
+  --dash-shadow-modal: 0 16px 48px rgba(0, 0, 0, 0.4);
+}
+
 /* Global search dialog — mobile fullscreen */
 @media (max-width: 767px) {
   .search-dialog-content {
