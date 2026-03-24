@@ -46,7 +46,7 @@ const HeroSection = () => {
             className={`mb-8 transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
           >
             <span
-              className="text-[11px] tracking-[0.14em] uppercase"
+              className="text-[12px] md:text-[11px] tracking-[0.14em] uppercase"
               style={{ color: "rgba(0,180,216,0.7)", fontWeight: 400 }}
             >
               Diagnóstico de Execução Dailix
@@ -70,7 +70,7 @@ const HeroSection = () => {
             className={`mt-6 max-w-lg transition-all duration-700 delay-200 ${
               visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
             }`}
-            style={{ fontSize: 16, color: "rgba(255,255,255,0.5)", lineHeight: 1.7, fontWeight: 300 }}
+            style={{ fontSize: 16, color: "rgba(255,255,255,0.5)", lineHeight: 1.75, fontWeight: 300 }}
           >
             Um diagnóstico rápido para identificar o padrão que hoje está roubando sua clareza, constância ou controle.
           </p>

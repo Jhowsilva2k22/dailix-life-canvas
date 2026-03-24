@@ -45,7 +45,7 @@ const FeaturesSection = () => {
           }`}
         >
           <span
-            className="text-[11px] tracking-[0.14em] uppercase mb-4 block"
+            className="text-[12px] md:text-[11px] tracking-[0.14em] uppercase mb-4 block"
             style={{ color: "rgba(0,180,216,0.6)", fontWeight: 400 }}
           >
             Pilares
@@ -79,7 +79,7 @@ const FeaturesSection = () => {
             >
               <span
                 className="font-display block mb-3"
-                style={{ fontSize: 11, letterSpacing: "0.1em", color: "rgba(0,180,216,0.5)", fontWeight: 400 }}
+                style={{ fontSize: 12, letterSpacing: "0.1em", color: "rgba(0,180,216,0.5)", fontWeight: 400 }}
               >
                 {p.num}
               </span>
@@ -89,7 +89,7 @@ const FeaturesSection = () => {
               >
                 {p.title}
               </h3>
-              <p style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", lineHeight: 1.7, fontWeight: 300 }}>
+              <p style={{ fontSize: 15, color: "rgba(255,255,255,0.4)", lineHeight: 1.75, fontWeight: 300 }}>
                 {p.desc}
               </p>
             </div>

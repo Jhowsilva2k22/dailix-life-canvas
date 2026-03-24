@@ -64,7 +64,7 @@ const DiagnosticResult = ({ principal, secundario }: Props) => {
             }}
           >
             <span
-              className="text-[11px] tracking-[0.1em] uppercase block mb-2"
+              className="text-[12px] md:text-[11px] tracking-[0.1em] uppercase block mb-2"
               style={{ color: "rgba(0,180,216,0.45)", fontWeight: 400 }}
             >
               {block.label}
@@ -72,8 +72,8 @@ const DiagnosticResult = ({ principal, secundario }: Props) => {
             <p
               style={{
                 color: "rgba(255,255,255,0.6)",
-                fontSize: 14,
-                lineHeight: 1.8,
+                fontSize: 15,
+                lineHeight: 1.85,
                 fontWeight: 300,
               }}
             >
@@ -92,7 +92,7 @@ const DiagnosticResult = ({ principal, secundario }: Props) => {
         }}
       >
         <span
-          className="text-[11px] tracking-[0.1em] uppercase block mb-2"
+          className="text-[12px] md:text-[11px] tracking-[0.1em] uppercase block mb-2"
           style={{ color: "rgba(255,255,255,0.3)", fontWeight: 400 }}
         >
           Padrão secundário identificado
@@ -101,7 +101,7 @@ const DiagnosticResult = ({ principal, secundario }: Props) => {
           className="mb-3"
           style={{
             color: "rgba(255,255,255,0.7)",
-            fontSize: 14,
+            fontSize: 15,
             fontWeight: 400,
           }}
         >
@@ -110,8 +110,8 @@ const DiagnosticResult = ({ principal, secundario }: Props) => {
         <p
           style={{
             color: "rgba(255,255,255,0.4)",
-            fontSize: 13,
-            lineHeight: 1.7,
+            fontSize: 14,
+            lineHeight: 1.75,
             fontWeight: 300,
           }}
         >

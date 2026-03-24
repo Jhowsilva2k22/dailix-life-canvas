@@ -25,13 +25,13 @@ const QuestionCard = ({ question, stepNumber, totalSteps, onAnswer }: Props) => 
       <div className="mb-10">
         <div className="flex items-center justify-between mb-3">
           <span
-            className="text-[11px] tracking-[0.14em] uppercase"
+            className="text-[12px] md:text-[11px] tracking-[0.14em] uppercase"
             style={{ color: "rgba(0,180,216,0.5)", fontWeight: 400 }}
           >
             Diagnóstico de Execução
           </span>
           <span
-            className="text-[12px] tabular-nums"
+            className="text-[13px] md:text-[12px] tabular-nums"
             style={{ color: "rgba(255,255,255,0.3)", fontWeight: 300 }}
           >
             {stepNumber} de {totalSteps}
@@ -67,7 +67,7 @@ const QuestionCard = ({ question, stepNumber, totalSteps, onAnswer }: Props) => 
             <button
               key={idx}
               onClick={() => handleSelect(idx)}
-              className="w-full text-left px-5 py-4 rounded-xl transition-all duration-200 active:scale-[0.98]"
+              className="w-full text-left px-5 py-4 rounded-xl transition-all duration-200 active:scale-[0.98] text-[15px] md:text-sm"
               style={{
                 background: isSelected
                   ? "rgba(0,180,216,0.1)"
@@ -78,7 +78,6 @@ const QuestionCard = ({ question, stepNumber, totalSteps, onAnswer }: Props) => 
                     : "rgba(255,255,255,0.06)"
                 }`,
                 color: isSelected ? "#00B4D8" : "rgba(255,255,255,0.7)",
-                fontSize: 14,
                 fontWeight: 300,
                 cursor: selected !== null ? "default" : "pointer",
               }}

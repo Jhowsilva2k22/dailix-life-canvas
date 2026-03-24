@@ -32,7 +32,7 @@ const DiagnosticSection = () => {
             }}
           >
             <span
-              className="text-[11px] tracking-[0.14em] uppercase mb-5 block"
+              className="text-[12px] md:text-[11px] tracking-[0.14em] uppercase mb-5 block"
               style={{ color: "rgba(0,180,216,0.6)", fontWeight: 400 }}
             >
               Diagnóstico
@@ -47,7 +47,7 @@ const DiagnosticSection = () => {
             </h2>
             <p
               className="mb-8"
-              style={{ color: "rgba(255,255,255,0.4)", fontSize: 14, lineHeight: 1.7, fontWeight: 300, maxWidth: 400, margin: "0 auto 2rem" }}
+              style={{ color: "rgba(255,255,255,0.4)", fontSize: 15, lineHeight: 1.75, fontWeight: 300, maxWidth: 400, margin: "0 auto 2rem" }}
             >
               Uma entrada simples e direta para entender se hoje o seu maior gargalo é foco, constância, organização ou dispersão.
             </p>
