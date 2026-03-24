@@ -349,21 +349,24 @@ const InsightCanvas = ({
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div
-            style={{
-              width: 28,
-              height: 28,
-              borderRadius: 7,
-              background: "linear-gradient(135deg, #00B4D8, #0077B6)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="#00B4D8"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            style={{ opacity: 0.7 }}
           >
-            <span style={{ fontSize: 14, fontWeight: 700, color: "#fff" }}>D</span>
-          </div>
-          <span style={{ fontSize: 18, fontWeight: 400, color: "#475569", letterSpacing: "0.04em" }}>
-            via Dailix
+            <rect width="7" height="9" x="3" y="3" rx="1" />
+            <rect width="7" height="5" x="14" y="3" rx="1" />
+            <rect width="7" height="9" x="14" y="12" rx="1" />
+            <rect width="7" height="5" x="3" y="16" rx="1" />
+          </svg>
+          <span style={{ fontSize: 18, fontWeight: 500, color: "#475569", letterSpacing: "0.04em" }}>
+            via <span style={{ fontWeight: 600, color: "#64748B" }}>Dailix</span>
           </span>
         </div>
         <span style={{ fontSize: 16, color: "#334155", fontWeight: 300 }}>
