@@ -115,6 +115,11 @@
     }
   }
 
+  /* Prevent double-tap zoom on interactive elements */
+  button, a, [role="button"], label, input, textarea, select {
+    touch-action: manipulation;
+  }
+
   /* Mobile base font & comfortable touch targets */
   @media (max-width: 767px) {
     html {
@@ -126,7 +131,6 @@
       min-width: 44px;
     }
 
-    /* Allow inline small buttons (icons etc.) to stay compact only if explicit */
     .touch-compact {
       min-height: unset;
       min-width: unset;
