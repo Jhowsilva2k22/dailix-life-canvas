@@ -239,7 +239,7 @@ const GoalCard = ({
 
 /* ─── Main Component ─── */
 const GoalsTabInner = ({ isActive = true, onReadyChange }: GoalsTabProps) => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [subTasks, setSubTasks] = useState<Record<string, SubTask[]>>({});
   const [loading, setLoading] = useState(true);
@@ -249,7 +249,7 @@ const GoalsTabInner = ({ isActive = true, onReadyChange }: GoalsTabProps) => {
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
 
   const fetchGoals = useCallback(async () => {
-    if (!user) { setLoading(false); return; }
+    if (!user) return;
     setLoading(true); setFetchError(false);
     try {
       const { data, error } = await supabase.from("goals").select("*").eq("user_id", user.id).order("created_at", { ascending: false });
@@ -270,11 +270,14 @@ const GoalsTabInner = ({ isActive = true, onReadyChange }: GoalsTabProps) => {
     finally { setLoading(false); }
   }, [user]);
 
-  useEffect(() => { fetchGoals(); }, [fetchGoals]);
+  useEffect(() => {
+    if (authLoading || !user) return;
+    fetchGoals();
+  }, [authLoading, user, fetchGoals]);
 
   useEffect(() => {
-    if (isActive) onReadyChange?.(!loading);
-  }, [isActive, loading, onReadyChange]);
+    if (isActive) onReadyChange?.(!authLoading && !loading);
+  }, [isActive, authLoading, loading, onReadyChange]);
 
   useEffect(() => {
     if (!user) return;
@@ -337,7 +340,7 @@ const GoalsTabInner = ({ isActive = true, onReadyChange }: GoalsTabProps) => {
   const openCreate = () => { setEditing(null); setShowModal(true); };
 
   /* Loading */
-  if (loading) return (
+  if (authLoading || loading) return (
     <div className="flex items-center justify-center py-16">
       <div className="w-6 h-6 border-2 rounded-full animate-spin" style={{ borderColor: "var(--dash-border-strong)", borderTopColor: "var(--dash-accent)" }} />
     </div>

@@ -46,7 +46,7 @@ const sortTasks = (list: Task[], mode: string) => {
 const CheckIcon = () => <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>;
 
 const TasksTab = ({ isActive = true, onReadyChange }: TasksTabProps) => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [filter, setFilter] = useState("hoje");
   const [showModal, setShowModal] = useState(false);
@@ -54,11 +54,7 @@ const TasksTab = ({ isActive = true, onReadyChange }: TasksTabProps) => {
   const [loading, setLoading] = useState(true);
 
   const fetchTasks = async () => {
-    if (!user) {
-      setTasks([]);
-      setLoading(false);
-      return;
-    }
+    if (!user) return;
     setLoading(true);
     try {
       const today = new Date().toISOString().split("T")[0];
@@ -75,11 +71,14 @@ const TasksTab = ({ isActive = true, onReadyChange }: TasksTabProps) => {
     finally { setLoading(false); }
   };
 
-  useEffect(() => { fetchTasks(); }, [user, filter]);
+  useEffect(() => {
+    if (authLoading || !user) return;
+    fetchTasks();
+  }, [authLoading, user, filter]);
 
   useEffect(() => {
-    if (isActive) onReadyChange?.(!loading);
-  }, [isActive, loading, onReadyChange]);
+    if (isActive) onReadyChange?.(!authLoading && !loading);
+  }, [isActive, authLoading, loading, onReadyChange]);
 
   useEffect(() => {
     if (!user) return;
@@ -114,7 +113,7 @@ const TasksTab = ({ isActive = true, onReadyChange }: TasksTabProps) => {
   const pending = tasks.filter((t) => !t.concluida);
   const done = tasks.filter((t) => t.concluida);
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <div className="space-y-4">
         <div className="flex items-center justify-between">
