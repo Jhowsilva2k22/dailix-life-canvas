@@ -1,4 +1,4 @@
-import { Home, Target, Heart, Settings, LogOut, Camera } from "lucide-react";
+import { Home, Target, Heart, Settings, LogOut, Camera, Search } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { useState } from "react";
