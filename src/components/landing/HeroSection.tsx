@@ -49,7 +49,7 @@ const HeroSection = () => {
               className="text-[11px] tracking-[0.14em] uppercase"
               style={{ color: "rgba(0,180,216,0.7)", fontWeight: 400 }}
             >
-              Sistema pessoal de execução
+              Diagnóstico de Execução Dailix
             </span>
           </div>
 
