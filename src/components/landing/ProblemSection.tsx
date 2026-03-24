@@ -55,7 +55,7 @@ const ProblemSection = () => {
                     background: "rgba(0,180,216,0.4)",
                   }}
                 />
-                <p style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", lineHeight: 1.7, fontWeight: 300 }}>
+                <p style={{ fontSize: 15, color: "rgba(255,255,255,0.5)", lineHeight: 1.75, fontWeight: 300 }}>
                   {line}
                 </p>
               </div>
