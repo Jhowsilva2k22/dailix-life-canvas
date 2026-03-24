@@ -64,7 +64,7 @@ const DiagnosticResult = ({ principal, secundario }: Props) => {
             }}
           >
             <span
-              className="text-[11px] tracking-[0.1em] uppercase block mb-2"
+              className="text-[12px] md:text-[11px] tracking-[0.1em] uppercase block mb-2"
               style={{ color: "rgba(0,180,216,0.45)", fontWeight: 400 }}
             >
               {block.label}
