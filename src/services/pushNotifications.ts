@@ -46,9 +46,13 @@ export async function subscribeToPush(userId: string): Promise<{ success: boolea
     const reg = await registerServiceWorker();
     if (!reg) return { success: false, error: "Service Worker indisponível" };
 
-    const permission = await Notification.requestPermission();
-    if (permission !== "granted") return { success: false, error: "Permissão negada" };
+    const permission = Notification.permission;
+    if (permission !== "granted") {
+      console.warn("[VAPID] Permission not granted:", permission);
+      return { success: false, error: `Permissão: ${permission}` };
+    }
 
+    console.log("[VAPID] Subscribing to push manager...");
     const sub = await reg.pushManager.subscribe({
       userVisibleOnly: true,
       applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) as any,
