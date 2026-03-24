@@ -241,7 +241,8 @@ const GoalCard = ({
 };
 
 /* ─── Main Component ─── */
-const GoalsTabInner = ({ isActive = true, onReadyChange }: GoalsTabProps) => {
+const GoalsTabInner = ({ isActive = true, onReadyChange, highlightId = null }: GoalsTabProps) => {
+  const { isHighlighted } = useSearchHighlight(highlightId);
   const { user, loading: authLoading } = useAuth();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [subTasks, setSubTasks] = useState<Record<string, SubTask[]>>({});
