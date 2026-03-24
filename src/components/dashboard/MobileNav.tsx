@@ -103,7 +103,7 @@ const MobileNav = ({ activeItem, onNavigate, onOpenSearch }: MobileNavProps) => 
         {navItems.map((item) => {
           const isActive = activeItem === item.path;
           return (
-            <button key={item.path} onClick={() => onNavigate(item.path)} className="flex flex-col items-center gap-1 py-1.5 px-2">
+            <button key={item.path} onClick={() => onNavigate(item.path)} className="flex flex-col items-center gap-1 py-1.5 px-2 touch-compact">
               <item.icon size={20} style={{ color: isActive ? "var(--dash-accent)" : "var(--dash-text-muted)" }} strokeWidth={isActive ? 2 : 1.5} />
               <span style={{ fontSize: 10, fontWeight: isActive ? 500 : 400, color: isActive ? "var(--dash-accent)" : "var(--dash-text-muted)" }}>
                 {item.label}
