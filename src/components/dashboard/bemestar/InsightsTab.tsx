@@ -1,7 +1,8 @@
 import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Lightbulb, Sparkles, Brain, Moon, Target, Zap, Shield, ChevronDown } from "lucide-react";
+import { Lightbulb, Sparkles, Brain, Moon, Target, Zap, Shield, ChevronDown, Share2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import InsightShareModal from "./InsightShareModal";
 
 interface Insight {
   id: string;
@@ -30,6 +31,18 @@ const InsightsTab = () => {
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [visibleCount, setVisibleCount] = useState(INITIAL_SHOW);
+  const [shareInsight, setShareInsight] = useState<{
+    titulo: string; texto: string; categoria: string; categoriaLabel: string;
+  } | null>(null);
+
+  const openShare = (item: Insight) => {
+    setShareInsight({
+      titulo: item.titulo,
+      texto: item.texto,
+      categoria: item.categoria,
+      categoriaLabel: categoryMeta[item.categoria]?.label || item.categoria,
+    });
+  };
 
   useEffect(() => {
     supabase
@@ -136,11 +149,21 @@ const InsightsTab = () => {
           <p style={{ color: "var(--dash-text-muted)", fontSize: 13, fontWeight: 300, lineHeight: 1.7 }}>
             {insightDoDia.texto}
           </p>
-          <div className="mt-3 flex items-center gap-1.5">
-            <DiaIcon size={12} style={{ color: "var(--dash-text-muted)", opacity: 0.6 }} />
-            <span style={{ fontSize: 11, color: "var(--dash-text-muted)", opacity: 0.6 }}>
-              {categoryMeta[insightDoDia.categoria]?.label || insightDoDia.categoria}
-            </span>
+          <div className="mt-3 flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <DiaIcon size={12} style={{ color: "var(--dash-text-muted)", opacity: 0.6 }} />
+              <span style={{ fontSize: 11, color: "var(--dash-text-muted)", opacity: 0.6 }}>
+                {categoryMeta[insightDoDia.categoria]?.label || insightDoDia.categoria}
+              </span>
+            </div>
+            <button
+              onClick={() => openShare(insightDoDia)}
+              className="p-1.5 rounded-lg transition-all"
+              style={{ color: "var(--dash-text-muted)", opacity: 0.5 }}
+              title="Compartilhar"
+            >
+              <Share2 size={14} />
+            </button>
           </div>
         </motion.div>
       )}
@@ -194,11 +217,21 @@ const InsightsTab = () => {
                         border: "1px solid var(--dash-border)",
                       }}
                     >
-                      <div className="flex items-center gap-1.5 mb-2">
-                        <Icon size={12} style={{ color: "var(--dash-accent)", opacity: 0.7 }} />
-                        <span style={{ fontSize: 11, letterSpacing: "0.08em", color: "var(--dash-text-muted)", opacity: 0.7 }}>
-                          {categoryMeta[item.categoria]?.label || item.categoria}
-                        </span>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-1.5">
+                          <Icon size={12} style={{ color: "var(--dash-accent)", opacity: 0.7 }} />
+                          <span style={{ fontSize: 11, letterSpacing: "0.08em", color: "var(--dash-text-muted)", opacity: 0.7 }}>
+                            {categoryMeta[item.categoria]?.label || item.categoria}
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => openShare(item)}
+                          className="p-1 rounded-lg transition-all"
+                          style={{ color: "var(--dash-text-muted)", opacity: 0.4 }}
+                          title="Compartilhar"
+                        >
+                          <Share2 size={13} />
+                        </button>
                       </div>
                       <h3
                         className="font-display mb-2"
@@ -248,6 +281,8 @@ const InsightsTab = () => {
           </p>
         </div>
       )}
+
+      <InsightShareModal insight={shareInsight} onClose={() => setShareInsight(null)} />
     </div>
   );
 };
