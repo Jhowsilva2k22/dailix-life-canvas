@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { useSearchHighlight } from "@/hooks/useSearchHighlight";
 import { Plus, Trash2, Flame, Pencil, Heart } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,6 +9,8 @@ import HabitModal from "./HabitModal";
 interface HabitsTabProps {
   isActive?: boolean;
   onReadyChange?: (ready: boolean) => void;
+  highlightId?: string | null;
+  onHighlightConsumed?: () => void;
 }
 
 interface Habit {
@@ -30,7 +33,8 @@ const categoryColors: Record<string, { bg: string; color: string; label: string 
 
 const CheckIcon = () => <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>;
 
-const HabitsTab = ({ isActive = true, onReadyChange }: HabitsTabProps) => {
+const HabitsTab = ({ isActive = true, onReadyChange, highlightId = null, onHighlightConsumed }: HabitsTabProps) => {
+  const { isHighlighted } = useSearchHighlight(highlightId);
   const { user, loading: authLoading } = useAuth();
   const [habits, setHabits] = useState<Habit[]>([]);
   const [completedToday, setCompletedToday] = useState<Set<string>>(new Set());
@@ -219,9 +223,9 @@ const HabitsTab = ({ isActive = true, onReadyChange }: HabitsTabProps) => {
             const cat = categoryColors[habit.categoria] || categoryColors.saude;
             const done = completedToday.has(habit.id);
             return (
-              <div key={habit.id} className="flex items-center gap-3 px-5 py-4 group transition-colors" style={{ borderBottom: i < habits.length - 1 ? "1px solid var(--dash-border)" : "none" }}
+              <div key={habit.id} data-search-id={habit.id} className={`flex items-center gap-3 px-5 py-4 group transition-all duration-500 ${isHighlighted(habit.id) ? "search-highlight" : ""}`} style={{ borderBottom: i < habits.length - 1 ? "1px solid var(--dash-border)" : "none" }}
                 onMouseEnter={(e) => { e.currentTarget.style.background = "var(--dash-muted-surface)"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                onMouseLeave={(e) => { if (!isHighlighted(habit.id)) e.currentTarget.style.background = "transparent"; }}
               >
                 <button
                   onClick={() => toggleHabit(habit.id)}

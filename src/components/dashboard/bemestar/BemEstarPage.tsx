@@ -18,6 +18,7 @@ interface BemEstarPageProps {
 const BemEstarPage = ({ searchFocus, onClearSearchFocus }: BemEstarPageProps) => {
   const [activeTab, setActiveTab] = useState("habitos");
   const [initialLoaded, setInitialLoaded] = useState(false);
+  const [highlightId, setHighlightId] = useState<string | null>(null);
   const revealRef = useScrollReveal();
   const loadedTabs = useRef(new Set<string>());
 
@@ -29,6 +30,7 @@ const BemEstarPage = ({ searchFocus, onClearSearchFocus }: BemEstarPageProps) =>
     } else if (searchFocus.type === "insight") {
       setActiveTab("insights");
     }
+    setHighlightId(searchFocus.id);
     onClearSearchFocus?.();
   }, [searchFocus, onClearSearchFocus]);
 
@@ -82,10 +84,10 @@ const BemEstarPage = ({ searchFocus, onClearSearchFocus }: BemEstarPageProps) =>
         </div>
 
         <div style={{ display: activeTab === "habitos" ? "block" : "none" }}>
-          <HabitsTab isActive={activeTab === "habitos"} onReadyChange={(ready) => handleReadyChange("habitos", ready)} />
+          <HabitsTab isActive={activeTab === "habitos"} onReadyChange={(ready) => handleReadyChange("habitos", ready)} highlightId={activeTab === "habitos" ? highlightId : null} onHighlightConsumed={() => setHighlightId(null)} />
         </div>
         <div style={{ display: activeTab === "insights" ? "block" : "none" }}>
-          <InsightsTab isActive={activeTab === "insights"} onReadyChange={(ready) => handleReadyChange("insights", ready)} />
+          <InsightsTab isActive={activeTab === "insights"} onReadyChange={(ready) => handleReadyChange("insights", ready)} highlightId={activeTab === "insights" ? highlightId : null} onHighlightConsumed={() => setHighlightId(null)} />
         </div>
       </div>
     </div>

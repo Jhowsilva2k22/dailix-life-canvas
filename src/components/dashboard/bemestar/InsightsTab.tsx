@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
+import { useSearchHighlight } from "@/hooks/useSearchHighlight";
 import { supabase } from "@/integrations/supabase/client";
 import { Lightbulb, Sparkles, Brain, Moon, Target, Zap, Shield, ChevronDown, Share2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -7,6 +8,8 @@ import InsightShareModal from "./InsightShareModal";
 interface InsightsTabProps {
   isActive?: boolean;
   onReadyChange?: (ready: boolean) => void;
+  highlightId?: string | null;
+  onHighlightConsumed?: () => void;
 }
 
 interface Insight {
@@ -31,7 +34,8 @@ const categoryMeta: Record<string, { label: string; icon: React.ElementType }> =
 const INITIAL_SHOW = 3;
 const LOAD_MORE = 3;
 
-const InsightsTab = ({ isActive = true, onReadyChange }: InsightsTabProps) => {
+const InsightsTab = ({ isActive = true, onReadyChange, highlightId = null, onHighlightConsumed }: InsightsTabProps) => {
+  const { isHighlighted } = useSearchHighlight(highlightId);
   const [insights, setInsights] = useState<Insight[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -215,15 +219,16 @@ const InsightsTab = ({ isActive = true, onReadyChange }: InsightsTabProps) => {
                   return (
                     <motion.div
                       key={item.id}
+                      data-search-id={item.id}
                       layout
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.95 }}
                       transition={{ duration: 0.25, delay: i * 0.04 }}
-                      className="rounded-2xl p-5"
+                      className={`rounded-2xl p-5 transition-all duration-500 ${isHighlighted(item.id) ? "search-highlight" : ""}`}
                       style={{
                         background: "var(--dash-surface)",
-                        border: "1px solid var(--dash-border)",
+                        border: isHighlighted(item.id) ? "1px solid var(--dash-accent)" : "1px solid var(--dash-border)",
                       }}
                     >
                       <div className="flex items-center justify-between mb-2">

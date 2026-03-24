@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSearchHighlight } from "@/hooks/useSearchHighlight";
 import { Plus, Trash2, Pencil, CheckSquare } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,6 +9,8 @@ import AddTaskModal from "../AddTaskModal";
 interface TasksTabProps {
   isActive?: boolean;
   onReadyChange?: (ready: boolean) => void;
+  highlightId?: string | null;
+  onHighlightConsumed?: () => void;
 }
 
 interface Task {
@@ -45,7 +48,8 @@ const sortTasks = (list: Task[], mode: string) => {
 
 const CheckIcon = () => <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>;
 
-const TasksTab = ({ isActive = true, onReadyChange }: TasksTabProps) => {
+const TasksTab = ({ isActive = true, onReadyChange, highlightId = null, onHighlightConsumed }: TasksTabProps) => {
+  const { isHighlighted } = useSearchHighlight(highlightId);
   const { user, loading: authLoading } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [filter, setFilter] = useState("hoje");
@@ -195,9 +199,9 @@ const TasksTab = ({ isActive = true, onReadyChange }: TasksTabProps) => {
             {pending.map((task, i) => {
               const ps = priorityStyles[task.prioridade] || priorityStyles.media;
               return (
-                <div key={task.id} className="flex items-center gap-3 px-5 py-4 group transition-colors" style={{ borderBottom: i < pending.length - 1 || done.length > 0 ? "1px solid var(--dash-border)" : "none" }}
+                <div key={task.id} data-search-id={task.id} className={`flex items-center gap-3 px-5 py-4 group transition-all duration-500 ${isHighlighted(task.id) ? "search-highlight" : ""}`} style={{ borderBottom: i < pending.length - 1 || done.length > 0 ? "1px solid var(--dash-border)" : "none" }}
                   onMouseEnter={(e) => { e.currentTarget.style.background = "var(--dash-muted-surface)"; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                  onMouseLeave={(e) => { if (!isHighlighted(task.id)) e.currentTarget.style.background = "transparent"; }}
                 >
                   <button
                     onClick={() => toggleTask(task.id, task.concluida)}
@@ -228,7 +232,7 @@ const TasksTab = ({ isActive = true, onReadyChange }: TasksTabProps) => {
                   <p style={{ color: "var(--dash-text-muted)", fontSize: 11, fontWeight: 400 }}>{done.length} concluída{done.length > 1 ? "s" : ""}</p>
                 </div>
                 {done.map((task) => (
-                  <div key={task.id} className="flex items-center gap-3 px-5 py-3 group" style={{ opacity: 0.4 }}>
+                  <div key={task.id} data-search-id={task.id} className={`flex items-center gap-3 px-5 py-3 group ${isHighlighted(task.id) ? "search-highlight" : ""}`} style={{ opacity: 0.4 }}>
                     <button
                       onClick={() => toggleTask(task.id, task.concluida)}
                       className="w-[18px] h-[18px] rounded flex items-center justify-center flex-shrink-0 transition-colors"

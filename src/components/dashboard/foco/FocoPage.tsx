@@ -18,6 +18,7 @@ interface FocoPageProps {
 const FocoPage = ({ searchFocus, onClearSearchFocus }: FocoPageProps) => {
   const [activeTab, setActiveTab] = useState("tarefas");
   const [initialLoaded, setInitialLoaded] = useState(false);
+  const [highlightId, setHighlightId] = useState<string | null>(null);
   const revealRef = useScrollReveal();
   const loadedTabs = useRef(new Set<string>());
 
@@ -29,6 +30,7 @@ const FocoPage = ({ searchFocus, onClearSearchFocus }: FocoPageProps) => {
     } else if (searchFocus.type === "goal") {
       setActiveTab("metas");
     }
+    setHighlightId(searchFocus.id);
     onClearSearchFocus?.();
   }, [searchFocus, onClearSearchFocus]);
 
@@ -82,10 +84,10 @@ const FocoPage = ({ searchFocus, onClearSearchFocus }: FocoPageProps) => {
         </div>
 
         <div style={{ display: activeTab === "tarefas" ? "block" : "none" }}>
-          <TasksTab isActive={activeTab === "tarefas"} onReadyChange={(ready) => handleReadyChange("tarefas", ready)} />
+          <TasksTab isActive={activeTab === "tarefas"} onReadyChange={(ready) => handleReadyChange("tarefas", ready)} highlightId={activeTab === "tarefas" ? highlightId : null} onHighlightConsumed={() => setHighlightId(null)} />
         </div>
         <div style={{ display: activeTab === "metas" ? "block" : "none" }}>
-          <GoalsTab isActive={activeTab === "metas"} onReadyChange={(ready) => handleReadyChange("metas", ready)} />
+          <GoalsTab isActive={activeTab === "metas"} onReadyChange={(ready) => handleReadyChange("metas", ready)} highlightId={activeTab === "metas" ? highlightId : null} onHighlightConsumed={() => setHighlightId(null)} />
         </div>
       </div>
     </div>
