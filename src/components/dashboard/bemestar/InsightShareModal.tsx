@@ -472,7 +472,7 @@ const InsightCanvas = ({
             via <span style={{ fontWeight: 600, color: "#64748B" }}>Dailix</span>
           </span>
         </div>
-        <span style={{ fontSize: isFeed ? 18 : 22, color: "#3E5068", fontWeight: 400, letterSpacing: "0.02em" }}>
+        <span style={{ fontSize: isFeed ? 18 : 22, color: "#4B6584", fontWeight: 400, letterSpacing: "0.02em" }}>
           dailix.app
         </span>
       </div>
