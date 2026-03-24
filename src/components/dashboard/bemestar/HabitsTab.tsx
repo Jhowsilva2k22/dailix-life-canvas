@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useSearchHighlight } from "@/hooks/useSearchHighlight";
-import { Plus, Trash2, Pencil, Heart, Activity } from "lucide-react";
+import { Plus, Trash2, Pencil, Heart } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -332,27 +332,31 @@ const HabitsTab = ({ isActive = true, onReadyChange, highlightId = null, onHighl
                 </span>
 
                 {/* Streak display */}
-                {(habit.streak > 0 || habit.best_streak > 0) && (
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    {habit.streak > 0 && (
-                      <span
-                        className="inline-flex items-center gap-1 font-display tracking-wide"
-                        style={{ fontSize: 11, color: "var(--dash-accent)", fontWeight: 500, letterSpacing: "0.04em" }}
-                        title={`Sequência atual: ${habit.streak} dia${habit.streak > 1 ? "s" : ""}`}
-                      >
-                        <Activity size={11} strokeWidth={1.5} />
-                        {habit.streak}<span style={{ fontSize: 9, fontWeight: 300, color: "var(--dash-text-muted)", marginLeft: 1 }}>d</span>
-                      </span>
-                    )}
-                    {habit.best_streak > 0 && habit.best_streak > habit.streak && (
-                      <span
-                        style={{ fontSize: 10, color: "var(--dash-text-muted)", fontWeight: 300, opacity: 0.7 }}
-                        title={`Melhor sequência: ${habit.best_streak} dia${habit.best_streak > 1 ? "s" : ""}`}
-                      >
-                        /{habit.best_streak}
-                      </span>
-                    )}
-                  </div>
+                {habit.streak > 0 && (
+                  <span
+                    className="inline-flex items-center gap-1.5 flex-shrink-0 rounded-full font-display"
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 400,
+                      letterSpacing: "0.03em",
+                      color: "var(--dash-accent)",
+                      border: "1px solid color-mix(in srgb, var(--dash-accent) 25%, transparent)",
+                      padding: "3px 10px 3px 8px",
+                    }}
+                    title={`Sequência atual: ${habit.streak} dia${habit.streak > 1 ? "s" : ""}`}
+                  >
+                    <span
+                      style={{
+                        width: 4,
+                        height: 4,
+                        borderRadius: "50%",
+                        background: "var(--dash-accent)",
+                        opacity: 0.7,
+                        flexShrink: 0,
+                      }}
+                    />
+                    {habit.streak} {habit.streak === 1 ? "dia" : "dias"}
+                  </span>
                 )}
 
                 <button onClick={() => openEdit(habit)} className="p-1 opacity-0 md:group-hover:opacity-60 transition-opacity" style={{ color: "var(--dash-text-muted)" }}>
