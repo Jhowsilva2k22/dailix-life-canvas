@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { CheckSquare, Flame, Target, TrendingUp, Plus } from "lucide-react";
+import RefreshButton from "./RefreshButton";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
