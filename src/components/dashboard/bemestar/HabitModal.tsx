@@ -37,6 +37,8 @@ const HabitModal = ({ onClose, onSaved, editingHabit }: HabitModalProps) => {
   const [categoria, setCategoria] = useState(editingHabit?.categoria ?? "saude");
   const [frequencia, setFrequencia] = useState(editingHabit?.frequencia ?? "diario");
   const [saving, setSaving] = useState(false);
+  const [lembreteAtivo, setLembreteAtivo] = useState((editingHabit as any)?.lembrete_ativo ?? false);
+  const [lembreteHorario, setLembreteHorario] = useState((editingHabit as any)?.lembrete_horario?.slice(0, 5) ?? "");
 
   const handleSave = async () => {
     if (!titulo.trim() || !user) return;
