@@ -4,7 +4,7 @@ import HabitsTab from "./HabitsTab";
 import InsightsTab from "./InsightsTab";
 
 const tabs = [
-  { key: "habitos", label: "Habitos" },
+  { key: "habitos", label: "Hábitos" },
   { key: "insights", label: "Insights" },
 ];
 
@@ -20,7 +20,7 @@ const BemEstarPage = () => {
             Bem-estar
           </h1>
           <p className="mt-1.5" style={{ color: "var(--dash-text-muted)", fontSize: 14, fontWeight: 300 }}>
-            Habitos, saude e aprendizado continuo.
+            Hábitos, saúde e aprendizado contínuo.
           </p>
         </div>
 
@@ -45,8 +45,12 @@ const BemEstarPage = () => {
           ))}
         </div>
 
-        {activeTab === "habitos" && <HabitsTab />}
-        {activeTab === "insights" && <InsightsTab />}
+        <div style={{ display: activeTab === "habitos" ? "block" : "none" }}>
+          <HabitsTab />
+        </div>
+        <div style={{ display: activeTab === "insights" ? "block" : "none" }}>
+          <InsightsTab />
+        </div>
       </div>
     </div>
   );
