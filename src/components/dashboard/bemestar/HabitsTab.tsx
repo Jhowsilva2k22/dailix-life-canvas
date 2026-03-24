@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { Plus, Trash2, Flame } from "lucide-react";
+import RefreshButton from "../RefreshButton";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
