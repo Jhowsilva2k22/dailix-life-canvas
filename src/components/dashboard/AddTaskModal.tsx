@@ -3,6 +3,7 @@ import { X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import ReminderField from "./ReminderField";
 
 interface Task {
   id: string;
@@ -42,6 +43,8 @@ const AddTaskModal = ({ onClose, onSaved, defaultGoalId, editingTask }: AddTaskM
   const [goalId, setGoalId] = useState<string>(editingTask?.goal_id ?? defaultGoalId ?? "");
   const [goals, setGoals] = useState<GoalOption[]>([]);
   const [saving, setSaving] = useState(false);
+  const [lembreteAtivo, setLembreteAtivo] = useState((editingTask as any)?.lembrete_ativo ?? false);
+  const [lembreteHorario, setLembreteHorario] = useState((editingTask as any)?.lembrete_horario?.slice(0, 5) ?? "");
 
   useEffect(() => {
     if (!user) return;
@@ -60,6 +63,8 @@ const AddTaskModal = ({ onClose, onSaved, defaultGoalId, editingTask }: AddTaskM
         prazo: prazo || null,
         prioridade,
         goal_id: goalId || null,
+        lembrete_ativo: lembreteAtivo,
+        lembrete_horario: lembreteAtivo && lembreteHorario ? lembreteHorario + ":00" : null,
       };
       if (isEdit && editingTask) {
         const { error } = await supabase.from("tasks").update(payload).eq("id", editingTask.id);
@@ -149,6 +154,13 @@ const AddTaskModal = ({ onClose, onSaved, defaultGoalId, editingTask }: AddTaskM
               </select>
             </div>
           )}
+          <ReminderField
+            lembreteAtivo={lembreteAtivo}
+            lembreteHorario={lembreteHorario}
+            onToggle={setLembreteAtivo}
+            onTimeChange={setLembreteHorario}
+            needsDate={!prazo}
+          />
         </div>
 
         <button onClick={handleSave} disabled={!titulo.trim() || saving} className="w-full mt-6 py-3 text-sm rounded-lg transition-all duration-150 disabled:opacity-50 active:scale-[0.98]" style={{ background: "var(--dash-gradient-primary)", color: "var(--dash-text)", fontWeight: 400, letterSpacing: "0.02em" }}>

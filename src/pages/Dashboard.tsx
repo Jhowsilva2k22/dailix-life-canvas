@@ -8,12 +8,14 @@ import BemEstarPage from "@/components/dashboard/bemestar/BemEstarPage";
 import SettingsPage from "@/components/dashboard/SettingsPage";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { useReminders } from "@/hooks/useReminders";
 
 const Dashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const [activeItem, setActiveItem] = useState("inicio");
   const [ready, setReady] = useState(false);
+  useReminders();
 
   useEffect(() => {
     if (!user) return;

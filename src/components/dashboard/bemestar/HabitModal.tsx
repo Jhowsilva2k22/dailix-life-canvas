@@ -3,6 +3,7 @@ import { X } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import ReminderField from "@/components/dashboard/ReminderField";
 
 interface Habit {
   id: string;
@@ -36,6 +37,8 @@ const HabitModal = ({ onClose, onSaved, editingHabit }: HabitModalProps) => {
   const [categoria, setCategoria] = useState(editingHabit?.categoria ?? "saude");
   const [frequencia, setFrequencia] = useState(editingHabit?.frequencia ?? "diario");
   const [saving, setSaving] = useState(false);
+  const [lembreteAtivo, setLembreteAtivo] = useState((editingHabit as any)?.lembrete_ativo ?? false);
+  const [lembreteHorario, setLembreteHorario] = useState((editingHabit as any)?.lembrete_horario?.slice(0, 5) ?? "");
 
   const handleSave = async () => {
     if (!titulo.trim() || !user) return;
@@ -46,6 +49,8 @@ const HabitModal = ({ onClose, onSaved, editingHabit }: HabitModalProps) => {
         descricao: descricao.trim() || null,
         categoria,
         frequencia,
+        lembrete_ativo: lembreteAtivo,
+        lembrete_horario: lembreteAtivo && lembreteHorario ? lembreteHorario + ":00" : null,
       };
       if (isEdit && editingHabit) {
         const { error } = await supabase.from("habits").update(payload).eq("id", editingHabit.id);
@@ -150,6 +155,12 @@ const HabitModal = ({ onClose, onSaved, editingHabit }: HabitModalProps) => {
               ))}
             </div>
           </div>
+          <ReminderField
+            lembreteAtivo={lembreteAtivo}
+            lembreteHorario={lembreteHorario}
+            onToggle={setLembreteAtivo}
+            onTimeChange={setLembreteHorario}
+          />
         </div>
 
         <div className="flex gap-3 mt-6">

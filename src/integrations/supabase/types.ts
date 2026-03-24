@@ -93,6 +93,8 @@ export type Database = {
           descricao: string | null
           frequencia: string
           id: string
+          lembrete_ativo: boolean
+          lembrete_horario: string | null
           streak: number
           titulo: string
           user_id: string
@@ -104,6 +106,8 @@ export type Database = {
           descricao?: string | null
           frequencia?: string
           id?: string
+          lembrete_ativo?: boolean
+          lembrete_horario?: string | null
           streak?: number
           titulo: string
           user_id: string
@@ -115,6 +119,8 @@ export type Database = {
           descricao?: string | null
           frequencia?: string
           id?: string
+          lembrete_ativo?: boolean
+          lembrete_horario?: string | null
           streak?: number
           titulo?: string
           user_id?: string
@@ -220,6 +226,8 @@ export type Database = {
           descricao: string | null
           goal_id: string | null
           id: string
+          lembrete_ativo: boolean
+          lembrete_horario: string | null
           prazo: string | null
           prioridade: string
           titulo: string
@@ -231,6 +239,8 @@ export type Database = {
           descricao?: string | null
           goal_id?: string | null
           id?: string
+          lembrete_ativo?: boolean
+          lembrete_horario?: string | null
           prazo?: string | null
           prioridade?: string
           titulo: string
@@ -242,6 +252,8 @@ export type Database = {
           descricao?: string | null
           goal_id?: string | null
           id?: string
+          lembrete_ativo?: boolean
+          lembrete_horario?: string | null
           prazo?: string | null
           prioridade?: string
           titulo?: string
