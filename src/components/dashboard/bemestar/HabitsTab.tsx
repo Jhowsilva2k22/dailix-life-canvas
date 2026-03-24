@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useSearchHighlight } from "@/hooks/useSearchHighlight";
-import { Plus, Trash2, Flame, Pencil, Heart, Trophy } from "lucide-react";
+import { Plus, Trash2, Pencil, Heart } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -336,20 +336,19 @@ const HabitsTab = ({ isActive = true, onReadyChange, highlightId = null, onHighl
                   <div className="flex items-center gap-2 flex-shrink-0">
                     {habit.streak > 0 && (
                       <span
-                        className="flex items-center gap-1"
-                        style={{ fontSize: 12, color: "var(--dash-warning-text)", fontWeight: 400 }}
+                        className="font-display tracking-wide"
+                        style={{ fontSize: 11, color: "var(--dash-accent)", fontWeight: 500, letterSpacing: "0.04em" }}
                         title={`Sequência atual: ${habit.streak} dia${habit.streak > 1 ? "s" : ""}`}
                       >
-                        <Flame size={12} /> {habit.streak}
+                        {habit.streak}<span style={{ fontSize: 9, fontWeight: 300, color: "var(--dash-text-muted)", marginLeft: 2 }}>d</span>
                       </span>
                     )}
                     {habit.best_streak > 0 && habit.best_streak > habit.streak && (
                       <span
-                        className="flex items-center gap-1"
-                        style={{ fontSize: 11, color: "var(--dash-text-muted)", fontWeight: 300 }}
+                        style={{ fontSize: 10, color: "var(--dash-text-muted)", fontWeight: 300, opacity: 0.7 }}
                         title={`Melhor sequência: ${habit.best_streak} dia${habit.best_streak > 1 ? "s" : ""}`}
                       >
-                        <Trophy size={11} /> {habit.best_streak}
+                        /{habit.best_streak}
                       </span>
                     )}
                   </div>
