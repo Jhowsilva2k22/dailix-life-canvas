@@ -84,10 +84,10 @@ const FocoPage = ({ searchFocus, onClearSearchFocus }: FocoPageProps) => {
         </div>
 
         <div style={{ display: activeTab === "tarefas" ? "block" : "none" }}>
-          <TasksTab isActive={activeTab === "tarefas"} onReadyChange={(ready) => handleReadyChange("tarefas", ready)} />
+          <TasksTab isActive={activeTab === "tarefas"} onReadyChange={(ready) => handleReadyChange("tarefas", ready)} highlightId={activeTab === "tarefas" ? highlightId : null} onHighlightConsumed={() => setHighlightId(null)} />
         </div>
         <div style={{ display: activeTab === "metas" ? "block" : "none" }}>
-          <GoalsTab isActive={activeTab === "metas"} onReadyChange={(ready) => handleReadyChange("metas", ready)} />
+          <GoalsTab isActive={activeTab === "metas"} onReadyChange={(ready) => handleReadyChange("metas", ready)} highlightId={activeTab === "metas" ? highlightId : null} onHighlightConsumed={() => setHighlightId(null)} />
         </div>
       </div>
     </div>

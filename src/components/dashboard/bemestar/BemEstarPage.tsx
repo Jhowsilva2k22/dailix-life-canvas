@@ -84,10 +84,10 @@ const BemEstarPage = ({ searchFocus, onClearSearchFocus }: BemEstarPageProps) =>
         </div>
 
         <div style={{ display: activeTab === "habitos" ? "block" : "none" }}>
-          <HabitsTab isActive={activeTab === "habitos"} onReadyChange={(ready) => handleReadyChange("habitos", ready)} />
+          <HabitsTab isActive={activeTab === "habitos"} onReadyChange={(ready) => handleReadyChange("habitos", ready)} highlightId={activeTab === "habitos" ? highlightId : null} onHighlightConsumed={() => setHighlightId(null)} />
         </div>
         <div style={{ display: activeTab === "insights" ? "block" : "none" }}>
-          <InsightsTab isActive={activeTab === "insights"} onReadyChange={(ready) => handleReadyChange("insights", ready)} />
+          <InsightsTab isActive={activeTab === "insights"} onReadyChange={(ready) => handleReadyChange("insights", ready)} highlightId={activeTab === "insights" ? highlightId : null} onHighlightConsumed={() => setHighlightId(null)} />
         </div>
       </div>
     </div>

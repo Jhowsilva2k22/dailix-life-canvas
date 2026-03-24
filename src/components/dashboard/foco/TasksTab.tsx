@@ -232,7 +232,7 @@ const TasksTab = ({ isActive = true, onReadyChange, highlightId = null, onHighli
                   <p style={{ color: "var(--dash-text-muted)", fontSize: 11, fontWeight: 400 }}>{done.length} concluída{done.length > 1 ? "s" : ""}</p>
                 </div>
                 {done.map((task) => (
-                  <div key={task.id} className="flex items-center gap-3 px-5 py-3 group" style={{ opacity: 0.4 }}>
+                  <div key={task.id} data-search-id={task.id} className={`flex items-center gap-3 px-5 py-3 group ${isHighlighted(task.id) ? "search-highlight" : ""}`} style={{ opacity: 0.4 }}>
                     <button
                       onClick={() => toggleTask(task.id, task.concluida)}
                       className="w-[18px] h-[18px] rounded flex items-center justify-center flex-shrink-0 transition-colors"
