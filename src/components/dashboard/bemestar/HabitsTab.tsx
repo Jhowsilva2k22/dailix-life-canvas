@@ -102,7 +102,28 @@ const HabitsTab = () => {
   }, [habits, calcStreak]);
 
   useEffect(() => { fetchHabits(); fetchTodayLogs(); }, [fetchHabits, fetchTodayLogs]);
-  useEffect(() => { if (habits.length > 0) refreshStreaks(); }, [habits.length]);
+  // Refresh streaks once after initial fetch (use a ref to avoid loops)
+  const streaksRefreshed = useState(false)[1];
+  useEffect(() => {
+    if (habits.length > 0) {
+      let mounted = true;
+      const doRefresh = async () => {
+        const updated = await Promise.all(
+          habits.map(async (h) => {
+            const streak = await calcStreak(h.id);
+            if (streak !== h.streak) {
+              await supabase.from("habits").update({ streak }).eq("id", h.id);
+            }
+            return { ...h, streak };
+          })
+        );
+        if (mounted) setHabits(updated);
+      };
+      doRefresh();
+      return () => { mounted = false; };
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Realtime subscriptions
   useEffect(() => {

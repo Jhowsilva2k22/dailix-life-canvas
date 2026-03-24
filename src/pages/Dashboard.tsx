@@ -79,7 +79,7 @@ const Dashboard = () => {
           exit={{ opacity: 0 }}
           transition={{ duration: 0.15, ease: "easeOut" }}
         >
-          {renderContent()}
+          <div>{renderContent()}</div>
         </motion.div>
       </AnimatePresence>
     </div>
