@@ -129,6 +129,7 @@ const GoalCard = ({
   onDelete,
   onToggleTask,
   onTaskAdded,
+  highlighted,
 }: {
   goal: Goal;
   tasks: SubTask[];
@@ -136,13 +137,14 @@ const GoalCard = ({
   onDelete: () => void;
   onToggleTask: (taskId: string, current: boolean) => void;
   onTaskAdded: (task: SubTask) => void;
+  highlighted?: boolean;
 }) => {
   const badge = statusBadge(goal.status);
   const progress = tasks.length > 0 ? calcProgress(tasks) : goal.progresso;
   const doneCount = tasks.filter((t) => t.concluida).length;
 
   return (
-    <div data-search-id={goal.id} className={`rounded-2xl overflow-hidden transition-all duration-500 ${isHighlighted(goal.id) ? "search-highlight" : ""}`} style={{ background: "var(--dash-surface)", border: isHighlighted(goal.id) ? "1px solid var(--dash-accent)" : "1px solid var(--dash-border)" }}>
+    <div data-search-id={goal.id} className={`rounded-2xl overflow-hidden transition-all duration-500 ${highlighted ? "search-highlight" : ""}`} style={{ background: "var(--dash-surface)", border: highlighted ? "1px solid var(--dash-accent)" : "1px solid var(--dash-border)" }}>
       <div className="p-5">
         {/* Header */}
         <div className="flex items-start justify-between mb-3">
