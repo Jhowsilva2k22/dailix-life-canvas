@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import DashboardContent from "@/components/dashboard/DashboardContent";
 import MobileNav from "@/components/dashboard/MobileNav";
