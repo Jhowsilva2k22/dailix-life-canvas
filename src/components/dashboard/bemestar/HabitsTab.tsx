@@ -28,6 +28,7 @@ const HabitsTab = () => {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [completedToday, setCompletedToday] = useState<Set<string>>(new Set());
   const [showModal, setShowModal] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const today = new Date().toISOString().split("T")[0];
 
