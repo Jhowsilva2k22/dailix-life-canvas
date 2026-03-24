@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import UserAvatar from "./UserAvatar";
 import AvatarUploadModal from "./AvatarUploadModal";
+import PushNotificationToggle from "./PushNotificationToggle";
 
 const SettingsPage = () => {
   const { user, signOut } = useAuth();
@@ -81,6 +82,12 @@ const SettingsPage = () => {
             <button className="text-sm transition-colors" style={{ color: "var(--dash-accent)", fontWeight: 400 }}>Gerenciar assinatura</button>
           )}
         </div>
+
+        {/* Push Notifications */}
+        <PushNotificationToggle />
+
+        {/* Spacer */}
+        <div className="h-4" />
 
         {/* Danger zone */}
         <div className="p-6 rounded-2xl" style={{ background: "var(--dash-surface)", border: "1px solid var(--dash-border)" }}>
