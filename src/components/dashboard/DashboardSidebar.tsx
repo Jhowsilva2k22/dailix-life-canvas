@@ -25,7 +25,7 @@ const DashboardSidebar = ({ activeItem, onNavigate }: DashboardSidebarProps) => 
     <>
       <aside
         className="hidden md:flex flex-col fixed left-0 top-0 h-screen z-30"
-        style={{ width: 240, background: "#0F172A", borderRight: "1px solid var(--dash-border)" }}
+        style={{ width: 240, background: "var(--dash-sidebar)", borderRight: "1px solid var(--dash-border)" }}
       >
         <div className="flex items-center h-16 px-6">
           <span className="font-display text-lg font-bold" style={{ color: "var(--dash-text)" }}>Dailix</span>
@@ -45,13 +45,13 @@ const DashboardSidebar = ({ activeItem, onNavigate }: DashboardSidebarProps) => 
                     fontSize: 13,
                     fontWeight: isActive ? 500 : 400,
                     color: isActive ? "var(--dash-text)" : "var(--dash-text-muted)",
-                    background: isActive ? "rgba(255,255,255,0.04)" : "transparent",
+                    background: isActive ? "var(--dash-muted-surface-hover)" : "transparent",
                     borderRadius: 10,
                   }}
                   onMouseEnter={(e) => {
                     if (!isActive) {
                       e.currentTarget.style.color = "var(--dash-text-secondary)";
-                      e.currentTarget.style.background = "rgba(255,255,255,0.02)";
+                      e.currentTarget.style.background = "var(--dash-muted-surface)";
                     }
                   }}
                   onMouseLeave={(e) => {
@@ -83,13 +83,13 @@ const DashboardSidebar = ({ activeItem, onNavigate }: DashboardSidebarProps) => 
               padding: "10px 16px",
               fontWeight: activeItem === "configuracoes" ? 500 : 400,
               color: activeItem === "configuracoes" ? "var(--dash-text)" : "var(--dash-text-muted)",
-              background: activeItem === "configuracoes" ? "rgba(255,255,255,0.04)" : "transparent",
+              background: activeItem === "configuracoes" ? "var(--dash-muted-surface-hover)" : "transparent",
               borderRadius: 10,
             }}
             onMouseEnter={(e) => {
               if (activeItem !== "configuracoes") {
                 e.currentTarget.style.color = "var(--dash-text-secondary)";
-                e.currentTarget.style.background = "rgba(255,255,255,0.02)";
+                e.currentTarget.style.background = "var(--dash-muted-surface)";
               }
             }}
             onMouseLeave={(e) => {
@@ -115,9 +115,9 @@ const DashboardSidebar = ({ activeItem, onNavigate }: DashboardSidebarProps) => 
             <UserAvatar avatarUrl={avatarUrl} displayName={displayName} size={36} />
             <div
               className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-              style={{ background: "rgba(0,0,0,0.5)", borderRadius: 12 }}
+              style={{ background: "var(--dash-overlay)", borderRadius: 12 }}
             >
-              <Camera size={13} style={{ color: "white" }} />
+              <Camera size={13} style={{ color: "var(--dash-text)" }} />
             </div>
           </div>
           <div className="flex-1 min-w-0">

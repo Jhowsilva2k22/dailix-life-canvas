@@ -39,7 +39,7 @@ const MobileNav = ({ activeItem, onNavigate }: MobileNavProps) => {
     <>
       <header
         className="md:hidden fixed top-0 left-0 right-0 z-30 flex items-center justify-between h-14 px-4"
-        style={{ background: "#0F172A", borderBottom: "1px solid var(--dash-border)" }}
+        style={{ background: "var(--dash-sidebar)", borderBottom: "1px solid var(--dash-border)" }}
       >
         <span className="font-display text-base font-bold" style={{ color: "var(--dash-text)" }}>Dailix</span>
         <div className="relative" ref={menuRef}>
@@ -55,7 +55,7 @@ const MobileNav = ({ activeItem, onNavigate }: MobileNavProps) => {
                 border: "1px solid var(--dash-border-strong)",
                 borderRadius: 12,
                 padding: 6,
-                boxShadow: "0 12px 40px rgba(0,0,0,0.4)",
+                boxShadow: "var(--dash-shadow-modal)",
                 minWidth: 200,
                 zIndex: 50,
               }}
@@ -80,7 +80,7 @@ const MobileNav = ({ activeItem, onNavigate }: MobileNavProps) => {
               <button
                 onClick={() => { setMenuOpen(false); signOut(); }}
                 className="flex items-center gap-2 w-full px-3 py-2.5 text-sm rounded-lg transition-colors"
-                style={{ color: "var(--dash-danger)" }}
+                style={{ color: "var(--dash-danger-text)" }}
               >
                 <LogOut size={15} />
                 Sair
@@ -92,7 +92,7 @@ const MobileNav = ({ activeItem, onNavigate }: MobileNavProps) => {
 
       <nav
         className="md:hidden fixed bottom-0 left-0 right-0 z-30 flex items-center justify-around h-16"
-        style={{ background: "#0F172A", borderTop: "1px solid var(--dash-border)" }}
+        style={{ background: "var(--dash-sidebar)", borderTop: "1px solid var(--dash-border)" }}
       >
         {navItems.map((item) => {
           const isActive = activeItem === item.path;

@@ -92,7 +92,7 @@ const AvatarUploadModal = ({ onClose }: AvatarUploadModalProps) => {
   return (
     <div
       className="fixed inset-0 z-[9999] flex items-center justify-center"
-      style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)" }}
+      style={{ background: "var(--dash-overlay)", backdropFilter: "blur(4px)" }}
       onClick={onClose}
     >
       <div
@@ -101,7 +101,7 @@ const AvatarUploadModal = ({ onClose }: AvatarUploadModalProps) => {
           background: "var(--dash-surface-elevated)",
           borderRadius: 16,
           border: "1px solid var(--dash-border-strong)",
-          boxShadow: "0 16px 48px rgba(0,0,0,0.4)",
+          boxShadow: "var(--dash-shadow-modal)",
         }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -119,7 +119,7 @@ const AvatarUploadModal = ({ onClose }: AvatarUploadModalProps) => {
             <div
               className="flex flex-col items-center justify-center cursor-pointer transition-colors"
               style={{
-                background: dragActive ? "var(--dash-accent-subtle)" : "rgba(255,255,255,0.02)",
+                background: dragActive ? "var(--dash-accent-subtle)" : "var(--dash-muted-surface)",
                 border: `2px dashed ${dragActive ? "var(--dash-accent)" : "var(--dash-border-strong)"}`,
                 borderRadius: 14,
                 padding: 40,
@@ -195,7 +195,7 @@ const AvatarUploadModal = ({ onClose }: AvatarUploadModalProps) => {
                   onClick={handleSave}
                   disabled={saving}
                   className="text-sm px-6 py-2.5 rounded-lg transition-opacity"
-                  style={{ background: "linear-gradient(135deg, #1E3A5F, #00B4D8)", color: "white", opacity: saving ? 0.7 : 1 }}
+                  style={{ background: "var(--dash-gradient-primary)", color: "var(--dash-text)", opacity: saving ? 0.7 : 1 }}
                 >
                   {saving ? "Salvando..." : "Salvar foto"}
                 </button>

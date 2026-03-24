@@ -9,11 +9,11 @@ interface HabitModalProps {
 }
 
 const categoryOptions = [
-  { value: "saude", label: "Saude", color: "#10B981" },
-  { value: "mental", label: "Mental", color: "#8B5CF6" },
-  { value: "sono", label: "Sono", color: "#1E3A5F" },
-  { value: "alimentacao", label: "Alimentacao", color: "#F59E0B" },
-  { value: "aprendizado", label: "Aprendizado", color: "#00B4D8" },
+  { value: "saude", label: "Saude", color: "var(--dash-success)" },
+  { value: "mental", label: "Mental", color: "var(--dash-purple)" },
+  { value: "sono", label: "Sono", color: "var(--dash-primary)" },
+  { value: "alimentacao", label: "Alimentacao", color: "var(--dash-warning)" },
+  { value: "aprendizado", label: "Aprendizado", color: "var(--dash-accent)" },
 ];
 
 const HabitModal = ({ onClose, onSaved }: HabitModalProps) => {
@@ -44,10 +44,10 @@ const HabitModal = ({ onClose, onSaved }: HabitModalProps) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.6)" }} onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "var(--dash-overlay)" }} onClick={onClose}>
       <div
         className="w-full max-w-md rounded-2xl p-6"
-        style={{ background: "var(--dash-surface-elevated)", border: "1px solid var(--dash-border-strong)", boxShadow: "0 16px 48px rgba(0,0,0,0.4)" }}
+        style={{ background: "var(--dash-surface-elevated)", border: "1px solid var(--dash-border-strong)", boxShadow: "var(--dash-shadow-modal)" }}
         onClick={(e) => e.stopPropagation()}
       >
         <h3 className="font-display text-lg mb-6" style={{ color: "var(--dash-text)", fontWeight: 400 }}>Novo habito</h3>
@@ -84,7 +84,7 @@ const HabitModal = ({ onClose, onSaved }: HabitModalProps) => {
                   className="px-3 py-1.5 text-xs rounded-lg transition-colors"
                   style={{
                     border: `1px solid ${categoria === c.value ? c.color : "var(--dash-border-strong)"}`,
-                    background: categoria === c.value ? `${c.color}18` : "transparent",
+                    background: categoria === c.value ? "var(--dash-muted-surface-hover)" : "transparent",
                     color: categoria === c.value ? c.color : "var(--dash-text-muted)",
                     fontWeight: 400,
                   }}
@@ -124,7 +124,7 @@ const HabitModal = ({ onClose, onSaved }: HabitModalProps) => {
             onClick={handleSave}
             disabled={!titulo.trim() || saving}
             className="flex-1 py-2.5 text-sm rounded-lg transition-opacity disabled:opacity-50"
-            style={{ background: "linear-gradient(135deg, #1E3A5F, #00B4D8)", color: "white", fontWeight: 400, letterSpacing: "0.02em" }}
+            style={{ background: "var(--dash-gradient-primary)", color: "var(--dash-text)", fontWeight: 400, letterSpacing: "0.02em" }}
           >
             {saving ? "Salvando..." : "Salvar"}
           </button>

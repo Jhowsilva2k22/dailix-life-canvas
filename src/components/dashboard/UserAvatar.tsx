@@ -29,8 +29,8 @@ const UserAvatar = ({ avatarUrl, displayName, size = 42 }: UserAvatarProps) => {
         width: size,
         height: size,
         borderRadius: 12,
-        background: "#1E3A5F",
-        color: "white",
+        background: "var(--dash-primary)",
+        color: "var(--dash-text)",
         fontSize: size * 0.38,
       }}
     >

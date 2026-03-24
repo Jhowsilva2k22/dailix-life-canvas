@@ -33,9 +33,9 @@ class GoalsErrorBoundary extends Component<EBProps, EBState> {
 
 const statusBadge = (s: string) => {
   const map: Record<string, { bg: string; color: string; label: string }> = {
-    ativa: { bg: "rgba(0,180,216,0.1)", color: "#22D3EE", label: "Ativa" },
-    concluida: { bg: "rgba(16,185,129,0.1)", color: "#34D399", label: "Concluida" },
-    pausada: { bg: "rgba(148,163,184,0.1)", color: "#94A3B8", label: "Pausada" },
+    ativa: { bg: "var(--dash-accent-subtle)", color: "var(--dash-accent-muted)", label: "Ativa" },
+    concluida: { bg: "var(--dash-success-bg)", color: "var(--dash-success-text)", label: "Concluida" },
+    pausada: { bg: "var(--dash-muted-surface-hover)", color: "var(--dash-text-secondary)", label: "Pausada" },
   };
   return map[s] ?? map.ativa;
 };
@@ -45,7 +45,7 @@ const calcProgress = (tasks: SubTask[]) => {
   return Math.round((tasks.filter((t) => t.concluida).length / tasks.length) * 100);
 };
 
-const CheckIcon = () => <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+const CheckIcon = () => <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>;
 
 const GoalsTabInner = () => {
   const { user } = useAuth();
@@ -164,7 +164,7 @@ const GoalsTabInner = () => {
 
                 <div className="flex items-center gap-3 mb-2">
                   <div className="flex-1 h-1.5 rounded-full overflow-hidden" style={{ background: "var(--dash-surface-hover)" }}>
-                    <div className="h-full rounded-full transition-all duration-700 ease-out" style={{ width: `${progress}%`, background: "linear-gradient(90deg, #1E3A5F, #00B4D8)" }} />
+                    <div className="h-full rounded-full transition-all duration-700 ease-out" style={{ width: `${progress}%`, background: "var(--dash-gradient-bar)" }} />
                   </div>
                   <span style={{ fontSize: 12, fontWeight: 400, color: "var(--dash-text-secondary)", minWidth: 52, textAlign: "right" }}>{progress}%</span>
                 </div>
@@ -187,7 +187,7 @@ const GoalsTabInner = () => {
                         <button
                           onClick={() => toggleSubTask(goal.id, task.id, task.concluida)}
                           className="w-4 h-4 rounded flex items-center justify-center flex-shrink-0 transition-colors"
-                          style={{ border: task.concluida ? "none" : "1.5px solid var(--dash-border-strong)", background: task.concluida ? "var(--dash-accent)" : "transparent" }}
+                          style={{ border: task.concluida ? "none" : "1.5px solid var(--dash-border-strong)", background: task.concluida ? "var(--dash-accent)" : "transparent", color: "var(--dash-text)" }}
                         >
                           {task.concluida && <CheckIcon />}
                         </button>
@@ -213,13 +213,13 @@ const GoalsTabInner = () => {
       {showModal && <GoalModal goal={editing} onClose={() => { setShowModal(false); setEditing(null); }} onSaved={handleSaved} />}
 
       {confirmDelete && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.6)" }} onClick={() => setConfirmDelete(null)}>
-          <div className="w-full max-w-sm rounded-2xl p-6" style={{ background: "var(--dash-surface-elevated)", border: "1px solid var(--dash-border-strong)", boxShadow: "0 16px 48px rgba(0,0,0,0.4)" }} onClick={(e) => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "var(--dash-overlay)" }} onClick={() => setConfirmDelete(null)}>
+          <div className="w-full max-w-sm rounded-2xl p-6" style={{ background: "var(--dash-surface-elevated)", border: "1px solid var(--dash-border-strong)", boxShadow: "var(--dash-shadow-modal)" }} onClick={(e) => e.stopPropagation()}>
             <h3 className="font-display mb-2" style={{ color: "var(--dash-text)", fontSize: 16, fontWeight: 400 }}>Deletar meta</h3>
             <p style={{ color: "var(--dash-text-muted)", fontSize: 14, fontWeight: 300, lineHeight: 1.6 }}>Essa acao nao pode ser desfeita.</p>
             <div className="flex gap-3 mt-6">
               <button onClick={() => setConfirmDelete(null)} className="flex-1 py-2.5 text-sm rounded-lg" style={{ border: "1px solid var(--dash-border-strong)", color: "var(--dash-text-muted)" }}>Cancelar</button>
-              <button onClick={() => deleteGoal(confirmDelete)} className="flex-1 py-2.5 text-sm rounded-lg" style={{ border: "1px solid var(--dash-danger)", color: "var(--dash-danger)" }}>Deletar</button>
+              <button onClick={() => deleteGoal(confirmDelete)} className="flex-1 py-2.5 text-sm rounded-lg" style={{ border: "1px solid var(--dash-danger-text)", color: "var(--dash-danger-text)" }}>Deletar</button>
             </div>
           </div>
         </div>
@@ -251,7 +251,7 @@ const InlineAddTask = ({ goalId, onAdded }: { goalId: string; onAdded: (t: SubTa
   if (!open) return <button onClick={() => setOpen(true)} className="inline-flex items-center gap-1 mt-2 transition-colors" style={{ color: "var(--dash-accent)", fontSize: 13, fontWeight: 400, opacity: 0.8 }}><Plus size={14} /> Adicionar tarefa</button>;
 
   return (
-    <div className="mt-3 p-3 rounded-xl" style={{ background: "rgba(255,255,255,0.02)", border: "1px solid var(--dash-border)" }}>
+    <div className="mt-3 p-3 rounded-xl" style={{ background: "var(--dash-muted-surface)", border: "1px solid var(--dash-border)" }}>
       <input type="text" value={titulo} onChange={(e) => setTitulo(e.target.value)} placeholder="Titulo da tarefa" autoFocus className="w-full px-3 py-2 text-sm rounded-lg outline-none mb-2" style={{ background: "var(--dash-surface)", border: "1px solid var(--dash-border-strong)", color: "var(--dash-text)" }} onKeyDown={(e) => e.key === "Enter" && save()} />
       <div className="flex items-center gap-2">
         {["alta", "media", "baixa"].map((p) => (
@@ -259,7 +259,7 @@ const InlineAddTask = ({ goalId, onAdded }: { goalId: string; onAdded: (t: SubTa
         ))}
         <div className="flex-1" />
         <button onClick={() => setOpen(false)} className="text-xs px-2 py-1" style={{ color: "var(--dash-text-muted)" }}>Cancelar</button>
-        <button onClick={save} disabled={!titulo.trim() || saving} className="text-xs px-3 py-1 rounded-lg disabled:opacity-50" style={{ background: "linear-gradient(135deg, #1E3A5F, #00B4D8)", color: "white" }}>{saving ? "..." : "Salvar"}</button>
+        <button onClick={save} disabled={!titulo.trim() || saving} className="text-xs px-3 py-1 rounded-lg disabled:opacity-50" style={{ background: "var(--dash-gradient-primary)", color: "var(--dash-text)" }}>{saving ? "..." : "Salvar"}</button>
       </div>
     </div>
   );
@@ -267,7 +267,7 @@ const InlineAddTask = ({ goalId, onAdded }: { goalId: string; onAdded: (t: SubTa
 
 /* Floating Button */
 const FloatingButton = ({ onClick }: { onClick: () => void }) => (
-  <button onClick={onClick} className="fixed bottom-20 md:bottom-8 right-5 md:right-8 flex items-center gap-2 transition-transform hover:-translate-y-0.5 z-40" style={{ background: "linear-gradient(135deg, #1E3A5F, #00B4D8)", color: "white", borderRadius: 50, padding: "12px 20px", fontSize: 13, fontWeight: 400, boxShadow: "0 4px 20px rgba(0,0,0,0.3)" }}>
+  <button onClick={onClick} className="fixed bottom-20 md:bottom-8 right-5 md:right-8 flex items-center gap-2 transition-transform hover:-translate-y-0.5 z-40" style={{ background: "var(--dash-gradient-primary)", color: "var(--dash-text)", borderRadius: 50, padding: "12px 20px", fontSize: 13, fontWeight: 400, boxShadow: "var(--dash-shadow-float)" }}>
     <Plus size={16} /> Nova meta
   </button>
 );
