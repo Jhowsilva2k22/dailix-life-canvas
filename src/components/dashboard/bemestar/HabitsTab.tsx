@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-import { Plus, Trash2, Flame } from "lucide-react";
+import { Plus, Trash2, Flame, Pencil, Heart } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -16,10 +16,10 @@ interface Habit {
 }
 
 const categoryColors: Record<string, { bg: string; color: string; label: string }> = {
-  saude: { bg: "var(--dash-success-bg)", color: "var(--dash-success-text)", label: "Saude" },
+  saude: { bg: "var(--dash-success-bg)", color: "var(--dash-success-text)", label: "Saúde" },
   mental: { bg: "var(--dash-purple-bg)", color: "var(--dash-purple-text)", label: "Mental" },
   sono: { bg: "var(--dash-blue-bg)", color: "var(--dash-blue-text)", label: "Sono" },
-  alimentacao: { bg: "var(--dash-warning-bg)", color: "var(--dash-warning-text)", label: "Alimentacao" },
+  alimentacao: { bg: "var(--dash-warning-bg)", color: "var(--dash-warning-text)", label: "Alimentação" },
   aprendizado: { bg: "var(--dash-accent-subtle)", color: "var(--dash-accent-muted)", label: "Aprendizado" },
 };
 
@@ -30,6 +30,8 @@ const HabitsTab = () => {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [completedToday, setCompletedToday] = useState<Set<string>>(new Set());
   const [showModal, setShowModal] = useState(false);
+  const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
   const today = new Date().toISOString().split("T")[0];
 
   const fetchHabits = useCallback(async () => {
@@ -106,60 +108,118 @@ const HabitsTab = () => {
   };
 
   const deleteHabit = async (id: string) => {
-    const backup = habits; setHabits((prev) => prev.filter((h) => h.id !== id)); toast.success("Removido");
+    const backup = habits;
+    setHabits((prev) => prev.filter((h) => h.id !== id));
+    setConfirmDelete(null);
+    toast.success("Hábito removido");
     const { error } = await supabase.from("habits").delete().eq("id", id);
     if (error) { setHabits(backup); toast.error("Algo deu errado."); }
   };
 
-  const handleHabitSaved = () => { setShowModal(false); fetchHabits(); toast.success("Habito criado"); };
+  const handleSaved = () => { setShowModal(false); setEditingHabit(null); fetchHabits(); };
+  const openCreate = () => { setEditingHabit(null); setShowModal(true); };
+  const openEdit = (habit: Habit) => { setEditingHabit(habit); setShowModal(true); };
+
+  const doneCount = habits.filter((h) => completedToday.has(h.id)).length;
 
   return (
     <div>
+      {/* Header */}
+      <div className="flex items-center justify-between mb-5">
+        {habits.length > 0 && (
+          <div className="flex items-center gap-4">
+            <div>
+              <span style={{ color: "var(--dash-text)", fontSize: 18, fontWeight: 500 }}>{habits.length}</span>
+              <span className="ml-1" style={{ color: "var(--dash-text-muted)", fontSize: 12, fontWeight: 300 }}>hábitos</span>
+            </div>
+            <div style={{ width: 1, height: 16, background: "var(--dash-border)" }} />
+            <div>
+              <span style={{ color: "var(--dash-accent)", fontSize: 14, fontWeight: 500 }}>{doneCount}</span>
+              <span className="ml-1" style={{ color: "var(--dash-text-muted)", fontSize: 11, fontWeight: 300 }}>hoje</span>
+            </div>
+          </div>
+        )}
+        {habits.length > 0 && (
+          <button onClick={openCreate} className="inline-flex items-center gap-1.5 rounded-lg transition-colors" style={{ border: "1px solid var(--dash-primary)", color: "var(--dash-text-secondary)", fontSize: 13, fontWeight: 400, padding: "7px 12px" }}>
+            <Plus size={14} /> Novo
+          </button>
+        )}
+      </div>
+
       {habits.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 rounded-2xl" style={{ background: "var(--dash-surface)", border: "1px solid var(--dash-border)" }}>
-          <p style={{ color: "var(--dash-text-muted)", fontSize: 14, fontWeight: 300 }}>Nenhum habito criado ainda.</p>
-          <button onClick={() => setShowModal(true)} className="inline-flex items-center gap-1.5 mt-3 transition-colors" style={{ color: "var(--dash-accent)", fontSize: 13, fontWeight: 400, padding: "8px 16px" }}>
-            <Plus size={16} /> Criar habito
+        <div className="flex flex-col items-center justify-center py-20 rounded-2xl" style={{ background: "var(--dash-surface)", border: "1px solid var(--dash-border)" }}>
+          <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4" style={{ background: "var(--dash-accent-subtle)" }}>
+            <Heart size={20} style={{ color: "var(--dash-accent)" }} />
+          </div>
+          <p style={{ color: "var(--dash-text)", fontSize: 15, fontWeight: 400, marginBottom: 4 }}>Nenhum hábito configurado</p>
+          <p style={{ color: "var(--dash-text-muted)", fontSize: 13, fontWeight: 300, maxWidth: 260, textAlign: "center", lineHeight: 1.6 }}>
+            Hábitos consistentes constroem resultados duradouros. Comece com algo simples.
+          </p>
+          <button onClick={openCreate} className="inline-flex items-center gap-2 mt-6 rounded-lg transition-colors" style={{ background: "var(--dash-gradient-primary)", color: "var(--dash-text)", fontSize: 13, fontWeight: 400, padding: "10px 20px" }}>
+            <Plus size={15} /> Criar primeiro hábito
           </button>
         </div>
       ) : (
-        <div>
-          <div className="rounded-2xl overflow-hidden" style={{ background: "var(--dash-surface)", border: "1px solid var(--dash-border)" }}>
-            {habits.map((habit, i) => {
-              const cat = categoryColors[habit.categoria] || categoryColors.saude;
-              const done = completedToday.has(habit.id);
-              return (
-                <div key={habit.id} className="flex items-center gap-3 px-5 py-4 group" style={{ borderBottom: i < habits.length - 1 ? "1px solid var(--dash-border)" : "none" }}>
-                  <button
-                    onClick={() => toggleHabit(habit.id)}
-                    className="w-[18px] h-[18px] rounded flex items-center justify-center flex-shrink-0 transition-colors"
-                    style={{ border: done ? "none" : "1.5px solid var(--dash-border-strong)", background: done ? "var(--dash-accent)" : "transparent", color: "var(--dash-text)" }}
-                  >
-                    {done && <CheckIcon />}
-                  </button>
-                  <div className="flex-1 min-w-0">
-                    <p style={{ color: "var(--dash-text)", fontSize: 14, fontWeight: 400 }}>{habit.titulo}</p>
-                    {habit.descricao && <p className="truncate mt-0.5" style={{ color: "var(--dash-text-muted)", fontSize: 12, fontWeight: 300 }}>{habit.descricao}</p>}
-                  </div>
-                  <span className="px-2 py-0.5 rounded" style={{ fontSize: 10, fontWeight: 400, background: cat.bg, color: cat.color }}>{cat.label}</span>
-                  {habit.streak > 0 && (
-                    <span className="flex items-center gap-1" style={{ fontSize: 12, color: "var(--dash-warning-text)", fontWeight: 400 }}>
-                      <Flame size={12} /> {habit.streak}
-                    </span>
-                  )}
-                  <button onClick={() => deleteHabit(habit.id)} className="opacity-0 group-hover:opacity-100 transition-opacity p-1" style={{ color: "var(--dash-text-muted)" }}>
-                    <Trash2 size={14} />
-                  </button>
+        <div className="rounded-2xl overflow-hidden" style={{ background: "var(--dash-surface)", border: "1px solid var(--dash-border)" }}>
+          {habits.map((habit, i) => {
+            const cat = categoryColors[habit.categoria] || categoryColors.saude;
+            const done = completedToday.has(habit.id);
+            return (
+              <div key={habit.id} className="flex items-center gap-3 px-5 py-4 group transition-colors" style={{ borderBottom: i < habits.length - 1 ? "1px solid var(--dash-border)" : "none" }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = "var(--dash-muted-surface)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+              >
+                <button
+                  onClick={() => toggleHabit(habit.id)}
+                  className="w-[18px] h-[18px] rounded flex items-center justify-center flex-shrink-0 transition-all duration-200"
+                  style={{
+                    border: done ? "none" : "1.5px solid var(--dash-border-strong)",
+                    background: done ? "var(--dash-accent)" : "transparent",
+                    color: "var(--dash-text)",
+                    transform: done ? "scale(1)" : "scale(1)",
+                  }}
+                  onMouseEnter={(e) => { if (!done) e.currentTarget.style.borderColor = "var(--dash-accent)"; }}
+                  onMouseLeave={(e) => { if (!done) e.currentTarget.style.borderColor = "var(--dash-border-strong)"; }}
+                >
+                  {done && <CheckIcon />}
+                </button>
+                <div className="flex-1 min-w-0 cursor-pointer" onClick={() => openEdit(habit)}>
+                  <p style={{ color: done ? "var(--dash-text-muted)" : "var(--dash-text)", fontSize: 14, fontWeight: 400, textDecoration: done ? "line-through" : "none", opacity: done ? 0.6 : 1 }}>{habit.titulo}</p>
+                  {habit.descricao && <p className="truncate mt-0.5" style={{ color: "var(--dash-text-muted)", fontSize: 12, fontWeight: 300 }}>{habit.descricao}</p>}
                 </div>
-              );
-            })}
-          </div>
-          <button onClick={() => setShowModal(true)} className="inline-flex items-center gap-1.5 mt-3 transition-colors" style={{ color: "var(--dash-accent)", fontSize: 13, fontWeight: 400, padding: "8px 16px", opacity: 0.8 }}>
-            <Plus size={16} /> Novo habito
-          </button>
+                <span className="px-2 py-0.5 rounded flex-shrink-0" style={{ fontSize: 10, fontWeight: 400, background: cat.bg, color: cat.color }}>{cat.label}</span>
+                {habit.streak > 0 && (
+                  <span className="flex items-center gap-1 flex-shrink-0" style={{ fontSize: 12, color: "var(--dash-warning-text)", fontWeight: 400 }}>
+                    <Flame size={12} /> {habit.streak}
+                  </span>
+                )}
+                <button onClick={() => openEdit(habit)} className="p-1 opacity-0 md:group-hover:opacity-60 transition-opacity" style={{ color: "var(--dash-text-muted)" }}>
+                  <Pencil size={13} />
+                </button>
+                <button onClick={() => setConfirmDelete(habit.id)} className="p-1 md:opacity-0 md:group-hover:opacity-60 opacity-40 transition-opacity" style={{ color: "var(--dash-text-muted)" }}>
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            );
+          })}
         </div>
       )}
-      {showModal && <HabitModal onClose={() => setShowModal(false)} onSaved={handleHabitSaved} />}
+
+      {showModal && <HabitModal onClose={() => { setShowModal(false); setEditingHabit(null); }} onSaved={handleSaved} editingHabit={editingHabit} />}
+
+      {/* Delete confirmation */}
+      {confirmDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "var(--dash-overlay)" }} onClick={() => setConfirmDelete(null)}>
+          <div className="w-full max-w-sm rounded-2xl p-6 animate-in fade-in zoom-in-95 duration-150" style={{ background: "var(--dash-surface-elevated)", border: "1px solid var(--dash-border-strong)", boxShadow: "var(--dash-shadow-modal)" }} onClick={(e) => e.stopPropagation()}>
+            <h3 className="font-display mb-2" style={{ color: "var(--dash-text)", fontSize: 16, fontWeight: 400 }}>Remover hábito</h3>
+            <p style={{ color: "var(--dash-text-muted)", fontSize: 14, fontWeight: 300, lineHeight: 1.6 }}>Essa ação não pode ser desfeita. O histórico será mantido.</p>
+            <div className="flex gap-3 mt-6">
+              <button onClick={() => setConfirmDelete(null)} className="flex-1 py-2.5 text-sm rounded-lg active:scale-[0.98]" style={{ border: "1px solid var(--dash-border-strong)", color: "var(--dash-text-muted)" }}>Cancelar</button>
+              <button onClick={() => deleteHabit(confirmDelete)} className="flex-1 py-2.5 text-sm rounded-lg active:scale-[0.98]" style={{ border: "1px solid var(--dash-danger-text)", color: "var(--dash-danger-text)" }}>Remover</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

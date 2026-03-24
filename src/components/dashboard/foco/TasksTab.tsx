@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, Pencil, CheckSquare } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -12,6 +12,7 @@ interface Task {
   prazo: string | null;
   prioridade: string;
   concluida: boolean;
+  goal_id?: string | null;
 }
 
 const filters = [
@@ -37,11 +38,14 @@ const sortTasks = (list: Task[], mode: string) => {
   });
 };
 
+const CheckIcon = () => <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+
 const TasksTab = () => {
   const { user } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [filter, setFilter] = useState("hoje");
   const [showModal, setShowModal] = useState(false);
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
 
   const fetchTasks = async () => {
     if (!user) return;
@@ -86,23 +90,24 @@ const TasksTab = () => {
     if (error) { setTasks(backup); toast.error("Algo deu errado."); }
   };
 
-  const handleTaskSaved = () => { setShowModal(false); fetchTasks(); toast.success("Tarefa criada"); };
+  const handleTaskSaved = () => { setShowModal(false); setEditingTask(null); fetchTasks(); };
 
-  const pending = tasks.filter((t) => !t.concluida).length;
-  const done = tasks.filter((t) => t.concluida).length;
+  const openEdit = (task: Task) => { setEditingTask(task); setShowModal(true); };
+  const openCreate = () => { setEditingTask(null); setShowModal(true); };
 
-  const CheckIcon = () => <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+  const pending = tasks.filter((t) => !t.concluida);
+  const done = tasks.filter((t) => t.concluida);
 
   return (
     <div>
       {/* Filters */}
-      <div className="mb-3 overflow-x-auto" data-reveal>
+      <div className="flex items-center justify-between mb-4" data-reveal>
         <div className="flex gap-2">
           {filters.map((f) => (
             <button
               key={f.key}
               onClick={() => setFilter(f.key)}
-              className="px-4 py-2 rounded-lg transition-colors whitespace-nowrap"
+              className="px-4 py-2 rounded-lg transition-all duration-150 whitespace-nowrap"
               style={{
                 fontSize: 13, fontWeight: 400,
                 background: filter === f.key ? "var(--dash-accent-subtle)" : "transparent",
@@ -114,53 +119,93 @@ const TasksTab = () => {
             </button>
           ))}
         </div>
+        <button
+          onClick={openCreate}
+          className="inline-flex items-center gap-1.5 rounded-lg transition-colors"
+          style={{ border: "1px solid var(--dash-primary)", color: "var(--dash-text-secondary)", fontSize: 13, fontWeight: 400, padding: "7px 12px" }}
+        >
+          <Plus size={14} /> Nova
+        </button>
       </div>
 
       <div className="mb-5" style={{ fontSize: 12, color: "var(--dash-text-muted)", fontWeight: 300 }}>
-        <span>{pending} pendentes</span><span className="mx-1.5">·</span><span>{done} concluidas</span>
+        <span>{pending.length} pendentes</span><span className="mx-1.5">·</span><span>{done.length} concluídas</span>
       </div>
 
       {tasks.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16 rounded-2xl" style={{ background: "var(--dash-surface)", border: "1px solid var(--dash-border)" }}>
-          <p style={{ color: "var(--dash-text-muted)", fontSize: 14, fontWeight: 300 }}>Nenhuma tarefa encontrada.</p>
-          <button onClick={() => setShowModal(true)} className="inline-flex items-center gap-1.5 mt-3 transition-colors" style={{ color: "var(--dash-accent)", fontSize: 13, fontWeight: 400, padding: "8px 16px" }}>
-            <Plus size={16} /> Adicionar tarefa
+        <div className="flex flex-col items-center justify-center py-20 rounded-2xl" style={{ background: "var(--dash-surface)", border: "1px solid var(--dash-border)" }}>
+          <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4" style={{ background: "var(--dash-accent-subtle)" }}>
+            <CheckSquare size={20} style={{ color: "var(--dash-accent)" }} />
+          </div>
+          <p style={{ color: "var(--dash-text)", fontSize: 15, fontWeight: 400, marginBottom: 4 }}>Nenhuma tarefa encontrada</p>
+          <p style={{ color: "var(--dash-text-muted)", fontSize: 13, fontWeight: 300, maxWidth: 240, textAlign: "center", lineHeight: 1.6 }}>
+            {filter === "hoje" ? "Seu dia está livre. Adicione tarefas para organizar sua rotina." : "Nenhuma tarefa neste filtro."}
+          </p>
+          <button onClick={openCreate} className="inline-flex items-center gap-2 mt-6 rounded-lg transition-colors" style={{ background: "var(--dash-gradient-primary)", color: "var(--dash-text)", fontSize: 13, fontWeight: 400, padding: "10px 20px" }}>
+            <Plus size={15} /> Criar tarefa
           </button>
         </div>
       ) : (
         <div>
           <div className="rounded-2xl overflow-hidden" style={{ background: "var(--dash-surface)", border: "1px solid var(--dash-border)" }}>
-            {tasks.map((task, i) => {
+            {/* Pending tasks */}
+            {pending.map((task, i) => {
               const ps = priorityStyles[task.prioridade] || priorityStyles.media;
               return (
-                <div key={task.id} className="flex items-center gap-3 px-5 py-4 group" style={{ borderBottom: i < tasks.length - 1 ? "1px solid var(--dash-border)" : "none", opacity: task.concluida ? 0.4 : 1 }}>
+                <div key={task.id} className="flex items-center gap-3 px-5 py-4 group transition-colors" style={{ borderBottom: i < pending.length - 1 || done.length > 0 ? "1px solid var(--dash-border)" : "none" }}
+                  onMouseEnter={(e) => { e.currentTarget.style.background = "var(--dash-muted-surface)"; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                >
                   <button
                     onClick={() => toggleTask(task.id, task.concluida)}
-                    className="w-[18px] h-[18px] rounded flex items-center justify-center flex-shrink-0 transition-colors"
-                    style={{ border: task.concluida ? "none" : "1.5px solid var(--dash-border-strong)", background: task.concluida ? "var(--dash-accent)" : "transparent", color: "var(--dash-text)" }}
-                  >
-                    {task.concluida && <CheckIcon />}
-                  </button>
-                  <div className="flex-1 min-w-0">
-                    <p style={{ color: task.concluida ? "var(--dash-text-muted)" : "var(--dash-text)", textDecoration: task.concluida ? "line-through" : "none", fontSize: 14, fontWeight: 400 }}>{task.titulo}</p>
+                    className="w-[18px] h-[18px] rounded flex items-center justify-center flex-shrink-0 transition-all duration-150"
+                    style={{ border: "1.5px solid var(--dash-border-strong)", background: "transparent" }}
+                    onMouseEnter={(e) => { e.currentTarget.style.borderColor = "var(--dash-accent)"; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.borderColor = "var(--dash-border-strong)"; }}
+                  />
+                  <div className="flex-1 min-w-0 cursor-pointer" onClick={() => openEdit(task)}>
+                    <p style={{ color: "var(--dash-text)", fontSize: 14, fontWeight: 400 }}>{task.titulo}</p>
                     {task.descricao && <p className="truncate mt-0.5" style={{ color: "var(--dash-text-muted)", fontSize: 12, fontWeight: 300 }}>{task.descricao}</p>}
                   </div>
-                  {task.prazo && <span style={{ fontSize: 12, color: "var(--dash-text-muted)", fontWeight: 300 }}>{new Date(task.prazo + "T12:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}</span>}
-                  <span className="px-2 py-0.5 rounded" style={{ fontSize: 10, fontWeight: 400, background: ps.bg, color: ps.color }}>{task.prioridade}</span>
-                  <button onClick={() => deleteTask(task.id)} className="opacity-0 group-hover:opacity-100 transition-opacity p-1" style={{ color: "var(--dash-text-muted)" }}>
+                  {task.prazo && <span className="hidden md:inline" style={{ fontSize: 11, color: "var(--dash-text-muted)", fontWeight: 300 }}>{new Date(task.prazo + "T12:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}</span>}
+                  <span className="px-2 py-0.5 rounded flex-shrink-0" style={{ fontSize: 10, fontWeight: 400, background: ps.bg, color: ps.color }}>{task.prioridade}</span>
+                  <button onClick={() => openEdit(task)} className="p-1 opacity-0 md:group-hover:opacity-60 transition-opacity" style={{ color: "var(--dash-text-muted)" }}>
+                    <Pencil size={13} />
+                  </button>
+                  <button onClick={() => deleteTask(task.id)} className="p-1 md:opacity-0 md:group-hover:opacity-60 opacity-40 transition-opacity" style={{ color: "var(--dash-text-muted)" }}>
                     <Trash2 size={14} />
                   </button>
                 </div>
               );
             })}
+            {/* Done tasks */}
+            {done.length > 0 && (
+              <>
+                <div className="px-5 py-2" style={{ background: "var(--dash-muted-surface)" }}>
+                  <p style={{ color: "var(--dash-text-muted)", fontSize: 11, fontWeight: 400 }}>{done.length} concluída{done.length > 1 ? "s" : ""}</p>
+                </div>
+                {done.map((task) => (
+                  <div key={task.id} className="flex items-center gap-3 px-5 py-3 group" style={{ opacity: 0.4 }}>
+                    <button
+                      onClick={() => toggleTask(task.id, task.concluida)}
+                      className="w-[18px] h-[18px] rounded flex items-center justify-center flex-shrink-0 transition-colors"
+                      style={{ background: "var(--dash-accent)", color: "var(--dash-text)" }}
+                    >
+                      <CheckIcon />
+                    </button>
+                    <p className="flex-1" style={{ color: "var(--dash-text-secondary)", fontSize: 13, fontWeight: 400, textDecoration: "line-through" }}>{task.titulo}</p>
+                    <button onClick={() => deleteTask(task.id)} className="p-1 md:opacity-0 md:group-hover:opacity-100 opacity-60 transition-opacity" style={{ color: "var(--dash-text-muted)" }}>
+                      <Trash2 size={13} />
+                    </button>
+                  </div>
+                ))}
+              </>
+            )}
           </div>
-          <button onClick={() => setShowModal(true)} className="inline-flex items-center gap-1.5 mt-3 transition-colors" style={{ color: "var(--dash-accent)", fontSize: 13, fontWeight: 400, padding: "8px 16px", opacity: 0.8 }}>
-            <Plus size={16} /> Nova tarefa
-          </button>
         </div>
       )}
 
-      {showModal && <AddTaskModal onClose={() => setShowModal(false)} onSaved={handleTaskSaved} />}
+      {showModal && <AddTaskModal onClose={() => { setShowModal(false); setEditingTask(null); }} onSaved={handleTaskSaved} editingTask={editingTask} />}
     </div>
   );
 };
