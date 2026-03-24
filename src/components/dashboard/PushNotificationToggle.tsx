@@ -8,15 +8,18 @@ import {
   subscribeToPush,
   unsubscribeFromPush,
   getActiveSubscription,
-  type PushState,
 } from "@/services/pushNotifications";
 import { registerFCMToken, unregisterFCMToken } from "@/services/fcmPush";
 import { toast } from "sonner";
+import NotificationSoftAskModal from "./NotificationSoftAskModal";
+import NotificationDeniedModal from "./NotificationDeniedModal";
 
 const PushNotificationToggle = () => {
   const { user } = useAuth();
   const [state, setState] = useState<"loading" | "active" | "inactive" | "denied" | "unsupported" | "ios-pwa">("loading");
   const [busy, setBusy] = useState(false);
+  const [showSoftAsk, setShowSoftAsk] = useState(false);
+  const [showDenied, setShowDenied] = useState(false);
 
   useEffect(() => {
     detectState();
@@ -24,46 +27,64 @@ const PushNotificationToggle = () => {
 
   const detectState = async () => {
     if (!getPushSupport()) {
-      if (isIOSWithoutPWA()) {
-        setState("ios-pwa");
-      } else {
-        setState("unsupported");
-      }
+      setState(isIOSWithoutPWA() ? "ios-pwa" : "unsupported");
       return;
     }
-
     const perm = getPushPermission();
     if (perm === "denied") { setState("denied"); return; }
-
     const sub = await getActiveSubscription();
     setState(sub ? "active" : "inactive");
   };
 
-  const handleEnable = async () => {
+  const handleEnableClick = () => {
     if (!user || busy) return;
-    setBusy(true);
+    const perm = getPushPermission();
+    if (perm === "denied") {
+      setShowDenied(true);
+      return;
+    }
+    if (perm === "granted") {
+      doEnable();
+    } else {
+      setShowSoftAsk(true);
+    }
+  };
 
-    // Register both VAPID and FCM in parallel
+  const doEnable = async () => {
+    if (!user) return;
+    setBusy(true);
     const [vapidResult, fcmResult] = await Promise.allSettled([
       subscribeToPush(user.id),
       registerFCMToken(user.id),
     ]);
-
     const vapidOk = vapidResult.status === "fulfilled" && vapidResult.value.success;
     const fcmOk = fcmResult.status === "fulfilled" && fcmResult.value.success;
 
     if (vapidOk || fcmOk) {
       setState("active");
-      toast.success("Notificações push ativadas");
+      toast.success("Notificações ativadas");
     } else {
-      const errorMsg =
-        vapidResult.status === "fulfilled" ? vapidResult.value.error : "Erro VAPID";
+      const errorMsg = vapidResult.status === "fulfilled" ? vapidResult.value.error : "Erro";
       if (errorMsg === "Permissão negada") {
         setState("denied");
+        setShowDenied(true);
+      } else {
+        toast.error(errorMsg || "Erro ao ativar notificações");
       }
-      toast.error(errorMsg || "Erro ao ativar push");
     }
     setBusy(false);
+  };
+
+  const handleSoftAskContinue = async () => {
+    setShowSoftAsk(false);
+    const permission = await Notification.requestPermission();
+    if (permission === "granted") {
+      doEnable();
+    } else if (permission === "denied") {
+      setState("denied");
+      setShowDenied(true);
+    }
+    // "default" = user dismissed — do nothing, no error
   };
 
   const handleDisable = async () => {
@@ -74,7 +95,7 @@ const PushNotificationToggle = () => {
       unregisterFCMToken(user.id),
     ]);
     setState("inactive");
-    toast.success("Notificações push desativadas");
+    toast.success("Notificações desativadas");
     setBusy(false);
   };
 
@@ -99,7 +120,7 @@ const PushNotificationToggle = () => {
               Instale o Dailix na Tela de Início
             </p>
             <p style={{ color: "var(--dash-text-muted)", fontSize: 12, lineHeight: 1.5 }}>
-              Para receber notificações push no iPhone/iPad, adicione o Dailix à Tela de Início:
+              Para receber notificações no iPhone/iPad, adicione o Dailix à Tela de Início:
               toque em <strong style={{ color: "var(--dash-text-secondary)" }}>Compartilhar</strong> → <strong style={{ color: "var(--dash-text-secondary)" }}>Tela de Início</strong>.
             </p>
           </div>
@@ -113,61 +134,62 @@ const PushNotificationToggle = () => {
       <div className="p-6 rounded-2xl" style={{ background: "var(--dash-surface)", border: "1px solid var(--dash-border)" }}>
         <div className="flex items-center gap-3">
           <BellOff size={16} style={{ color: "var(--dash-text-muted)" }} />
-          <span style={{ color: "var(--dash-text-muted)", fontSize: 13 }}>Notificações push não disponíveis neste navegador</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (state === "denied") {
-    return (
-      <div className="p-6 rounded-2xl" style={{ background: "var(--dash-surface)", border: "1px solid var(--dash-border)" }}>
-        <div className="flex items-center gap-3">
-          <BellOff size={16} style={{ color: "var(--dash-danger-text)" }} />
-          <span style={{ color: "var(--dash-text-muted)", fontSize: 13 }}>
-            Notificações bloqueadas. Ative nas configurações do navegador.
-          </span>
+          <span style={{ color: "var(--dash-text-muted)", fontSize: 13 }}>Seu dispositivo não oferece suporte a notificações</span>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-6 rounded-2xl" style={{ background: "var(--dash-surface)", border: "1px solid var(--dash-border)" }}>
-      <p className="mb-3" style={{ color: "var(--dash-text-muted)", fontSize: 11, fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase" }}>
-        Notificações push
-      </p>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          {state === "active" ? (
-            <BellRing size={16} style={{ color: "var(--dash-success-text)" }} />
-          ) : (
-            <Bell size={16} style={{ color: "var(--dash-text-muted)" }} />
-          )}
-          <span style={{ color: "var(--dash-text)", fontSize: 14 }}>
-            {state === "active" ? "Ativadas" : "Desativadas"}
-          </span>
-        </div>
-        <button
-          onClick={state === "active" ? handleDisable : handleEnable}
-          disabled={busy}
-          className="text-sm px-4 py-2 rounded-lg transition-all duration-150 disabled:opacity-50"
-          style={{
-            border: `1px solid ${state === "active" ? "var(--dash-border-strong)" : "var(--dash-accent)"}`,
-            background: state === "active" ? "transparent" : "var(--dash-accent-subtle)",
-            color: state === "active" ? "var(--dash-text-muted)" : "var(--dash-accent)",
-            fontWeight: 400,
-          }}
-        >
-          {busy ? <Loader2 size={14} className="animate-spin" /> : state === "active" ? "Desativar" : "Ativar"}
-        </button>
-      </div>
-      {state === "active" && (
-        <p style={{ color: "var(--dash-text-muted)", fontSize: 11, marginTop: 8 }}>
-          Você receberá lembretes mesmo com o app fechado
+    <>
+      <div className="p-6 rounded-2xl" style={{ background: "var(--dash-surface)", border: "1px solid var(--dash-border)" }}>
+        <p className="mb-3" style={{ color: "var(--dash-text-muted)", fontSize: 11, fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase" }}>
+          Notificações push
         </p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            {state === "active" ? (
+              <BellRing size={16} style={{ color: "var(--dash-success-text)" }} />
+            ) : state === "denied" ? (
+              <BellOff size={16} style={{ color: "var(--dash-danger-text)" }} />
+            ) : (
+              <Bell size={16} style={{ color: "var(--dash-text-muted)" }} />
+            )}
+            <span style={{ color: "var(--dash-text)", fontSize: 14 }}>
+              {state === "active" ? "Notificações ativas" : state === "denied" ? "Permissão bloqueada" : "Ativar notificações"}
+            </span>
+          </div>
+          <button
+            onClick={state === "active" ? handleDisable : handleEnableClick}
+            disabled={busy}
+            className="text-sm px-4 py-2 rounded-lg transition-all duration-150 disabled:opacity-50"
+            style={{
+              border: `1px solid ${state === "active" ? "var(--dash-border-strong)" : state === "denied" ? "var(--dash-danger-text)" : "var(--dash-accent)"}`,
+              background: state === "active" ? "transparent" : state === "denied" ? "var(--dash-danger-bg)" : "var(--dash-accent-subtle)",
+              color: state === "active" ? "var(--dash-text-muted)" : state === "denied" ? "var(--dash-danger-text)" : "var(--dash-accent)",
+              fontWeight: 400,
+            }}
+          >
+            {busy ? <Loader2 size={14} className="animate-spin" /> : state === "active" ? "Desativar" : state === "denied" ? "Ver como ativar" : "Ativar"}
+          </button>
+        </div>
+        {state === "active" && (
+          <p style={{ color: "var(--dash-text-muted)", fontSize: 11, marginTop: 8 }}>
+            Você receberá lembretes mesmo com o app fechado
+          </p>
+        )}
+      </div>
+
+      {showSoftAsk && (
+        <NotificationSoftAskModal
+          onContinue={handleSoftAskContinue}
+          onDismiss={() => setShowSoftAsk(false)}
+        />
       )}
-    </div>
+      {showDenied && (
+        <NotificationDeniedModal onClose={() => setShowDenied(false)} />
+      )}
+    </>
   );
 };
 
