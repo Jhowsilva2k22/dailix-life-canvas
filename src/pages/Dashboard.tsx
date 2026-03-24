@@ -15,6 +15,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [activeItem, setActiveItem] = useState("inicio");
   const [ready, setReady] = useState(false);
+  useReminders();
 
   useEffect(() => {
     if (!user) return;
