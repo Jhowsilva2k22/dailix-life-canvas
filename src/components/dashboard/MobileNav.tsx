@@ -44,8 +44,8 @@ const MobileNav = ({ activeItem, onNavigate, onOpenSearch }: MobileNavProps) => 
       >
         <span className="font-display text-base font-bold" style={{ color: "var(--dash-text)" }}>Dailix</span>
         <div className="flex items-center gap-2">
-          <button onClick={onOpenSearch} className="p-1.5" style={{ color: "var(--dash-text-muted)" }}>
-            <Search size={20} strokeWidth={1.5} />
+          <button onClick={onOpenSearch} className="p-1.5 touch-compact" style={{ color: "var(--dash-text-muted)" }}>
+            <Search size={22} strokeWidth={1.5} />
           </button>
           <div className="relative" ref={menuRef}>
           <button onClick={() => setMenuOpen((v) => !v)}>
