@@ -25,17 +25,14 @@ const SolutionSection = () => {
             className="font-display text-[1.75rem] md:text-[2.25rem] tracking-tight mb-8"
             style={{ color: "#fff", fontWeight: 400, lineHeight: 1.15 }}
           >
-            Menos ruído. Mais clareza.
+            Dailix transforma intenção solta
             <br />
-            Mais continuidade.
+            em execução organizada.
           </h2>
 
           <div style={{ color: "rgba(255,255,255,0.45)", fontSize: 15, lineHeight: 1.8, fontWeight: 300 }}>
             <p>
-              Dailix foi desenhado para transformar intenção em execução.
-            </p>
-            <p className="mt-4">
-              Um sistema que reúne, no mesmo ambiente, o que precisa ser feito, mantido, construído e lembrado.
+              Em vez de depender de fragmentos, você passa a operar em um sistema único, claro e contínuo.
             </p>
           </div>
         </div>

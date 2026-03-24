@@ -60,9 +60,11 @@ const HeroSection = () => {
             }`}
             style={{ color: "#fff", lineHeight: 1.08, fontWeight: 400 }}
           >
-            Seu sistema pessoal
+            Pare de organizar sua vida
             <br />
-            premium de execução.
+            em pedaços. Centralize sua
+            <br />
+            execução em um único sistema.
           </h1>
 
           {/* Subheadline */}
@@ -72,7 +74,7 @@ const HeroSection = () => {
             }`}
             style={{ fontSize: 16, color: "rgba(255,255,255,0.5)", lineHeight: 1.7, fontWeight: 300 }}
           >
-            Organize tarefas, metas, hábitos e insights em um ambiente claro, sóbrio e feito para manter constância real.
+            Tarefas, metas, hábitos e insights em um ambiente premium criado para quem precisa de clareza, constância e controle.
           </p>
 
           {/* CTAs */}
@@ -103,7 +105,7 @@ const HeroSection = () => {
               <ArrowRight className="h-4 w-4" />
             </button>
             <a
-              href="#pilares"
+              href="#diagnostico"
               className="inline-flex items-center px-7 py-3.5 text-sm rounded-lg transition-all duration-200"
               style={{
                 color: "rgba(255,255,255,0.6)",
@@ -119,7 +121,7 @@ const HeroSection = () => {
                 e.currentTarget.style.color = "rgba(255,255,255,0.6)";
               }}
             >
-              Ver como funciona
+              Ver acesso prioritário
             </a>
           </div>
         </div>

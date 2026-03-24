@@ -4,22 +4,22 @@ const pillars = [
   {
     num: "01",
     title: "Tarefas",
-    desc: "Organize o que exige ação agora.",
+    desc: "Saiba exatamente o que precisa de ação agora.",
   },
   {
     num: "02",
     title: "Metas",
-    desc: "Mantenha direção visível sem perder foco no longo prazo.",
+    desc: "Mantenha direção sem deixar o longo prazo morrer.",
   },
   {
     num: "03",
     title: "Hábitos",
-    desc: "Construa consistência com acompanhamento simples e confiável.",
+    desc: "Construa constância com acompanhamento real, não motivação passageira.",
   },
   {
     num: "04",
     title: "Insights",
-    desc: "Guarde e revisite ideias que merecem permanecer acessíveis.",
+    desc: "Capture o que importa e traga de volta quando precisar pensar com clareza.",
   },
 ];
 
