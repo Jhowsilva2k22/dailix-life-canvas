@@ -65,24 +65,14 @@ const AvatarUploadModal = ({ onClose }: AvatarUploadModalProps) => {
     try {
       const blob = await getCroppedImg(imageSrc, croppedArea);
       const path = `${user.id}/avatar.webp`;
-
-      // Delete old avatar if exists
       await supabase.storage.from("avatars").remove([path]);
-
       const { error: uploadError } = await supabase.storage
         .from("avatars")
         .upload(path, blob, { contentType: "image/webp", upsert: true });
-
       if (uploadError) throw uploadError;
-
       const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
       const publicUrl = `${urlData.publicUrl}?t=${Date.now()}`;
-
-      await supabase
-        .from("profiles")
-        .update({ avatar_url: publicUrl })
-        .eq("user_id", user.id);
-
+      await supabase.from("profiles").update({ avatar_url: publicUrl }).eq("user_id", user.id);
       refreshAvatar();
       onClose();
     } catch (err) {
@@ -108,19 +98,18 @@ const AvatarUploadModal = ({ onClose }: AvatarUploadModalProps) => {
       <div
         className="relative w-full max-w-md mx-4"
         style={{
-          background: "#FFFFFF",
+          background: "var(--dash-surface-elevated)",
           borderRadius: 16,
-          border: "1px solid #E2E8F0",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+          border: "1px solid var(--dash-border-strong)",
+          boxShadow: "0 16px 48px rgba(0,0,0,0.4)",
         }}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: "1px solid #E2E8F0" }}>
-          <h2 className="font-display text-lg" style={{ color: "#0F172A", fontWeight: 400 }}>
+        <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: "1px solid var(--dash-border)" }}>
+          <h2 className="font-display text-lg" style={{ color: "var(--dash-text)", fontWeight: 400 }}>
             {step === "upload" ? "Alterar foto" : "Ajustar foto"}
           </h2>
-          <button onClick={onClose} className="p-1 rounded-lg transition-colors" style={{ color: "#94A3B8" }}>
+          <button onClick={onClose} className="p-1 rounded-lg transition-colors" style={{ color: "var(--dash-text-muted)" }}>
             <X size={20} />
           </button>
         </div>
@@ -130,9 +119,9 @@ const AvatarUploadModal = ({ onClose }: AvatarUploadModalProps) => {
             <div
               className="flex flex-col items-center justify-center cursor-pointer transition-colors"
               style={{
-                background: dragActive ? "rgba(0,180,216,0.08)" : "rgba(0,180,216,0.04)",
-                border: `2px dashed ${dragActive ? "#00B4D8" : "rgba(0,180,216,0.3)"}`,
-                borderRadius: 16,
+                background: dragActive ? "var(--dash-accent-subtle)" : "rgba(255,255,255,0.02)",
+                border: `2px dashed ${dragActive ? "var(--dash-accent)" : "var(--dash-border-strong)"}`,
+                borderRadius: 14,
                 padding: 40,
               }}
               onClick={() => inputRef.current?.click()}
@@ -140,16 +129,16 @@ const AvatarUploadModal = ({ onClose }: AvatarUploadModalProps) => {
               onDragLeave={() => setDragActive(false)}
               onDrop={handleDrop}
             >
-              <Upload size={32} style={{ color: "#00B4D8", opacity: 0.5 }} className="mb-3" />
-              <p className="text-sm font-medium mb-1" style={{ color: "#0F172A" }}>
+              <Upload size={28} style={{ color: "var(--dash-text-muted)", opacity: 0.5 }} className="mb-3" />
+              <p className="text-sm mb-1" style={{ color: "var(--dash-text)" }}>
                 Arraste sua foto aqui
               </p>
-              <p className="text-xs mb-4" style={{ color: "#94A3B8" }}>
+              <p className="text-xs mb-4" style={{ color: "var(--dash-text-muted)" }}>
                 JPG, PNG ou WebP — max. 5MB
               </p>
               <span
-                className="text-sm font-medium px-4 py-2 rounded-lg transition-colors"
-                style={{ color: "#00B4D8", border: "1px solid rgba(0,180,216,0.3)" }}
+                className="text-sm px-4 py-2 rounded-lg"
+                style={{ color: "var(--dash-accent)", border: "1px solid var(--dash-border-strong)" }}
               >
                 Escolher arquivo
               </span>
@@ -168,15 +157,7 @@ const AvatarUploadModal = ({ onClose }: AvatarUploadModalProps) => {
 
           {step === "crop" && imageSrc && (
             <>
-              <div
-                className="relative mb-4"
-                style={{
-                  height: 300,
-                  borderRadius: 12,
-                  overflow: "hidden",
-                  background: "#0F172A",
-                }}
-              >
+              <div className="relative mb-4" style={{ height: 300, borderRadius: 12, overflow: "hidden", background: "var(--dash-bg)" }}>
                 <Cropper
                   image={imageSrc}
                   crop={crop}
@@ -186,16 +167,11 @@ const AvatarUploadModal = ({ onClose }: AvatarUploadModalProps) => {
                   onCropChange={setCrop}
                   onZoomChange={setZoom}
                   onCropComplete={onCropComplete}
-                  style={{
-                    cropAreaStyle: { borderRadius: 12 },
-                  }}
+                  style={{ cropAreaStyle: { borderRadius: 12 } }}
                 />
               </div>
-
               <div className="mb-6">
-                <label className="text-xs font-medium mb-2 block" style={{ color: "#94A3B8" }}>
-                  Ajustar zoom
-                </label>
+                <label className="text-xs mb-2 block" style={{ color: "var(--dash-text-muted)" }}>Ajustar zoom</label>
                 <input
                   type="range"
                   min={1}
@@ -204,26 +180,22 @@ const AvatarUploadModal = ({ onClose }: AvatarUploadModalProps) => {
                   value={zoom}
                   onChange={(e) => setZoom(Number(e.target.value))}
                   className="w-full"
-                  style={{ accentColor: "#00B4D8" }}
+                  style={{ accentColor: "var(--dash-accent)" }}
                 />
               </div>
-
               <div className="flex items-center gap-3 justify-end">
                 <button
                   onClick={() => { setStep("upload"); setImageSrc(null); }}
-                  className="text-sm font-medium px-4 py-2.5 rounded-lg transition-colors"
-                  style={{ color: "#64748B" }}
+                  className="text-sm px-4 py-2.5 rounded-lg"
+                  style={{ color: "var(--dash-text-muted)" }}
                 >
                   Cancelar
                 </button>
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className="text-sm font-medium px-6 py-2.5 rounded-lg text-white transition-opacity"
-                  style={{
-                    background: "linear-gradient(135deg, #1E3A5F, #00B4D8)",
-                    opacity: saving ? 0.7 : 1,
-                  }}
+                  className="text-sm px-6 py-2.5 rounded-lg transition-opacity"
+                  style={{ background: "linear-gradient(135deg, #1E3A5F, #00B4D8)", color: "white", opacity: saving ? 0.7 : 1 }}
                 >
                   {saving ? "Salvando..." : "Salvar foto"}
                 </button>

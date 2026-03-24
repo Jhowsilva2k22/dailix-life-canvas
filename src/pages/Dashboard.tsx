@@ -4,7 +4,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import DashboardContent from "@/components/dashboard/DashboardContent";
 import MobileNav from "@/components/dashboard/MobileNav";
-import ModulePage from "@/components/dashboard/ModulePage";
 import FocoPage from "@/components/dashboard/foco/FocoPage";
 import BemEstarPage from "@/components/dashboard/bemestar/BemEstarPage";
 import SettingsPage from "@/components/dashboard/SettingsPage";
@@ -41,9 +40,6 @@ const Dashboard = () => {
         return <FocoPage />;
       case "bem-estar":
         return <BemEstarPage />;
-      case "familia":
-      case "negocios":
-        return <ModulePage moduleKey={activeItem} />;
       case "configuracoes":
         return <SettingsPage />;
       default:
@@ -54,7 +50,7 @@ const Dashboard = () => {
   if (!ready) return null;
 
   return (
-    <div className="min-h-screen" style={{ background: "#F1F5F9" }}>
+    <div className="dashboard-shell min-h-screen" style={{ background: "var(--dash-bg)" }}>
       <DashboardSidebar activeItem={activeItem} onNavigate={setActiveItem} />
       <MobileNav activeItem={activeItem} onNavigate={setActiveItem} />
       <AnimatePresence mode="wait">

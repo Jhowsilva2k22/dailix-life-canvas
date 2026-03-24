@@ -20,24 +20,11 @@ const filters = [
   { key: "todas", label: "Todas" },
 ];
 
-const priorityBadge = (p: string) => {
-  const map: Record<string, { bg: string; color: string }> = {
-    alta: { bg: "rgba(239,68,68,0.1)", color: "#EF4444" },
-    media: { bg: "rgba(245,158,11,0.1)", color: "#F59E0B" },
-    baixa: { bg: "rgba(16,185,129,0.1)", color: "#10B981" },
-  };
-  return map[p] || map.media;
-};
-
 const priorityOrder: Record<string, number> = { alta: 0, media: 1, baixa: 2 };
 
 const sortTasks = (list: Task[], mode: string) => {
   return [...list].sort((a, b) => {
-    if (mode === "todas") {
-      // pending first, then by priority
-      if (a.concluida !== b.concluida) return a.concluida ? 1 : -1;
-    }
-    // no-date first, then by priority
+    if (mode === "todas") { if (a.concluida !== b.concluida) return a.concluida ? 1 : -1; }
     if (!a.prazo && b.prazo) return -1;
     if (a.prazo && !b.prazo) return 1;
     return (priorityOrder[a.prioridade] ?? 1) - (priorityOrder[b.prioridade] ?? 1);
@@ -54,96 +41,56 @@ const TasksTab = () => {
     if (!user) return;
     try {
       const today = new Date().toISOString().split("T")[0];
-
-      let query = supabase
-        .from("tasks")
-        .select("*")
-        .eq("user_id", user.id);
-
-      if (filter === "hoje") {
-        query = query.or(`prazo.eq.${today},prazo.is.null`);
-      } else if (filter === "semana") {
-        const end = new Date();
-        end.setDate(end.getDate() + 7);
-        const endStr = end.toISOString().split("T")[0];
-        query = query
-          .eq("concluida", false)
-          .or(`and(prazo.gte.${today},prazo.lte.${endStr}),prazo.is.null`);
+      let query = supabase.from("tasks").select("*").eq("user_id", user.id);
+      if (filter === "hoje") query = query.or(`prazo.eq.${today},prazo.is.null`);
+      else if (filter === "semana") {
+        const end = new Date(); end.setDate(end.getDate() + 7); const endStr = end.toISOString().split("T")[0];
+        query = query.eq("concluida", false).or(`and(prazo.gte.${today},prazo.lte.${endStr}),prazo.is.null`);
       }
-      // "todas" → no extra filters
-
       const { data, error } = await query;
       if (error) throw error;
       if (data) setTasks(sortTasks(data as Task[], filter));
-    } catch {
-      toast.error("Algo deu errado. Tente novamente.");
-    }
+    } catch { toast.error("Algo deu errado."); }
   };
 
   useEffect(() => { fetchTasks(); }, [user, filter]);
 
-  // Realtime subscription
   useEffect(() => {
     if (!user) return;
-    const channel = supabase
-      .channel('tasks-realtime')
-      .on('postgres_changes', {
-        event: '*',
-        schema: 'public',
-        table: 'tasks',
-        filter: `user_id=eq.${user.id}`,
-      }, (payload) => {
-        const { eventType } = payload;
-        if (eventType === 'INSERT') {
-          const newTask = payload.new as Task;
-          setTasks((prev) => sortTasks([newTask, ...prev], filter));
-        } else if (eventType === 'UPDATE') {
-          const updated = payload.new as Task;
-          setTasks((prev) => sortTasks(prev.map((t) => t.id === updated.id ? updated : t), filter));
-        } else if (eventType === 'DELETE') {
-          const old = payload.old as { id: string };
-          setTasks((prev) => prev.filter((t) => t.id !== old.id));
-        }
-      })
-      .subscribe();
+    const channel = supabase.channel('tasks-realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'tasks', filter: `user_id=eq.${user.id}` }, (payload) => {
+        if (payload.eventType === 'INSERT') setTasks((prev) => sortTasks([payload.new as Task, ...prev], filter));
+        else if (payload.eventType === 'UPDATE') setTasks((prev) => sortTasks(prev.map((t) => t.id === (payload.new as Task).id ? payload.new as Task : t), filter));
+        else if (payload.eventType === 'DELETE') setTasks((prev) => prev.filter((t) => t.id !== (payload.old as { id: string }).id));
+      }).subscribe();
     return () => { supabase.removeChannel(channel); };
   }, [user, filter]);
 
   const toggleTask = async (id: string, concluida: boolean) => {
-    // Optimistic update
     setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, concluida: !concluida } : t)));
     const { error } = await supabase.from("tasks").update({ concluida: !concluida }).eq("id", id);
-    if (error) {
-      setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, concluida } : t)));
-      toast.error("Algo deu errado. Tente novamente.");
-    }
+    if (error) { setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, concluida } : t))); toast.error("Algo deu errado."); }
   };
 
   const deleteTask = async (id: string) => {
     const backup = tasks;
-    // Optimistic
     setTasks((prev) => prev.filter((t) => t.id !== id));
     toast.success("Removido");
     const { error } = await supabase.from("tasks").delete().eq("id", id);
-    if (error) {
-      setTasks(backup);
-      toast.error("Algo deu errado. Tente novamente.");
-    }
+    if (error) { setTasks(backup); toast.error("Algo deu errado."); }
   };
 
-  const handleTaskSaved = () => {
-    setShowModal(false);
-    fetchTasks();
-    toast.success("Tarefa criada");
-  };
+  const handleTaskSaved = () => { setShowModal(false); fetchTasks(); toast.success("Tarefa criada"); };
 
   const pending = tasks.filter((t) => !t.concluida).length;
   const done = tasks.filter((t) => t.concluida).length;
 
+  const CheckIcon = () => <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+
   return (
     <div>
       {/* Filters */}
-      <div className="mb-2 overflow-x-auto" data-reveal style={{ transitionDelay: "160ms" }}>
+      <div className="mb-3 overflow-x-auto" data-reveal>
         <div className="flex gap-2">
           {filters.map((f) => (
             <button
@@ -151,11 +98,10 @@ const TasksTab = () => {
               onClick={() => setFilter(f.key)}
               className="px-4 py-2 rounded-lg transition-colors whitespace-nowrap"
               style={{
-                fontSize: 13,
-                fontWeight: 400,
-                background: filter === f.key ? "rgba(0,180,216,0.1)" : "transparent",
-                color: filter === f.key ? "#00B4D8" : "#94A3B8",
-                border: filter === f.key ? "1px solid rgba(0,180,216,0.3)" : "1px solid transparent",
+                fontSize: 13, fontWeight: 400,
+                background: filter === f.key ? "var(--dash-accent-subtle)" : "transparent",
+                color: filter === f.key ? "var(--dash-accent)" : "var(--dash-text-muted)",
+                border: filter === f.key ? "1px solid rgba(0,180,216,0.2)" : "1px solid transparent",
               }}
             >
               {f.label}
@@ -163,92 +109,53 @@ const TasksTab = () => {
           ))}
         </div>
       </div>
-      {/* Counters */}
-      <div className="mb-4" data-reveal style={{ transitionDelay: "200ms", fontSize: 12, color: "#94A3B8", fontWeight: 300 }}>
-        <span>{pending} pendentes</span>
-        <span className="mx-1.5">·</span>
-        <span>{done} concluidas</span>
+
+      <div className="mb-5" style={{ fontSize: 12, color: "var(--dash-text-muted)", fontWeight: 300 }}>
+        <span>{pending} pendentes</span><span className="mx-1.5">·</span><span>{done} concluidas</span>
       </div>
 
-      {/* Task list */}
       {tasks.length === 0 ? (
-        <div
-          data-reveal
-          style={{ transitionDelay: "240ms", background: "rgba(0,180,216,0.03)", border: "1px dashed rgba(0,180,216,0.2)", borderRadius: 14 }}
-          className="flex flex-col items-center justify-center py-16"
-        >
-          <p style={{ color: "#94A3B8", fontSize: 14, fontWeight: 300 }}>Nenhuma tarefa encontrada.</p>
-          <button
-            onClick={() => setShowModal(true)}
-            className="inline-flex items-center gap-1.5 mt-3 transition-colors"
-            style={{ color: "#00B4D8", fontSize: 13, fontWeight: 400, padding: "8px 16px" }}
-          >
-            <Plus size={16} />
-            Adicionar tarefa
+        <div className="flex flex-col items-center justify-center py-16 rounded-2xl" style={{ background: "var(--dash-surface)", border: "1px solid var(--dash-border)" }}>
+          <p style={{ color: "var(--dash-text-muted)", fontSize: 14, fontWeight: 300 }}>Nenhuma tarefa encontrada.</p>
+          <button onClick={() => setShowModal(true)} className="inline-flex items-center gap-1.5 mt-3 transition-colors" style={{ color: "var(--dash-accent)", fontSize: 13, fontWeight: 400, padding: "8px 16px" }}>
+            <Plus size={16} /> Adicionar tarefa
           </button>
         </div>
       ) : (
-        <div className="space-y-2" data-reveal style={{ transitionDelay: "240ms" }}>
-          {tasks.map((task) => {
-            const badge = priorityBadge(task.prioridade);
-            return (
-              <div
-                key={task.id}
-                className="flex items-center gap-3 p-4 group transition-all duration-200"
-                style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 12 }}
-              >
+        <div>
+          <div className="rounded-2xl overflow-hidden" style={{ background: "var(--dash-surface)", border: "1px solid var(--dash-border)" }}>
+            {tasks.map((task, i) => (
+              <div key={task.id} className="flex items-center gap-3 px-5 py-4 group" style={{ borderBottom: i < tasks.length - 1 ? "1px solid var(--dash-border)" : "none", opacity: task.concluida ? 0.4 : 1 }}>
                 <button
                   onClick={() => toggleTask(task.id, task.concluida)}
-                  className="w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors"
-                  style={{ borderColor: task.concluida ? "#00B4D8" : "#CBD5E1", background: task.concluida ? "#00B4D8" : "transparent" }}
+                  className="w-[18px] h-[18px] rounded flex items-center justify-center flex-shrink-0 transition-colors"
+                  style={{ border: task.concluida ? "none" : "1.5px solid var(--dash-border-strong)", background: task.concluida ? "var(--dash-accent)" : "transparent" }}
                 >
-                  {task.concluida && (
-                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                      <path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  )}
+                  {task.concluida && <CheckIcon />}
                 </button>
                 <div className="flex-1 min-w-0">
-                  <p style={{ color: task.concluida ? "#94A3B8" : "#0F172A", textDecoration: task.concluida ? "line-through" : "none", fontSize: 14, fontWeight: 400 }}>
-                    {task.titulo}
-                  </p>
-                  {task.descricao && (
-                    <p className="truncate mt-0.5" style={{ color: "#94A3B8", fontSize: 12, fontWeight: 300 }}>{task.descricao}</p>
-                  )}
+                  <p style={{ color: task.concluida ? "var(--dash-text-muted)" : "var(--dash-text)", textDecoration: task.concluida ? "line-through" : "none", fontSize: 14, fontWeight: 400 }}>{task.titulo}</p>
+                  {task.descricao && <p className="truncate mt-0.5" style={{ color: "var(--dash-text-muted)", fontSize: 12, fontWeight: 300 }}>{task.descricao}</p>}
                 </div>
-                {task.prazo && (
-                  <span style={{ fontSize: 12, color: "#94A3B8", fontWeight: 300 }}>{new Date(task.prazo + "T12:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}</span>
-                )}
-                <span className="px-2 py-0.5 rounded-full" style={{ fontSize: 10, fontWeight: 400, background: badge.bg, color: badge.color }}>
-                  {task.prioridade}
-                </span>
-                <button
-                  onClick={() => deleteTask(task.id)}
-                  className="opacity-0 group-hover:opacity-100 transition-opacity p-1"
-                  style={{ color: "#94A3B8" }}
-                >
+                {task.prazo && <span style={{ fontSize: 12, color: "var(--dash-text-muted)", fontWeight: 300 }}>{new Date(task.prazo + "T12:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}</span>}
+                <span className="px-2 py-0.5 rounded" style={{
+                  fontSize: 10, fontWeight: 400,
+                  background: task.prioridade === "alta" ? "rgba(239,68,68,0.12)" : task.prioridade === "baixa" ? "rgba(16,185,129,0.12)" : "rgba(245,158,11,0.12)",
+                  color: task.prioridade === "alta" ? "#F87171" : task.prioridade === "baixa" ? "#34D399" : "#FBBF24",
+                }}>{task.prioridade}</span>
+                <button onClick={() => deleteTask(task.id)} className="opacity-0 group-hover:opacity-100 transition-opacity p-1" style={{ color: "var(--dash-text-muted)" }}>
                   <Trash2 size={14} />
                 </button>
               </div>
-            );
-          })}
-          <button
-            onClick={() => setShowModal(true)}
-            className="inline-flex items-center gap-1.5 mt-2 transition-colors"
-            style={{ color: "#00B4D8", fontSize: 13, fontWeight: 400, padding: "8px 16px" }}
-          >
-            <Plus size={16} />
-            Nova tarefa
+            ))}
+          </div>
+          <button onClick={() => setShowModal(true)} className="inline-flex items-center gap-1.5 mt-3 transition-colors" style={{ color: "var(--dash-accent)", fontSize: 13, fontWeight: 400, padding: "8px 16px", opacity: 0.8 }}>
+            <Plus size={16} /> Nova tarefa
           </button>
         </div>
       )}
 
-      {showModal && (
-        <AddTaskModal
-          onClose={() => setShowModal(false)}
-          onSaved={handleTaskSaved}
-        />
-      )}
+      {showModal && <AddTaskModal onClose={() => setShowModal(false)} onSaved={handleTaskSaved} />}
     </div>
   );
 };
