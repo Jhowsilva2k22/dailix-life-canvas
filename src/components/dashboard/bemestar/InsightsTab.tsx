@@ -219,15 +219,16 @@ const InsightsTab = ({ isActive = true, onReadyChange, highlightId = null, onHig
                   return (
                     <motion.div
                       key={item.id}
+                      data-search-id={item.id}
                       layout
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.95 }}
                       transition={{ duration: 0.25, delay: i * 0.04 }}
-                      className="rounded-2xl p-5"
+                      className={`rounded-2xl p-5 transition-all duration-500 ${isHighlighted(item.id) ? "search-highlight" : ""}`}
                       style={{
                         background: "var(--dash-surface)",
-                        border: "1px solid var(--dash-border)",
+                        border: isHighlighted(item.id) ? "1px solid var(--dash-accent)" : "1px solid var(--dash-border)",
                       }}
                     >
                       <div className="flex items-center justify-between mb-2">
