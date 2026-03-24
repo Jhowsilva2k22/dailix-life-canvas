@@ -26,19 +26,19 @@ const FORMAT_CONFIG: Record<Format, { w: number; h: number; label: string }> = {
 const InsightShareModal = ({ insight, onClose }: InsightShareModalProps) => {
   const [format, setFormat] = useState<Format>("feed");
   const [generating, setGenerating] = useState(false);
-  const canvasRef = useRef<HTMLDivElement>(null);
+  const exportRef = useRef<HTMLDivElement>(null);
 
   const cfg = FORMAT_CONFIG[format];
   const previewScale = format === "feed" ? 0.28 : 0.2;
 
   const generate = useCallback(async (): Promise<Blob | null> => {
-    if (!canvasRef.current) return null;
+    if (!exportRef.current) return null;
     setGenerating(true);
     try {
-      const dataUrl = await toPng(canvasRef.current, {
+      const dataUrl = await toPng(exportRef.current, {
         width: cfg.w,
         height: cfg.h,
-        pixelRatio: 3,
+        pixelRatio: 1,
         cacheBust: true,
       });
       const res = await fetch(dataUrl);
