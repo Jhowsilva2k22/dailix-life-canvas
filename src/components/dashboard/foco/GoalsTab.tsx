@@ -1,5 +1,6 @@
 import { Component, useEffect, useState, useCallback, type ReactNode } from "react";
 import { Plus, Pencil, Trash2 } from "lucide-react";
+import RefreshButton from "../RefreshButton";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -73,6 +74,7 @@ const GoalsTabInner = () => {
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<Goal | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   const fetchGoals = useCallback(async () => {
     if (!user) { setLoading(false); return; }
@@ -247,7 +249,10 @@ const GoalsTabInner = () => {
   /* ---- Header with inline button ---- */
   const headerRow = (
     <div className="flex items-center justify-between mb-4">
-      <h2 style={{ color: "#0F172A", fontSize: 16, fontWeight: 500 }}>Metas</h2>
+      <div className="flex items-center gap-2">
+        <h2 style={{ color: "#0F172A", fontSize: 16, fontWeight: 500 }}>Metas</h2>
+        <RefreshButton refreshing={refreshing} onRefresh={async () => { setRefreshing(true); await fetchGoals(); setRefreshing(false); }} />
+      </div>
       <button
         onClick={() => { setEditing(null); setShowModal(true); }}
         className="inline-flex items-center gap-1 transition-colors hover:opacity-80"

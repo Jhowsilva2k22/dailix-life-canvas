@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { Plus, Trash2, Flame } from "lucide-react";
+import RefreshButton from "../RefreshButton";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -27,6 +28,7 @@ const HabitsTab = () => {
   const [habits, setHabits] = useState<Habit[]>([]);
   const [completedToday, setCompletedToday] = useState<Set<string>>(new Set());
   const [showModal, setShowModal] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   const today = new Date().toISOString().split("T")[0];
 
@@ -196,6 +198,11 @@ const HabitsTab = () => {
 
   return (
     <div>
+      {/* Header with refresh */}
+      <div className="flex items-center gap-2 mb-4">
+        <h2 style={{ color: "#0F172A", fontSize: 16, fontWeight: 500 }}>Habitos</h2>
+        <RefreshButton refreshing={refreshing} onRefresh={async () => { setRefreshing(true); await fetchHabits(); await fetchTodayLogs(); setRefreshing(false); }} />
+      </div>
       {habits.length === 0 ? (
         <div
           data-reveal

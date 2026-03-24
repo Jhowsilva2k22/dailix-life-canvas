@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { CheckSquare, Flame, Target, TrendingUp, Plus } from "lucide-react";
+import RefreshButton from "./RefreshButton";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
@@ -62,6 +63,7 @@ const DashboardContent = () => {
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
   const revealRef = useScrollReveal();
 
   const today = new Date().toISOString().split("T")[0];
@@ -424,9 +426,12 @@ const DashboardContent = () => {
 
         {/* Hoje - Tarefas */}
         <section className="mb-10" data-reveal style={{ transitionDelay: "160ms" }}>
-          <h2 className="font-display mb-4" style={{ color: "#0F172A", fontSize: 16, fontWeight: 400, letterSpacing: "0.01em" }}>
-            Hoje
-          </h2>
+          <div className="flex items-center gap-2 mb-4">
+            <h2 className="font-display" style={{ color: "#0F172A", fontSize: 16, fontWeight: 400, letterSpacing: "0.01em" }}>
+              Hoje
+            </h2>
+            <RefreshButton refreshing={refreshing} onRefresh={async () => { setRefreshing(true); await fetchAll(); setRefreshing(false); }} />
+          </div>
           {todayTasks.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8" style={{ background: "rgba(0,180,216,0.03)", border: "1px dashed rgba(0,180,216,0.2)", borderRadius: 12 }}>
               <p style={{ color: "#94A3B8", fontSize: 14, fontWeight: 300 }}>Nenhuma tarefa para hoje ainda.</p>
@@ -453,9 +458,11 @@ const DashboardContent = () => {
 
         {/* Habitos de hoje */}
         <section className="mb-10" data-reveal style={{ transitionDelay: "240ms" }}>
-          <h2 className="font-display mb-4" style={{ color: "#0F172A", fontSize: 16, fontWeight: 400, letterSpacing: "0.01em" }}>
-            Habitos de hoje
-          </h2>
+          <div className="flex items-center gap-2 mb-4">
+            <h2 className="font-display" style={{ color: "#0F172A", fontSize: 16, fontWeight: 400, letterSpacing: "0.01em" }}>
+              Habitos de hoje
+            </h2>
+          </div>
           {habits.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8" style={{ background: "rgba(0,180,216,0.03)", border: "1px dashed rgba(0,180,216,0.2)", borderRadius: 12 }}>
               <p style={{ color: "#94A3B8", fontSize: 14, fontWeight: 300 }}>Nenhum habito configurado.</p>
