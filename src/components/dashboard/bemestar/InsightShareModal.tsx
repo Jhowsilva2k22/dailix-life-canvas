@@ -303,7 +303,7 @@ const InsightCanvas = ({
         {/* Title */}
         <h2
           style={{
-            fontSize: isFeed ? 52 : 56,
+            fontSize: isFeed ? 58 : 64,
             fontWeight: 600,
             lineHeight: 1.25,
             color: "#F1F5F9",
