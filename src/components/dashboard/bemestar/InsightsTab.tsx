@@ -110,7 +110,7 @@ const InsightsTab = () => {
           style={{
             background: "linear-gradient(135deg, var(--dash-surface) 0%, var(--dash-bg) 100%)",
             border: "1px solid var(--dash-accent)",
-            borderColor: "rgba(0,194,255,0.25)",
+            borderColor: "hsl(var(--accent) / 0.25)",
           }}
         >
           <div className="flex items-center gap-2 mb-3">
