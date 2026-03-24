@@ -393,6 +393,7 @@ const GoalsTabInner = ({ isActive = true, onReadyChange, highlightId = null }: G
       <div className="space-y-3">
         {goals.map((goal) => (
           <GoalCard
+            highlighted={isHighlighted(goal.id)}
             key={goal.id}
             goal={goal}
             tasks={subTasks[goal.id] || []}
