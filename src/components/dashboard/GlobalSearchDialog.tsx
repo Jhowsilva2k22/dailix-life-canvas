@@ -22,7 +22,7 @@ interface Props {
   onSelect: (focus: SearchFocus) => void;
 }
 
-export default function GlobalSearchDialog({ open, onClose, onNavigate }: Props) {
+export default function GlobalSearchDialog({ open, onClose, onSelect }: Props) {
   const { query, setQuery, results, loading, error } = useGlobalSearch();
 
   useEffect(() => {
