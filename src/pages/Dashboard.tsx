@@ -24,12 +24,20 @@ const Dashboard = () => {
       .select("onboarding_completed")
       .eq("user_id", user.id)
       .single()
-      .then(({ data }) => {
+      .then(({ data, error }) => {
+        if (error) {
+          // If profile fetch fails, still show dashboard
+          setReady(true);
+          return;
+        }
         if (data && !data.onboarding_completed) {
           navigate("/welcome", { replace: true });
         } else {
           setReady(true);
         }
+      })
+      .catch(() => {
+        setReady(true);
       });
   }, [user, navigate]);
 
@@ -51,7 +59,13 @@ const Dashboard = () => {
     }
   };
 
-  if (!ready) return null;
+  if (!ready) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: "#F1F5F9" }}>
+        <div className="w-6 h-6 border-2 rounded-full animate-spin" style={{ borderColor: "#E2E8F0", borderTopColor: "#00B4D8" }} />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen" style={{ background: "#F1F5F9" }}>
