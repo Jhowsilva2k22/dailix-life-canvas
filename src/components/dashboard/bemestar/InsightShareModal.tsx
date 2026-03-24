@@ -38,7 +38,7 @@ const InsightShareModal = ({ insight, onClose }: InsightShareModalProps) => {
       const dataUrl = await toPng(canvasRef.current, {
         width: cfg.w,
         height: cfg.h,
-        pixelRatio: 1,
+        pixelRatio: 3,
         cacheBust: true,
       });
       const res = await fetch(dataUrl);
