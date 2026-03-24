@@ -63,6 +63,8 @@ const AddTaskModal = ({ onClose, onSaved, defaultGoalId, editingTask }: AddTaskM
         prazo: prazo || null,
         prioridade,
         goal_id: goalId || null,
+        lembrete_ativo: lembreteAtivo,
+        lembrete_horario: lembreteAtivo && lembreteHorario ? lembreteHorario + ":00" : null,
       };
       if (isEdit && editingTask) {
         const { error } = await supabase.from("tasks").update(payload).eq("id", editingTask.id);
