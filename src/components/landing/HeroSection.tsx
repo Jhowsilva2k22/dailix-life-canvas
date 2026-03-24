@@ -72,7 +72,7 @@ const HeroSection = () => {
             }`}
             style={{ fontSize: 16, color: "rgba(255,255,255,0.5)", lineHeight: 1.7, fontWeight: 300 }}
           >
-            Tarefas, metas, hábitos e insights em um ambiente premium criado para quem precisa de clareza, constância e controle.
+            Um diagnóstico rápido para identificar o padrão que hoje está roubando sua clareza, constância ou controle.
           </p>
 
           {/* CTAs */}
