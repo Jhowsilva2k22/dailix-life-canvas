@@ -10,6 +10,7 @@ import {
   getActiveSubscription,
   type PushState,
 } from "@/services/pushNotifications";
+import { registerFCMToken, unregisterFCMToken } from "@/services/fcmPush";
 import { toast } from "sonner";
 
 const PushNotificationToggle = () => {
@@ -41,15 +42,26 @@ const PushNotificationToggle = () => {
   const handleEnable = async () => {
     if (!user || busy) return;
     setBusy(true);
-    const result = await subscribeToPush(user.id);
-    if (result.success) {
+
+    // Register both VAPID and FCM in parallel
+    const [vapidResult, fcmResult] = await Promise.allSettled([
+      subscribeToPush(user.id),
+      registerFCMToken(user.id),
+    ]);
+
+    const vapidOk = vapidResult.status === "fulfilled" && vapidResult.value.success;
+    const fcmOk = fcmResult.status === "fulfilled" && fcmResult.value.success;
+
+    if (vapidOk || fcmOk) {
       setState("active");
       toast.success("Notificações push ativadas");
     } else {
-      if (result.error === "Permissão negada") {
+      const errorMsg =
+        vapidResult.status === "fulfilled" ? vapidResult.value.error : "Erro VAPID";
+      if (errorMsg === "Permissão negada") {
         setState("denied");
       }
-      toast.error(result.error || "Erro ao ativar push");
+      toast.error(errorMsg || "Erro ao ativar push");
     }
     setBusy(false);
   };
@@ -57,7 +69,10 @@ const PushNotificationToggle = () => {
   const handleDisable = async () => {
     if (!user || busy) return;
     setBusy(true);
-    await unsubscribeFromPush(user.id);
+    await Promise.allSettled([
+      unsubscribeFromPush(user.id),
+      unregisterFCMToken(user.id),
+    ]);
     setState("inactive");
     toast.success("Notificações push desativadas");
     setBusy(false);
