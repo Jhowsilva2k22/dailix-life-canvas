@@ -217,11 +217,21 @@ const InsightsTab = () => {
                         border: "1px solid var(--dash-border)",
                       }}
                     >
-                      <div className="flex items-center gap-1.5 mb-2">
-                        <Icon size={12} style={{ color: "var(--dash-accent)", opacity: 0.7 }} />
-                        <span style={{ fontSize: 11, letterSpacing: "0.08em", color: "var(--dash-text-muted)", opacity: 0.7 }}>
-                          {categoryMeta[item.categoria]?.label || item.categoria}
-                        </span>
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-1.5">
+                          <Icon size={12} style={{ color: "var(--dash-accent)", opacity: 0.7 }} />
+                          <span style={{ fontSize: 11, letterSpacing: "0.08em", color: "var(--dash-text-muted)", opacity: 0.7 }}>
+                            {categoryMeta[item.categoria]?.label || item.categoria}
+                          </span>
+                        </div>
+                        <button
+                          onClick={() => openShare(item)}
+                          className="p-1 rounded-lg transition-all"
+                          style={{ color: "var(--dash-text-muted)", opacity: 0.4 }}
+                          title="Compartilhar"
+                        >
+                          <Share2 size={13} />
+                        </button>
                       </div>
                       <h3
                         className="font-display mb-2"
