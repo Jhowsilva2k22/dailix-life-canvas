@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Lightbulb, Sparkles, Brain, Moon, Target, Zap, Shield } from "lucide-react";
+import { Lightbulb, Sparkles, Brain, Moon, Target, Zap, Shield, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 interface Insight {
@@ -22,10 +22,14 @@ const categoryMeta: Record<string, { label: string; icon: React.ElementType }> =
   produtividade: { label: "Produtividade", icon: Sparkles },
 };
 
+const INITIAL_SHOW = 3;
+const LOAD_MORE = 3;
+
 const InsightsTab = () => {
   const [insights, setInsights] = useState<Insight[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
+  const [visibleCount, setVisibleCount] = useState(INITIAL_SHOW);
 
   useEffect(() => {
     supabase
@@ -106,7 +110,7 @@ const InsightsTab = () => {
           style={{
             background: "linear-gradient(135deg, var(--dash-surface) 0%, var(--dash-bg) 100%)",
             border: "1px solid var(--dash-accent)",
-            borderColor: "rgba(0,194,255,0.25)",
+            borderColor: "hsl(var(--accent) / 0.25)",
           }}
         >
           <div className="flex items-center gap-2 mb-3">
@@ -143,80 +147,95 @@ const InsightsTab = () => {
 
       {/* Category filters */}
       <div className="flex gap-2 flex-wrap">
-        <button
-          onClick={() => setActiveCategory(null)}
-          className="px-3 py-1.5 rounded-full transition-all"
-          style={{
-            fontSize: 12,
-            fontWeight: activeCategory === null ? 500 : 400,
-            color: activeCategory === null ? "var(--dash-accent)" : "var(--dash-text-muted)",
-            background: activeCategory === null ? "rgba(0,194,255,0.1)" : "transparent",
-            border: `1px solid ${activeCategory === null ? "rgba(0,194,255,0.2)" : "var(--dash-border)"}`,
-          }}
-        >
-          Todos
-        </button>
-        {categories.map((cat) => {
-          const meta = categoryMeta[cat];
-          const active = activeCategory === cat;
-          return (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(active ? null : cat)}
-              className="px-3 py-1.5 rounded-full transition-all"
-              style={{
-                fontSize: 12,
-                fontWeight: active ? 500 : 400,
-                color: active ? "var(--dash-accent)" : "var(--dash-text-muted)",
-                background: active ? "rgba(0,194,255,0.1)" : "transparent",
-                border: `1px solid ${active ? "rgba(0,194,255,0.2)" : "var(--dash-border)"}`,
-              }}
-            >
-              {meta?.label || cat}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Insights list */}
-      <div className="grid md:grid-cols-2 gap-3">
-        <AnimatePresence mode="popLayout">
-          {filtered.map((item, i) => {
-            const Icon = categoryMeta[item.categoria]?.icon || Lightbulb;
+        {[{ key: null, label: "Todos" }, ...categories.map((c) => ({ key: c, label: categoryMeta[c]?.label || c }))].map(
+          ({ key, label }) => {
+            const active = activeCategory === key;
             return (
-              <motion.div
-                key={item.id}
-                layout
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.25, delay: i * 0.04 }}
-                className="rounded-2xl p-5"
+              <button
+                key={label}
+                onClick={() => { setActiveCategory(key); setVisibleCount(INITIAL_SHOW); }}
+                className="px-3 py-1.5 rounded-full transition-all"
                 style={{
-                  background: "var(--dash-surface)",
-                  border: "1px solid var(--dash-border)",
+                  fontSize: 12,
+                  fontWeight: active ? 500 : 400,
+                  color: active ? "var(--dash-accent)" : "var(--dash-text-muted)",
+                  background: active ? "hsl(var(--accent) / 0.1)" : "transparent",
+                  border: `1px solid ${active ? "hsl(var(--accent) / 0.2)" : "var(--dash-border)"}`,
                 }}
               >
-                <div className="flex items-center gap-1.5 mb-2">
-                  <Icon size={12} style={{ color: "var(--dash-accent)", opacity: 0.7 }} />
-                  <span style={{ fontSize: 11, letterSpacing: "0.08em", color: "var(--dash-text-muted)", opacity: 0.7 }}>
-                    {categoryMeta[item.categoria]?.label || item.categoria}
-                  </span>
-                </div>
-                <h3
-                  className="font-display mb-2"
-                  style={{ color: "var(--dash-text)", fontSize: 14, fontWeight: 500, lineHeight: 1.4 }}
-                >
-                  {item.titulo}
-                </h3>
-                <p style={{ color: "var(--dash-text-muted)", fontSize: 13, fontWeight: 300, lineHeight: 1.7 }}>
-                  {item.texto_curto || item.texto}
-                </p>
-              </motion.div>
+                {label}
+              </button>
             );
-          })}
-        </AnimatePresence>
+          }
+        )}
       </div>
+
+      {/* Insights list — curated */}
+      {(() => {
+        const visible = filtered.slice(0, visibleCount);
+        const hasMore = filtered.length > visibleCount;
+        return (
+          <>
+            <div className="grid md:grid-cols-2 gap-3">
+              <AnimatePresence mode="popLayout">
+                {visible.map((item, i) => {
+                  const Icon = categoryMeta[item.categoria]?.icon || Lightbulb;
+                  return (
+                    <motion.div
+                      key={item.id}
+                      layout
+                      initial={{ opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95 }}
+                      transition={{ duration: 0.25, delay: i * 0.04 }}
+                      className="rounded-2xl p-5"
+                      style={{
+                        background: "var(--dash-surface)",
+                        border: "1px solid var(--dash-border)",
+                      }}
+                    >
+                      <div className="flex items-center gap-1.5 mb-2">
+                        <Icon size={12} style={{ color: "var(--dash-accent)", opacity: 0.7 }} />
+                        <span style={{ fontSize: 11, letterSpacing: "0.08em", color: "var(--dash-text-muted)", opacity: 0.7 }}>
+                          {categoryMeta[item.categoria]?.label || item.categoria}
+                        </span>
+                      </div>
+                      <h3
+                        className="font-display mb-2"
+                        style={{ color: "var(--dash-text)", fontSize: 14, fontWeight: 500, lineHeight: 1.4 }}
+                      >
+                        {item.titulo}
+                      </h3>
+                      <p style={{ color: "var(--dash-text-muted)", fontSize: 13, fontWeight: 300, lineHeight: 1.7 }}>
+                        {item.texto_curto || item.texto}
+                      </p>
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
+            </div>
+
+            {hasMore && (
+              <motion.button
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                onClick={() => setVisibleCount((c) => c + LOAD_MORE)}
+                className="flex items-center gap-1.5 mx-auto mt-2 px-4 py-2 rounded-full transition-all"
+                style={{
+                  fontSize: 12,
+                  fontWeight: 400,
+                  color: "var(--dash-accent)",
+                  background: "hsl(var(--accent) / 0.06)",
+                  border: "1px solid hsl(var(--accent) / 0.15)",
+                }}
+              >
+                Explorar mais
+                <ChevronDown size={14} />
+              </motion.button>
+            )}
+          </>
+        );
+      })()}
 
       {filtered.length === 0 && (
         <div
