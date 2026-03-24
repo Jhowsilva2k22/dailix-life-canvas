@@ -149,11 +149,21 @@ const InsightsTab = () => {
           <p style={{ color: "var(--dash-text-muted)", fontSize: 13, fontWeight: 300, lineHeight: 1.7 }}>
             {insightDoDia.texto}
           </p>
-          <div className="mt-3 flex items-center gap-1.5">
-            <DiaIcon size={12} style={{ color: "var(--dash-text-muted)", opacity: 0.6 }} />
-            <span style={{ fontSize: 11, color: "var(--dash-text-muted)", opacity: 0.6 }}>
-              {categoryMeta[insightDoDia.categoria]?.label || insightDoDia.categoria}
-            </span>
+          <div className="mt-3 flex items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <DiaIcon size={12} style={{ color: "var(--dash-text-muted)", opacity: 0.6 }} />
+              <span style={{ fontSize: 11, color: "var(--dash-text-muted)", opacity: 0.6 }}>
+                {categoryMeta[insightDoDia.categoria]?.label || insightDoDia.categoria}
+              </span>
+            </div>
+            <button
+              onClick={() => openShare(insightDoDia)}
+              className="p-1.5 rounded-lg transition-all"
+              style={{ color: "var(--dash-text-muted)", opacity: 0.5 }}
+              title="Compartilhar"
+            >
+              <Share2 size={14} />
+            </button>
           </div>
         </motion.div>
       )}
