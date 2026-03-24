@@ -45,12 +45,8 @@ const BemEstarPage = () => {
           ))}
         </div>
 
-        <div style={{ display: activeTab === "habitos" ? "block" : "none" }}>
-          <HabitsTab />
-        </div>
-        <div style={{ display: activeTab === "insights" ? "block" : "none" }}>
-          <InsightsTab />
-        </div>
+        {activeTab === "habitos" && <HabitsTab />}
+        {activeTab === "insights" && <InsightsTab />}
       </div>
     </div>
   );

@@ -46,12 +46,8 @@ const FocoPage = () => {
           ))}
         </div>
 
-        <div style={{ display: activeTab === "tarefas" ? "block" : "none" }}>
-          <TasksTab />
-        </div>
-        <div style={{ display: activeTab === "metas" ? "block" : "none" }}>
-          <GoalsTab />
-        </div>
+        {activeTab === "tarefas" && <TasksTab />}
+        {activeTab === "metas" && <GoalsTab />}
       </div>
     </div>
   );

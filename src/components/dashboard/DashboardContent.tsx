@@ -60,94 +60,22 @@ const DashboardContent = () => {
   const [maxStreak, setMaxStreak] = useState(0);
   const [activeGoal, setActiveGoal] = useState<GoalWithProgress | null>(null);
   const [showTaskModal, setShowTaskModal] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [fetchError, setFetchError] = useState(false);
   const revealRef = useScrollReveal();
 
   const today = new Date().toISOString().split("T")[0];
 
-  const fetchAll = useCallback(async () => {
+  useEffect(() => {
     if (!user) return;
-    setLoading(true);
-    setFetchError(false);
-    try {
-      // Profile
-      const { data: profileData } = await supabase
-        .from("profiles")
-        .select("display_name, first_goal, modules")
-        .eq("user_id", user.id)
-        .single();
-      if (profileData) setProfile(profileData);
-
-      // Tasks
-      const { data: tasksData, error: tasksErr } = await supabase
-        .from("tasks")
-        .select("*")
-        .eq("user_id", user.id)
-        .order("created_at", { ascending: false });
-      if (tasksErr) throw tasksErr;
-      setTasks(Array.isArray(tasksData) ? (tasksData as Task[]) : []);
-
-      // Habits
-      const { data: habitsData, error: habitsErr } = await supabase
-        .from("habits")
-        .select("id, titulo, categoria, streak")
-        .eq("user_id", user.id)
-        .eq("ativo", true);
-      if (habitsErr) throw habitsErr;
-      const habitsList = Array.isArray(habitsData) ? (habitsData as Habit[]) : [];
-      setHabits(habitsList);
-      setMaxStreak(habitsList.reduce((max, h) => Math.max(max, h.streak || 0), 0));
-
-      // Today's habit logs
-      const { data: logsData } = await supabase
-        .from("habit_logs")
-        .select("habit_id")
-        .eq("user_id", user.id)
-        .eq("data", new Date().toISOString().split("T")[0])
-        .eq("concluido", true);
-      if (logsData) setCompletedHabitsToday(new Set(logsData.map((l: any) => l.habit_id)));
-
-      // Active goal
-      await fetchActiveGoal();
-    } catch {
-      setFetchError(true);
-    } finally {
-      setLoading(false);
-    }
+    supabase
+      .from("profiles")
+      .select("display_name, first_goal, modules")
+      .eq("user_id", user.id)
+      .single()
+      .then(({ data }) => { if (data) setProfile(data); });
+    fetchTasks();
+    fetchHabits();
+    fetchActiveGoal();
   }, [user]);
-
-  const fetchActiveGoal = useCallback(async () => {
-    if (!user) return;
-    try {
-      const { data: goalsData } = await supabase
-        .from("goals")
-        .select("id, titulo, progresso, status")
-        .eq("user_id", user.id)
-        .eq("status", "ativa")
-        .order("created_at", { ascending: false })
-        .limit(1);
-      if (goalsData && goalsData.length > 0) {
-        const goal = goalsData[0];
-        const { data: linkedTasks } = await supabase
-          .from("tasks")
-          .select("concluida")
-          .eq("user_id", user.id)
-          .eq("goal_id", goal.id);
-        if (linkedTasks && linkedTasks.length > 0) {
-          const done = linkedTasks.filter((t: any) => t.concluida).length;
-          const progress = Math.round((done / linkedTasks.length) * 100);
-          setActiveGoal({ ...goal, progresso: progress, hasLinkedTasks: true } as GoalWithProgress);
-        } else {
-          setActiveGoal({ ...goal, progresso: 0, hasLinkedTasks: false } as GoalWithProgress);
-        }
-      } else {
-        setActiveGoal(null);
-      }
-    } catch { /* silent */ }
-  }, [user]);
-
-  useEffect(() => { fetchAll(); }, [fetchAll]);
 
   // Realtime subscriptions
   useEffect(() => {
@@ -169,6 +97,7 @@ const DashboardContent = () => {
           const old = payload.old as { id: string };
           setTasks((prev) => prev.filter((t) => t.id !== old.id));
         }
+        // Refresh active goal progress when tasks change
         fetchActiveGoal();
       })
       .on('postgres_changes', {
@@ -197,27 +126,19 @@ const DashboardContent = () => {
         filter: `user_id=eq.${user.id}`,
       }, (payload) => {
         if (payload.eventType === 'INSERT') {
-          const h = payload.new as Habit;
-          setHabits((prev) => {
-            const updated = [h, ...prev];
-            setMaxStreak(updated.reduce((max, x) => Math.max(max, x.streak || 0), 0));
-            return updated;
-          });
+          setHabits((prev) => [payload.new as Habit, ...prev]);
         } else if (payload.eventType === 'UPDATE') {
           const h = payload.new as Habit;
-          setHabits((prev) => {
-            const updated = prev.map((old) => old.id === h.id ? h : old);
-            setMaxStreak(updated.reduce((max, x) => Math.max(max, x.streak || 0), 0));
-            return updated;
-          });
+          setHabits((prev) => prev.map((old) => old.id === h.id ? h : old));
         } else if (payload.eventType === 'DELETE') {
           const old = payload.old as { id: string };
-          setHabits((prev) => {
-            const updated = prev.filter((h) => h.id !== old.id);
-            setMaxStreak(updated.reduce((max, x) => Math.max(max, x.streak || 0), 0));
-            return updated;
-          });
+          setHabits((prev) => prev.filter((h) => h.id !== old.id));
         }
+        // Recalc max streak
+        setHabits((prev) => {
+          setMaxStreak(prev.reduce((max, h) => Math.max(max, h.streak || 0), 0));
+          return prev;
+        });
       })
       .on('postgres_changes', {
         event: '*',
@@ -229,9 +150,68 @@ const DashboardContent = () => {
       })
       .subscribe();
     return () => { supabase.removeChannel(channel); };
-  }, [user, fetchActiveGoal]);
+  }, [user]);
+
+  const fetchActiveGoal = async () => {
+    if (!user) return;
+    const { data: goalsData } = await supabase
+      .from("goals")
+      .select("id, titulo, progresso, status")
+      .eq("user_id", user.id)
+      .eq("status", "ativa")
+      .order("created_at", { ascending: false })
+      .limit(1);
+    if (goalsData && goalsData.length > 0) {
+      const goal = goalsData[0];
+      const { data: linkedTasks } = await supabase
+        .from("tasks")
+        .select("concluida")
+        .eq("user_id", user.id)
+        .eq("goal_id", goal.id);
+      if (linkedTasks && linkedTasks.length > 0) {
+        const done = linkedTasks.filter((t: any) => t.concluida).length;
+        const progress = Math.round((done / linkedTasks.length) * 100);
+        setActiveGoal({ ...goal, progresso: progress, hasLinkedTasks: true } as GoalWithProgress);
+      } else {
+        setActiveGoal({ ...goal, progresso: 0, hasLinkedTasks: false } as GoalWithProgress);
+      }
+    }
+  };
+
+  const fetchTasks = async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from("tasks")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false });
+    if (data) setTasks(data as Task[]);
+  };
+
+  const fetchHabits = useCallback(async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from("habits")
+      .select("id, titulo, categoria, streak")
+      .eq("user_id", user.id)
+      .eq("ativo", true);
+    if (data) {
+      setHabits(data as Habit[]);
+      const best = data.reduce((max: number, h: any) => Math.max(max, h.streak || 0), 0);
+      setMaxStreak(best);
+    }
+
+    const { data: logs } = await supabase
+      .from("habit_logs")
+      .select("habit_id")
+      .eq("user_id", user.id)
+      .eq("data", new Date().toISOString().split("T")[0])
+      .eq("concluido", true);
+    if (logs) setCompletedHabitsToday(new Set(logs.map((l: any) => l.habit_id)));
+  }, [user]);
 
   const toggleTask = async (id: string, concluida: boolean) => {
+    // Optimistic
     setTasks((prev) => prev.map((t) => (t.id === id ? { ...t, concluida: !concluida } : t)));
     const { error } = await supabase.from("tasks").update({ concluida: !concluida }).eq("id", id);
     if (error) {
@@ -243,11 +223,14 @@ const DashboardContent = () => {
   const toggleHabit = async (habitId: string) => {
     if (!user) return;
     const isCompleted = completedHabitsToday.has(habitId);
+
+    // Optimistic
     if (isCompleted) {
       setCompletedHabitsToday((prev) => { const s = new Set(prev); s.delete(habitId); return s; });
     } else {
       setCompletedHabitsToday((prev) => new Set(prev).add(habitId));
     }
+
     try {
       if (isCompleted) {
         const { error } = await supabase.from("habit_logs").delete().eq("habit_id", habitId).eq("user_id", user.id).eq("data", today);
@@ -257,6 +240,7 @@ const DashboardContent = () => {
         if (error) throw error;
       }
     } catch {
+      // Revert
       if (isCompleted) {
         setCompletedHabitsToday((prev) => new Set(prev).add(habitId));
       } else {
@@ -268,6 +252,7 @@ const DashboardContent = () => {
 
   const handleTaskSaved = () => {
     setShowTaskModal(false);
+    fetchTasks();
     toast.success("Tarefa criada");
   };
 
@@ -302,55 +287,6 @@ const DashboardContent = () => {
     { num: "02", title: "Crie um habito", desc: "Consistencia supera intensidade.", cta: "Criar habito", action: () => {} },
     { num: "03", title: "Explore seu conteudo", desc: "Videos selecionados para cada area da sua vida.", cta: "Ver conteudo", action: () => {} },
   ];
-
-  // Loading state
-  if (loading) {
-    return (
-      <div className="flex-1 min-h-screen md:ml-[240px] flex items-center justify-center" style={{ background: "#F1F5F9" }}>
-        <div className="w-6 h-6 border-2 rounded-full animate-spin" style={{ borderColor: "#E2E8F0", borderTopColor: "#00B4D8" }} />
-      </div>
-    );
-  }
-
-  // Error state
-  if (fetchError) {
-    return (
-      <div className="flex-1 min-h-screen md:ml-[240px] flex items-center justify-center" style={{ background: "#F1F5F9" }}>
-        <div className="flex flex-col items-center">
-          <p style={{ color: "#64748B", fontSize: 14, fontWeight: 300 }}>Erro ao carregar dados.</p>
-          <button onClick={fetchAll} className="mt-3" style={{ color: "#00B4D8", fontSize: 13, fontWeight: 400, padding: "8px 16px" }}>Tentar novamente</button>
-        </div>
-      </div>
-    );
-  }
-
-  const pendingTasks = todayTasks.filter((t) => !t.concluida);
-  const doneTasks = todayTasks.filter((t) => t.concluida);
-
-  const renderTask = (task: Task, dimmed: boolean) => (
-    <div key={task.id} className="flex items-center gap-3 p-4" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 12, opacity: dimmed ? 0.5 : 1 }}>
-      <button
-        onClick={() => toggleTask(task.id, task.concluida)}
-        className="w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors"
-        style={{ borderColor: task.concluida ? "#00B4D8" : "#CBD5E1", background: task.concluida ? "#00B4D8" : "transparent" }}
-      >
-        {task.concluida && (
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-        )}
-      </button>
-      <div className="flex-1 min-w-0">
-        <p style={{ color: task.concluida ? "#94A3B8" : "#0F172A", textDecoration: task.concluida ? "line-through" : "none", fontSize: 14, fontWeight: 400 }}>{task.titulo}</p>
-        {task.descricao && <p className="truncate mt-0.5" style={{ color: "#94A3B8", fontSize: 12, fontWeight: 300 }}>{task.descricao}</p>}
-      </div>
-      <span className="px-2 py-0.5 rounded-full" style={{
-        fontSize: 10, fontWeight: 400,
-        background: task.prioridade === "alta" ? "rgba(239,68,68,0.1)" : task.prioridade === "baixa" ? "rgba(34,197,94,0.1)" : "rgba(245,158,11,0.1)",
-        color: task.prioridade === "alta" ? "#EF4444" : task.prioridade === "baixa" ? "#22C55E" : "#F59E0B",
-      }}>
-        {task.prioridade}
-      </span>
-    </div>
-  );
 
   return (
     <div ref={revealRef} className="flex-1 min-h-screen md:ml-[240px]" style={{ background: "#F1F5F9" }}>
@@ -434,21 +370,49 @@ const DashboardContent = () => {
                 <Plus size={16} /> Adicionar tarefa
               </button>
             </div>
-          ) : (
-            <div className="space-y-2">
-              {pendingTasks.map((t) => renderTask(t, false))}
-              {doneTasks.length > 0 && (
-                <>
-                  <div className="my-3" style={{ borderTop: "1px solid #E2E8F0" }} />
-                  <p style={{ fontSize: 12, color: "#94A3B8", fontWeight: 300 }}>{doneTasks.length} concluída{doneTasks.length > 1 ? "s" : ""} hoje</p>
-                  {doneTasks.map((t) => renderTask(t, true))}
-                </>
-              )}
-              <button onClick={() => setShowTaskModal(true)} className="inline-flex items-center gap-1.5 rounded-lg transition-colors mt-2" style={{ color: "#00B4D8", fontSize: 13, fontWeight: 400, padding: "8px 16px" }}>
-                <Plus size={16} /> Adicionar tarefa
-              </button>
-            </div>
-          )}
+          ) : (() => {
+            const pendingTasks = todayTasks.filter((t) => !t.concluida);
+            const doneTasks = todayTasks.filter((t) => t.concluida);
+            const renderTask = (task: Task, dimmed = false) => (
+              <div key={task.id} className="flex items-center gap-3 p-4" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 12, opacity: dimmed ? 0.5 : 1 }}>
+                <button
+                  onClick={() => toggleTask(task.id, task.concluida)}
+                  className="w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors"
+                  style={{ borderColor: task.concluida ? "#00B4D8" : "#CBD5E1", background: task.concluida ? "#00B4D8" : "transparent" }}
+                >
+                  {task.concluida && (
+                    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                  )}
+                </button>
+                <div className="flex-1 min-w-0">
+                  <p style={{ color: task.concluida ? "#94A3B8" : "#0F172A", textDecoration: task.concluida ? "line-through" : "none", fontSize: 14, fontWeight: 400 }}>{task.titulo}</p>
+                  {task.descricao && <p className="truncate mt-0.5" style={{ color: "#94A3B8", fontSize: 12, fontWeight: 300 }}>{task.descricao}</p>}
+                </div>
+                <span className="px-2 py-0.5 rounded-full" style={{
+                  fontSize: 10, fontWeight: 400,
+                  background: task.prioridade === "alta" ? "rgba(239,68,68,0.1)" : task.prioridade === "baixa" ? "rgba(34,197,94,0.1)" : "rgba(245,158,11,0.1)",
+                  color: task.prioridade === "alta" ? "#EF4444" : task.prioridade === "baixa" ? "#22C55E" : "#F59E0B",
+                }}>
+                  {task.prioridade}
+                </span>
+              </div>
+            );
+            return (
+              <div className="space-y-2">
+                {pendingTasks.map((t) => renderTask(t, false))}
+                {doneTasks.length > 0 && (
+                  <>
+                    <div className="my-3" style={{ borderTop: "1px solid #E2E8F0" }} />
+                    <p style={{ fontSize: 12, color: "#94A3B8", fontWeight: 300 }}>{doneTasks.length} concluída{doneTasks.length > 1 ? "s" : ""} hoje</p>
+                    {doneTasks.map((t) => renderTask(t, true))}
+                  </>
+                )}
+                <button onClick={() => setShowTaskModal(true)} className="inline-flex items-center gap-1.5 rounded-lg transition-colors mt-2" style={{ color: "#00B4D8", fontSize: 13, fontWeight: 400, padding: "8px 16px" }}>
+                  <Plus size={16} /> Adicionar tarefa
+                </button>
+              </div>
+            );
+          })()}
         </section>
 
         {/* Habitos de hoje */}
