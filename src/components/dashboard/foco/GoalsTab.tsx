@@ -5,6 +5,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import GoalModal, { type Goal } from "./GoalModal";
 
+interface GoalsTabProps {
+  isActive?: boolean;
+  onReadyChange?: (ready: boolean) => void;
+}
+
 interface SubTask {
   id: string;
   titulo: string;
@@ -233,7 +238,7 @@ const GoalCard = ({
 };
 
 /* ─── Main Component ─── */
-const GoalsTabInner = () => {
+const GoalsTabInner = ({ isActive = true, onReadyChange }: GoalsTabProps) => {
   const { user } = useAuth();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [subTasks, setSubTasks] = useState<Record<string, SubTask[]>>({});
@@ -266,6 +271,10 @@ const GoalsTabInner = () => {
   }, [user]);
 
   useEffect(() => { fetchGoals(); }, [fetchGoals]);
+
+  useEffect(() => {
+    if (isActive) onReadyChange?.(!loading);
+  }, [isActive, loading, onReadyChange]);
 
   useEffect(() => {
     if (!user) return;
@@ -452,5 +461,9 @@ const InlineAddTask = ({ goalId, onAdded }: { goalId: string; onAdded: (t: SubTa
   );
 };
 
-const GoalsTab = () => (<GoalsErrorBoundary><GoalsTabInner /></GoalsErrorBoundary>);
+const GoalsTab = ({ isActive = true, onReadyChange }: GoalsTabProps) => (
+  <GoalsErrorBoundary>
+    <GoalsTabInner isActive={isActive} onReadyChange={onReadyChange} />
+  </GoalsErrorBoundary>
+);
 export default GoalsTab;

@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import { toast } from "sonner";
 import AddTaskModal from "./AddTaskModal";
+import SectionTransitionSkeleton from "./SectionTransitionSkeleton";
 
 interface Profile {
   display_name: string | null;
@@ -70,16 +71,36 @@ const DashboardContent = () => {
   const [maxStreak, setMaxStreak] = useState(0);
   const [activeGoal, setActiveGoal] = useState<GoalWithProgress | null>(null);
   const [showTaskModal, setShowTaskModal] = useState(false);
+  const [loading, setLoading] = useState(true);
   const revealRef = useScrollReveal();
 
   const today = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
-    if (!user) return;
-    supabase.from("profiles").select("display_name, first_goal, modules").eq("user_id", user.id).single().then(({ data }) => { if (data) setProfile(data); });
-    fetchTasks();
-    fetchHabits();
-    fetchActiveGoal();
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+
+    let cancelled = false;
+
+    const load = async () => {
+      setLoading(true);
+      await Promise.all([
+        supabase.from("profiles").select("display_name, first_goal, modules").eq("user_id", user.id).single().then(({ data }) => { if (data) setProfile(data); }),
+        fetchTasks(),
+        fetchHabits(),
+        fetchActiveGoal(),
+      ]);
+
+      if (!cancelled) setLoading(false);
+    };
+
+    load();
+
+    return () => {
+      cancelled = true;
+    };
   }, [user]);
 
   useEffect(() => {
@@ -191,6 +212,14 @@ const DashboardContent = () => {
   const hasNoContent = todayTasks.length === 0 && habits.length === 0;
 
   const CheckIcon = () => <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+
+  if (loading) {
+    return (
+      <div className="flex-1 min-h-screen md:ml-[240px]" style={{ background: "var(--dash-bg)" }}>
+        <SectionTransitionSkeleton showTabs={false} />
+      </div>
+    );
+  }
 
   return (
     <div ref={revealRef} className="flex-1 min-h-screen md:ml-[240px]" style={{ background: "var(--dash-bg)" }}>
