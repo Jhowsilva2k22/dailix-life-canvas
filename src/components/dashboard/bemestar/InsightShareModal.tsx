@@ -63,40 +63,30 @@ const InsightShareModal = ({ insight, onClose }: InsightShareModalProps) => {
     toast.success("Imagem salva");
   }, [generate, format]);
 
+  const shareNative = useCallback(async (file: File) => {
+    if (navigator.canShare?.({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file], title: "Insight Dailix" });
+        return true;
+      } catch (e: any) {
+        if (e.name === "AbortError") return true; // user cancelled, not an error
+      }
+    }
+    return false;
+  }, []);
+
   const shareToDestination = useCallback(async (destination: string) => {
     const blob = await generate();
     if (!blob) return;
     const file = new File([blob], `dailix-insight-${format}.png`, { type: "image/png" });
 
-    if (destination === "native" && navigator.canShare?.({ files: [file] })) {
-      try {
-        await navigator.share({ files: [file] });
-        return;
-      } catch (e: any) {
-        if (e.name === "AbortError") return;
-      }
-    }
+    // All destinations attempt native share (OS handles routing to the correct app)
+    const shared = await shareNative(file);
+    if (shared) return;
 
-    // For WhatsApp/Instagram/TikTok on mobile, try native share which lets OS route to the app
-    // On desktop or when native share unavailable, fallback to download
-    if (navigator.canShare?.({ files: [file] })) {
-      try {
-        await navigator.share({ files: [file] });
-        return;
-      } catch (e: any) {
-        if (e.name === "AbortError") return;
-      }
-    }
-
-    // Final fallback — download
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `dailix-insight-${format}.png`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success("Imagem salva — envie manualmente para o app desejado");
-  }, [generate, format]);
+    // Desktop fallback: copy to clipboard or inform user
+    toast.info("Use o botão 'Salvar imagem' e envie manualmente");
+  }, [generate, format, shareNative]);
 
   if (!insight) return null;
 
