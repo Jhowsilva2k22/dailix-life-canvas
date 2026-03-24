@@ -68,13 +68,13 @@ const Login = () => {
           <div className="flex flex-col gap-1.5">
             <div className="flex items-center justify-between">
               <Label htmlFor="password" style={{ color: "#0F172A" }}>Senha</Label>
-              <button
-                type="button"
-                className="text-xs transition-colors"
+              <Link
+                to="/recuperar-senha"
+                className="text-xs"
                 style={{ color: "#00B4D8" }}
               >
                 Esqueci minha senha
-              </button>
+              </Link>
             </div>
             <div className="relative">
               <Input
