@@ -15,6 +15,12 @@ interface GoalOption {
   titulo: string;
 }
 
+const priorityStyles: Record<string, { color: string; bg: string }> = {
+  alta: { color: "var(--dash-danger-text)", bg: "var(--dash-danger-bg)" },
+  media: { color: "var(--dash-warning-text)", bg: "var(--dash-warning-bg)" },
+  baixa: { color: "var(--dash-success-text)", bg: "var(--dash-success-bg)" },
+};
+
 const AddTaskModal = ({ onClose, onSaved, defaultGoalId }: AddTaskModalProps) => {
   const { user } = useAuth();
   const [titulo, setTitulo] = useState("");
@@ -41,16 +47,16 @@ const AddTaskModal = ({ onClose, onSaved, defaultGoalId }: AddTaskModalProps) =>
   };
 
   const priorities = [
-    { value: "alta", label: "Alta", color: "#F87171" },
-    { value: "media", label: "Media", color: "#FBBF24" },
-    { value: "baixa", label: "Baixa", color: "#34D399" },
+    { value: "alta", label: "Alta" },
+    { value: "media", label: "Media" },
+    { value: "baixa", label: "Baixa" },
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.6)" }} onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "var(--dash-overlay)" }} onClick={onClose}>
       <div
         className="w-full max-w-md rounded-2xl p-6"
-        style={{ background: "var(--dash-surface-elevated)", border: "1px solid var(--dash-border-strong)", boxShadow: "0 16px 48px rgba(0,0,0,0.4)" }}
+        style={{ background: "var(--dash-surface-elevated)", border: "1px solid var(--dash-border-strong)", boxShadow: "var(--dash-shadow-modal)" }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-6">
@@ -74,16 +80,19 @@ const AddTaskModal = ({ onClose, onSaved, defaultGoalId }: AddTaskModalProps) =>
           <div>
             <label className="block text-sm mb-1.5" style={{ color: "var(--dash-text-secondary)", fontWeight: 400 }}>Prioridade</label>
             <div className="flex gap-2">
-              {priorities.map((p) => (
-                <button key={p.value} onClick={() => setPrioridade(p.value)} className="flex-1 px-3 py-2 text-sm rounded-lg transition-colors" style={{
-                  border: `1px solid ${prioridade === p.value ? p.color : "var(--dash-border-strong)"}`,
-                  background: prioridade === p.value ? `${p.color}18` : "transparent",
-                  color: prioridade === p.value ? p.color : "var(--dash-text-muted)",
-                  fontWeight: 400,
-                }}>
-                  {p.label}
-                </button>
-              ))}
+              {priorities.map((p) => {
+                const ps = priorityStyles[p.value];
+                return (
+                  <button key={p.value} onClick={() => setPrioridade(p.value)} className="flex-1 px-3 py-2 text-sm rounded-lg transition-colors" style={{
+                    border: `1px solid ${prioridade === p.value ? ps.color : "var(--dash-border-strong)"}`,
+                    background: prioridade === p.value ? ps.bg : "transparent",
+                    color: prioridade === p.value ? ps.color : "var(--dash-text-muted)",
+                    fontWeight: 400,
+                  }}>
+                    {p.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
           {goals.length > 0 && (
@@ -97,7 +106,7 @@ const AddTaskModal = ({ onClose, onSaved, defaultGoalId }: AddTaskModalProps) =>
           )}
         </div>
 
-        <button onClick={handleSave} disabled={!titulo.trim() || saving} className="w-full mt-6 py-3 text-sm rounded-lg transition-opacity disabled:opacity-50" style={{ background: "linear-gradient(135deg, #1E3A5F, #00B4D8)", color: "white", fontWeight: 400, letterSpacing: "0.02em" }}>
+        <button onClick={handleSave} disabled={!titulo.trim() || saving} className="w-full mt-6 py-3 text-sm rounded-lg transition-opacity disabled:opacity-50" style={{ background: "var(--dash-gradient-primary)", color: "var(--dash-text)", fontWeight: 400, letterSpacing: "0.02em" }}>
           {saving ? "Salvando..." : "Salvar tarefa"}
         </button>
       </div>

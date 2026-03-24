@@ -56,7 +56,7 @@ const SettingsPage = () => {
             <button
               onClick={() => setConfirmLogout(true)}
               className="flex items-center gap-2 text-sm px-4 py-2.5 rounded-lg transition-colors"
-              style={{ color: "var(--dash-danger)", border: "1px solid rgba(239,68,68,0.2)" }}
+              style={{ color: "var(--dash-danger-text)", border: "1px solid var(--dash-danger-bg)" }}
             >
               <LogOut size={15} /> Sair da conta
             </button>
@@ -64,7 +64,7 @@ const SettingsPage = () => {
             <div className="flex flex-col gap-3">
               <p className="text-sm" style={{ color: "var(--dash-text)" }}>Tem certeza que deseja sair?</p>
               <div className="flex items-center gap-3">
-                <button onClick={signOut} className="text-sm px-4 py-2.5 rounded-lg" style={{ background: "var(--dash-danger)", color: "white" }}>Sim, sair</button>
+                <button onClick={signOut} className="text-sm px-4 py-2.5 rounded-lg" style={{ background: "var(--dash-danger)", color: "var(--dash-text)" }}>Sim, sair</button>
                 <button onClick={() => setConfirmLogout(false)} className="text-sm px-4 py-2.5 rounded-lg" style={{ color: "var(--dash-text-muted)" }}>Cancelar</button>
               </div>
             </div>

@@ -51,10 +51,10 @@ const GoalModal = ({ goal, onClose, onSaved }: GoalModalProps) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.6)" }} onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "var(--dash-overlay)" }} onClick={onClose}>
       <div
         className="w-full max-w-md rounded-2xl p-6"
-        style={{ background: "var(--dash-surface-elevated)", border: "1px solid var(--dash-border-strong)", boxShadow: "0 16px 48px rgba(0,0,0,0.4)" }}
+        style={{ background: "var(--dash-surface-elevated)", border: "1px solid var(--dash-border-strong)", boxShadow: "var(--dash-shadow-modal)" }}
         onClick={(e) => e.stopPropagation()}
       >
         <h3 className="font-display text-lg mb-6" style={{ color: "var(--dash-text)", fontWeight: 400 }}>
@@ -101,7 +101,7 @@ const GoalModal = ({ goal, onClose, onSaved }: GoalModalProps) => {
             onClick={save}
             disabled={!titulo.trim() || saving}
             className="flex-1 py-2.5 text-sm rounded-lg transition-opacity disabled:opacity-50"
-            style={{ background: "linear-gradient(135deg, #1E3A5F, #00B4D8)", color: "white", fontWeight: 400, letterSpacing: "0.02em" }}
+            style={{ background: "var(--dash-gradient-primary)", color: "var(--dash-text)", fontWeight: 400, letterSpacing: "0.02em" }}
           >
             {saving ? "Salvando..." : "Salvar"}
           </button>

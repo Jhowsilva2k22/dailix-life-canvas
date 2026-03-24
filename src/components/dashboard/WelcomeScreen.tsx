@@ -25,13 +25,13 @@ const WelcomeScreen = ({ displayName, firstGoal }: WelcomeScreenProps) => {
       {show && (
         <motion.div
           className="fixed inset-0 z-[9999] flex flex-col items-center justify-center"
-          style={{ background: "#0F172A" }}
+          style={{ background: "var(--dash-sidebar)" }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.8 }}
         >
-          {/* Logo */}
           <motion.span
-            className="font-display text-lg font-bold text-white mb-12"
+            className="font-display text-lg font-bold mb-12"
+            style={{ color: "var(--dash-text)", opacity: 0.6 }}
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.6 }}
             transition={{ delay: 0, duration: 0.5 }}
@@ -39,9 +39,9 @@ const WelcomeScreen = ({ displayName, firstGoal }: WelcomeScreenProps) => {
             Dailix
           </motion.span>
 
-          {/* Name */}
           <motion.h1
-            className="font-display text-4xl md:text-[56px] font-bold text-white text-center"
+            className="font-display text-4xl md:text-[56px] font-bold text-center"
+            style={{ color: "var(--dash-text)" }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.8 }}
@@ -49,10 +49,9 @@ const WelcomeScreen = ({ displayName, firstGoal }: WelcomeScreenProps) => {
             {displayName}.
           </motion.h1>
 
-          {/* Tagline */}
           <motion.p
             className="mt-4 text-center"
-            style={{ fontSize: 20, fontWeight: 400, color: "#00B4D8" }}
+            style={{ fontSize: 20, fontWeight: 400, color: "var(--dash-accent)" }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.2, duration: 0.6 }}
@@ -60,11 +59,10 @@ const WelcomeScreen = ({ displayName, firstGoal }: WelcomeScreenProps) => {
             Sua vida organizada começa agora.
           </motion.p>
 
-          {/* Goal */}
           {firstGoal && (
             <motion.p
               className="mt-6 text-center italic"
-              style={{ fontSize: 16, fontWeight: 300, color: "rgba(255,255,255,0.45)" }}
+              style={{ fontSize: 16, fontWeight: 300, color: "var(--dash-text-muted)" }}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 2, duration: 0.6 }}
@@ -73,7 +71,6 @@ const WelcomeScreen = ({ displayName, firstGoal }: WelcomeScreenProps) => {
             </motion.p>
           )}
 
-          {/* Icon */}
           <motion.img
             src="/dailix-icon.png"
             alt="Dailix"

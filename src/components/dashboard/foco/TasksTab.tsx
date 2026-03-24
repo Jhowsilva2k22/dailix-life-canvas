@@ -22,6 +22,12 @@ const filters = [
 
 const priorityOrder: Record<string, number> = { alta: 0, media: 1, baixa: 2 };
 
+const priorityStyles: Record<string, { color: string; bg: string }> = {
+  alta: { color: "var(--dash-danger-text)", bg: "var(--dash-danger-bg)" },
+  media: { color: "var(--dash-warning-text)", bg: "var(--dash-warning-bg)" },
+  baixa: { color: "var(--dash-success-text)", bg: "var(--dash-success-bg)" },
+};
+
 const sortTasks = (list: Task[], mode: string) => {
   return [...list].sort((a, b) => {
     if (mode === "todas") { if (a.concluida !== b.concluida) return a.concluida ? 1 : -1; }
@@ -85,7 +91,7 @@ const TasksTab = () => {
   const pending = tasks.filter((t) => !t.concluida).length;
   const done = tasks.filter((t) => t.concluida).length;
 
-  const CheckIcon = () => <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+  const CheckIcon = () => <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>;
 
   return (
     <div>
@@ -101,7 +107,7 @@ const TasksTab = () => {
                 fontSize: 13, fontWeight: 400,
                 background: filter === f.key ? "var(--dash-accent-subtle)" : "transparent",
                 color: filter === f.key ? "var(--dash-accent)" : "var(--dash-text-muted)",
-                border: filter === f.key ? "1px solid rgba(0,180,216,0.2)" : "1px solid transparent",
+                border: filter === f.key ? "1px solid var(--dash-accent-subtle)" : "1px solid transparent",
               }}
             >
               {f.label}
@@ -124,30 +130,29 @@ const TasksTab = () => {
       ) : (
         <div>
           <div className="rounded-2xl overflow-hidden" style={{ background: "var(--dash-surface)", border: "1px solid var(--dash-border)" }}>
-            {tasks.map((task, i) => (
-              <div key={task.id} className="flex items-center gap-3 px-5 py-4 group" style={{ borderBottom: i < tasks.length - 1 ? "1px solid var(--dash-border)" : "none", opacity: task.concluida ? 0.4 : 1 }}>
-                <button
-                  onClick={() => toggleTask(task.id, task.concluida)}
-                  className="w-[18px] h-[18px] rounded flex items-center justify-center flex-shrink-0 transition-colors"
-                  style={{ border: task.concluida ? "none" : "1.5px solid var(--dash-border-strong)", background: task.concluida ? "var(--dash-accent)" : "transparent" }}
-                >
-                  {task.concluida && <CheckIcon />}
-                </button>
-                <div className="flex-1 min-w-0">
-                  <p style={{ color: task.concluida ? "var(--dash-text-muted)" : "var(--dash-text)", textDecoration: task.concluida ? "line-through" : "none", fontSize: 14, fontWeight: 400 }}>{task.titulo}</p>
-                  {task.descricao && <p className="truncate mt-0.5" style={{ color: "var(--dash-text-muted)", fontSize: 12, fontWeight: 300 }}>{task.descricao}</p>}
+            {tasks.map((task, i) => {
+              const ps = priorityStyles[task.prioridade] || priorityStyles.media;
+              return (
+                <div key={task.id} className="flex items-center gap-3 px-5 py-4 group" style={{ borderBottom: i < tasks.length - 1 ? "1px solid var(--dash-border)" : "none", opacity: task.concluida ? 0.4 : 1 }}>
+                  <button
+                    onClick={() => toggleTask(task.id, task.concluida)}
+                    className="w-[18px] h-[18px] rounded flex items-center justify-center flex-shrink-0 transition-colors"
+                    style={{ border: task.concluida ? "none" : "1.5px solid var(--dash-border-strong)", background: task.concluida ? "var(--dash-accent)" : "transparent", color: "var(--dash-text)" }}
+                  >
+                    {task.concluida && <CheckIcon />}
+                  </button>
+                  <div className="flex-1 min-w-0">
+                    <p style={{ color: task.concluida ? "var(--dash-text-muted)" : "var(--dash-text)", textDecoration: task.concluida ? "line-through" : "none", fontSize: 14, fontWeight: 400 }}>{task.titulo}</p>
+                    {task.descricao && <p className="truncate mt-0.5" style={{ color: "var(--dash-text-muted)", fontSize: 12, fontWeight: 300 }}>{task.descricao}</p>}
+                  </div>
+                  {task.prazo && <span style={{ fontSize: 12, color: "var(--dash-text-muted)", fontWeight: 300 }}>{new Date(task.prazo + "T12:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}</span>}
+                  <span className="px-2 py-0.5 rounded" style={{ fontSize: 10, fontWeight: 400, background: ps.bg, color: ps.color }}>{task.prioridade}</span>
+                  <button onClick={() => deleteTask(task.id)} className="opacity-0 group-hover:opacity-100 transition-opacity p-1" style={{ color: "var(--dash-text-muted)" }}>
+                    <Trash2 size={14} />
+                  </button>
                 </div>
-                {task.prazo && <span style={{ fontSize: 12, color: "var(--dash-text-muted)", fontWeight: 300 }}>{new Date(task.prazo + "T12:00:00").toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })}</span>}
-                <span className="px-2 py-0.5 rounded" style={{
-                  fontSize: 10, fontWeight: 400,
-                  background: task.prioridade === "alta" ? "rgba(239,68,68,0.12)" : task.prioridade === "baixa" ? "rgba(16,185,129,0.12)" : "rgba(245,158,11,0.12)",
-                  color: task.prioridade === "alta" ? "#F87171" : task.prioridade === "baixa" ? "#34D399" : "#FBBF24",
-                }}>{task.prioridade}</span>
-                <button onClick={() => deleteTask(task.id)} className="opacity-0 group-hover:opacity-100 transition-opacity p-1" style={{ color: "var(--dash-text-muted)" }}>
-                  <Trash2 size={14} />
-                </button>
-              </div>
-            ))}
+              );
+            })}
           </div>
           <button onClick={() => setShowModal(true)} className="inline-flex items-center gap-1.5 mt-3 transition-colors" style={{ color: "var(--dash-accent)", fontSize: 13, fontWeight: 400, padding: "8px 16px", opacity: 0.8 }}>
             <Plus size={16} /> Nova tarefa

@@ -44,11 +44,17 @@ const getGreeting = (name: string) => {
 };
 
 const categoryColors: Record<string, { bg: string; color: string; label: string }> = {
-  saude: { bg: "rgba(16,185,129,0.12)", color: "#34D399", label: "Saude" },
-  mental: { bg: "rgba(139,92,246,0.12)", color: "#A78BFA", label: "Mental" },
-  sono: { bg: "rgba(30,58,95,0.15)", color: "#60A5FA", label: "Sono" },
-  alimentacao: { bg: "rgba(245,158,11,0.12)", color: "#FBBF24", label: "Alimentacao" },
-  aprendizado: { bg: "rgba(0,180,216,0.12)", color: "#22D3EE", label: "Aprendizado" },
+  saude: { bg: "var(--dash-success-bg)", color: "var(--dash-success-text)", label: "Saude" },
+  mental: { bg: "var(--dash-purple-bg)", color: "var(--dash-purple-text)", label: "Mental" },
+  sono: { bg: "var(--dash-blue-bg)", color: "var(--dash-blue-text)", label: "Sono" },
+  alimentacao: { bg: "var(--dash-warning-bg)", color: "var(--dash-warning-text)", label: "Alimentacao" },
+  aprendizado: { bg: "var(--dash-accent-subtle)", color: "var(--dash-accent-muted)", label: "Aprendizado" },
+};
+
+const priorityStyles: Record<string, { color: string; bg: string }> = {
+  alta: { color: "var(--dash-danger-text)", bg: "var(--dash-danger-bg)" },
+  media: { color: "var(--dash-warning-text)", bg: "var(--dash-warning-bg)" },
+  baixa: { color: "var(--dash-success-text)", bg: "var(--dash-success-bg)" },
 };
 
 const DashboardContent = () => {
@@ -163,7 +169,7 @@ const DashboardContent = () => {
 
   const hasNoContent = todayTasks.length === 0 && habits.length === 0;
 
-  const CheckIcon = () => <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+  const CheckIcon = () => <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>;
 
   return (
     <div ref={revealRef} className="flex-1 min-h-screen md:ml-[240px]" style={{ background: "var(--dash-bg)" }}>
@@ -181,26 +187,23 @@ const DashboardContent = () => {
 
         {/* Metrics strip */}
         <div className="grid grid-cols-1 md:grid-cols-3 mb-12 rounded-2xl overflow-hidden" data-reveal style={{ border: "1px solid var(--dash-border)", background: "var(--dash-surface)" }}>
-          {/* Tarefas */}
           <div className="p-6" style={{ borderBottom: "1px solid var(--dash-border)", borderRight: "none" }}>
             <p style={{ color: "var(--dash-text-muted)", fontSize: 11, fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase" as const }}>Tarefas pendentes</p>
             <p className="mt-1" style={{ color: "var(--dash-text)", fontSize: 28, fontWeight: 300 }}>{pendingToday}</p>
             <p style={{ color: "var(--dash-text-secondary)", fontSize: 12, fontWeight: 300 }}>para hoje</p>
           </div>
-          {/* Sequência */}
           <div className="p-6" style={{ borderBottom: "1px solid var(--dash-border)", borderLeft: "none", borderRight: "none" }}>
             <p style={{ color: "var(--dash-text-muted)", fontSize: 11, fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase" as const }}>Sequência</p>
             <p className="mt-1" style={{ color: "var(--dash-text)", fontSize: 28, fontWeight: 300 }}>{maxStreak}</p>
             <p style={{ color: "var(--dash-text-secondary)", fontSize: 12, fontWeight: 300 }}>dias seguidos</p>
           </div>
-          {/* Meta ativa */}
           <div className="p-6" style={{ borderBottom: "none" }}>
             <p style={{ color: "var(--dash-text-muted)", fontSize: 11, fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase" as const }}>Meta ativa</p>
             <p className="mt-1 truncate" style={{ color: "var(--dash-text)", fontSize: 15, fontWeight: 400 }}>{goalTitle}</p>
             {goalHasLinkedTasks ? (
               <>
                 <div className="mt-2 h-1 rounded-full overflow-hidden" style={{ background: "var(--dash-surface-hover)" }}>
-                  <div className="h-full rounded-full transition-all duration-700" style={{ width: `${goalProgress}%`, background: "linear-gradient(90deg, #1E3A5F, #00B4D8)" }} />
+                  <div className="h-full rounded-full transition-all duration-700" style={{ width: `${goalProgress}%`, background: "var(--dash-gradient-bar)" }} />
                 </div>
                 <p className="mt-1" style={{ color: "var(--dash-text-secondary)", fontSize: 12, fontWeight: 300 }}>{goalProgress}% concluido</p>
               </>
@@ -262,29 +265,28 @@ const DashboardContent = () => {
             </div>
           ) : (
             <div className="rounded-2xl overflow-hidden" style={{ background: "var(--dash-surface)", border: "1px solid var(--dash-border)" }}>
-              {pendingTasks.map((task, i) => (
-                <div key={task.id} className="flex items-center gap-3 px-5 py-4" style={{ borderBottom: i < pendingTasks.length - 1 || doneTasks.length > 0 ? "1px solid var(--dash-border)" : "none" }}>
-                  <button
-                    onClick={() => toggleTask(task.id, task.concluida)}
-                    className="w-[18px] h-[18px] rounded flex items-center justify-center flex-shrink-0 transition-colors"
-                    style={{ border: "1.5px solid var(--dash-border-strong)", background: "transparent" }}
-                  />
-                  <div className="flex-1 min-w-0">
-                    <p style={{ color: "var(--dash-text)", fontSize: 14, fontWeight: 400 }}>{task.titulo}</p>
-                    {task.descricao && <p className="truncate mt-0.5" style={{ color: "var(--dash-text-muted)", fontSize: 12, fontWeight: 300 }}>{task.descricao}</p>}
+              {pendingTasks.map((task, i) => {
+                const ps = priorityStyles[task.prioridade] || priorityStyles.media;
+                return (
+                  <div key={task.id} className="flex items-center gap-3 px-5 py-4" style={{ borderBottom: i < pendingTasks.length - 1 || doneTasks.length > 0 ? "1px solid var(--dash-border)" : "none" }}>
+                    <button
+                      onClick={() => toggleTask(task.id, task.concluida)}
+                      className="w-[18px] h-[18px] rounded flex items-center justify-center flex-shrink-0 transition-colors"
+                      style={{ border: "1.5px solid var(--dash-border-strong)", background: "transparent" }}
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p style={{ color: "var(--dash-text)", fontSize: 14, fontWeight: 400 }}>{task.titulo}</p>
+                      {task.descricao && <p className="truncate mt-0.5" style={{ color: "var(--dash-text-muted)", fontSize: 12, fontWeight: 300 }}>{task.descricao}</p>}
+                    </div>
+                    <span className="px-2 py-0.5 rounded" style={{ fontSize: 10, fontWeight: 400, background: ps.bg, color: ps.color }}>
+                      {task.prioridade}
+                    </span>
                   </div>
-                  <span className="px-2 py-0.5 rounded" style={{
-                    fontSize: 10, fontWeight: 400,
-                    background: task.prioridade === "alta" ? "rgba(239,68,68,0.12)" : task.prioridade === "baixa" ? "rgba(16,185,129,0.12)" : "rgba(245,158,11,0.12)",
-                    color: task.prioridade === "alta" ? "#F87171" : task.prioridade === "baixa" ? "#34D399" : "#FBBF24",
-                  }}>
-                    {task.prioridade}
-                  </span>
-                </div>
-              ))}
+                );
+              })}
               {doneTasks.length > 0 && (
                 <>
-                  <div className="px-5 py-2" style={{ background: "rgba(255,255,255,0.01)" }}>
+                  <div className="px-5 py-2" style={{ background: "var(--dash-muted-surface)" }}>
                     <p style={{ color: "var(--dash-text-muted)", fontSize: 11, fontWeight: 400 }}>{doneTasks.length} concluída{doneTasks.length > 1 ? "s" : ""}</p>
                   </div>
                   {doneTasks.map((task) => (
@@ -292,7 +294,7 @@ const DashboardContent = () => {
                       <button
                         onClick={() => toggleTask(task.id, task.concluida)}
                         className="w-[18px] h-[18px] rounded flex items-center justify-center flex-shrink-0"
-                        style={{ background: "var(--dash-accent)" }}
+                        style={{ background: "var(--dash-accent)", color: "var(--dash-text)" }}
                       >
                         <CheckIcon />
                       </button>
@@ -324,7 +326,7 @@ const DashboardContent = () => {
                     <button
                       onClick={() => toggleHabit(habit.id)}
                       className="w-[18px] h-[18px] rounded flex items-center justify-center flex-shrink-0 transition-colors"
-                      style={{ border: done ? "none" : "1.5px solid var(--dash-border-strong)", background: done ? "var(--dash-accent)" : "transparent" }}
+                      style={{ border: done ? "none" : "1.5px solid var(--dash-border-strong)", background: done ? "var(--dash-accent)" : "transparent", color: "var(--dash-text)" }}
                     >
                       {done && <CheckIcon />}
                     </button>
@@ -333,7 +335,7 @@ const DashboardContent = () => {
                     </div>
                     <span className="px-2 py-0.5 rounded" style={{ fontSize: 10, fontWeight: 400, background: cat.bg, color: cat.color }}>{cat.label}</span>
                     {habit.streak > 0 && (
-                      <span className="flex items-center gap-1" style={{ fontSize: 12, color: "var(--dash-warning)", fontWeight: 400 }}>
+                      <span className="flex items-center gap-1" style={{ fontSize: 12, color: "var(--dash-warning-text)", fontWeight: 400 }}>
                         <Flame size={12} /> {habit.streak}
                       </span>
                     )}

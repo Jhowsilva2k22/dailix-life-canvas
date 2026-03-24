@@ -16,14 +16,14 @@ interface Habit {
 }
 
 const categoryColors: Record<string, { bg: string; color: string; label: string }> = {
-  saude: { bg: "rgba(16,185,129,0.12)", color: "#34D399", label: "Saude" },
-  mental: { bg: "rgba(139,92,246,0.12)", color: "#A78BFA", label: "Mental" },
-  sono: { bg: "rgba(30,58,95,0.15)", color: "#60A5FA", label: "Sono" },
-  alimentacao: { bg: "rgba(245,158,11,0.12)", color: "#FBBF24", label: "Alimentacao" },
-  aprendizado: { bg: "rgba(0,180,216,0.12)", color: "#22D3EE", label: "Aprendizado" },
+  saude: { bg: "var(--dash-success-bg)", color: "var(--dash-success-text)", label: "Saude" },
+  mental: { bg: "var(--dash-purple-bg)", color: "var(--dash-purple-text)", label: "Mental" },
+  sono: { bg: "var(--dash-blue-bg)", color: "var(--dash-blue-text)", label: "Sono" },
+  alimentacao: { bg: "var(--dash-warning-bg)", color: "var(--dash-warning-text)", label: "Alimentacao" },
+  aprendizado: { bg: "var(--dash-accent-subtle)", color: "var(--dash-accent-muted)", label: "Aprendizado" },
 };
 
-const CheckIcon = () => <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+const CheckIcon = () => <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>;
 
 const HabitsTab = () => {
   const { user } = useAuth();
@@ -133,7 +133,7 @@ const HabitsTab = () => {
                   <button
                     onClick={() => toggleHabit(habit.id)}
                     className="w-[18px] h-[18px] rounded flex items-center justify-center flex-shrink-0 transition-colors"
-                    style={{ border: done ? "none" : "1.5px solid var(--dash-border-strong)", background: done ? "var(--dash-accent)" : "transparent" }}
+                    style={{ border: done ? "none" : "1.5px solid var(--dash-border-strong)", background: done ? "var(--dash-accent)" : "transparent", color: "var(--dash-text)" }}
                   >
                     {done && <CheckIcon />}
                   </button>
@@ -143,7 +143,7 @@ const HabitsTab = () => {
                   </div>
                   <span className="px-2 py-0.5 rounded" style={{ fontSize: 10, fontWeight: 400, background: cat.bg, color: cat.color }}>{cat.label}</span>
                   {habit.streak > 0 && (
-                    <span className="flex items-center gap-1" style={{ fontSize: 12, color: "var(--dash-warning)", fontWeight: 400 }}>
+                    <span className="flex items-center gap-1" style={{ fontSize: 12, color: "var(--dash-warning-text)", fontWeight: 400 }}>
                       <Flame size={12} /> {habit.streak}
                     </span>
                   )}
