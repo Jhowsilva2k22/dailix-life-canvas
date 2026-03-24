@@ -14,6 +14,7 @@ const navItems = [
 interface DashboardSidebarProps {
   activeItem: string;
   onNavigate: (path: string) => void;
+  onOpenSearch?: () => void;
 }
 
 const DashboardSidebar = ({ activeItem, onNavigate }: DashboardSidebarProps) => {
