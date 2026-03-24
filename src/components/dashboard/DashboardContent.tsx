@@ -308,9 +308,11 @@ const DashboardContent = () => {
               {doneTasks.length > 0 && (
                 <>
                   <div className="px-5 py-2" style={{ background: "var(--dash-muted-surface)" }}>
-                    <p style={{ color: "var(--dash-text-muted)", fontSize: 11, fontWeight: 400 }}>{doneTasks.length} concluída{doneTasks.length > 1 ? "s" : ""}</p>
+                    <p style={{ color: "var(--dash-text-muted)", fontSize: 11, fontWeight: 400 }}>
+                      {doneTasks.length} concluída{doneTasks.length > 1 ? "s" : ""} hoje
+                    </p>
                   </div>
-                  {doneTasks.map((task) => (
+                  {doneTasks.slice(0, 3).map((task) => (
                     <div key={task.id} className="flex items-center gap-3 px-5 py-3" style={{ opacity: 0.4 }}>
                       <button
                         onClick={() => toggleTask(task.id, task.concluida)}
@@ -322,6 +324,13 @@ const DashboardContent = () => {
                       <p style={{ color: "var(--dash-text-secondary)", fontSize: 13, fontWeight: 400, textDecoration: "line-through" }}>{task.titulo}</p>
                     </div>
                   ))}
+                  {doneTasks.length > 3 && (
+                    <div className="px-5 py-2.5" style={{ background: "var(--dash-muted-surface)" }}>
+                      <p style={{ color: "var(--dash-text-muted)", fontSize: 11, fontWeight: 400 }}>
+                        +{doneTasks.length - 3} concluída{doneTasks.length - 3 > 1 ? "s" : ""}
+                      </p>
+                    </div>
+                  )}
                 </>
               )}
             </div>
