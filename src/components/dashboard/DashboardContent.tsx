@@ -126,7 +126,7 @@ const DashboardContent = () => {
 
   const fetchTasks = async () => {
     if (!user) return;
-    const { data } = await supabase.from("tasks").select("*").eq("user_id", user.id).order("created_at", { ascending: false });
+    const { data } = await supabase.from("tasks").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(100);
     if (data) setTasks(data as Task[]);
   };
 
@@ -308,9 +308,11 @@ const DashboardContent = () => {
               {doneTasks.length > 0 && (
                 <>
                   <div className="px-5 py-2" style={{ background: "var(--dash-muted-surface)" }}>
-                    <p style={{ color: "var(--dash-text-muted)", fontSize: 11, fontWeight: 400 }}>{doneTasks.length} concluída{doneTasks.length > 1 ? "s" : ""}</p>
+                    <p style={{ color: "var(--dash-text-muted)", fontSize: 11, fontWeight: 400 }}>
+                      {doneTasks.length} concluída{doneTasks.length > 1 ? "s" : ""} hoje
+                    </p>
                   </div>
-                  {doneTasks.map((task) => (
+                  {doneTasks.slice(0, 3).map((task) => (
                     <div key={task.id} className="flex items-center gap-3 px-5 py-3" style={{ opacity: 0.4 }}>
                       <button
                         onClick={() => toggleTask(task.id, task.concluida)}
@@ -322,6 +324,13 @@ const DashboardContent = () => {
                       <p style={{ color: "var(--dash-text-secondary)", fontSize: 13, fontWeight: 400, textDecoration: "line-through" }}>{task.titulo}</p>
                     </div>
                   ))}
+                  {doneTasks.length > 3 && (
+                    <div className="px-5 py-2.5" style={{ background: "var(--dash-muted-surface)" }}>
+                      <p style={{ color: "var(--dash-text-muted)", fontSize: 11, fontWeight: 400 }}>
+                        +{doneTasks.length - 3} concluída{doneTasks.length - 3 > 1 ? "s" : ""}
+                      </p>
+                    </div>
+                  )}
                 </>
               )}
             </div>
@@ -359,26 +368,29 @@ const DashboardContent = () => {
 
         <section className="mb-12" data-reveal>
           <div className="flex items-center justify-between mb-4">
-            <span style={{ color: "var(--dash-text-muted)", fontSize: 11, fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase" as const }}>Habitos</span>
+            <span style={{ color: "var(--dash-text-muted)", fontSize: 11, fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase" as const }}>Hábitos do dia</span>
+            {habits.length > 0 && (
+              <span style={{ color: "var(--dash-text-muted)", fontSize: 11, fontWeight: 300 }}>
+                {habits.filter(h => completedHabitsToday.has(h.id)).length}/{habits.length}
+              </span>
+            )}
           </div>
           {habits.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 rounded-2xl" style={{ background: "var(--dash-surface)", border: "1px solid var(--dash-border)" }}>
-              <p style={{ color: "var(--dash-text-muted)", fontSize: 14, fontWeight: 300 }}>Nenhum habito configurado.</p>
+              <p style={{ color: "var(--dash-text-muted)", fontSize: 14, fontWeight: 300 }}>Nenhum hábito configurado.</p>
             </div>
           ) : (
             <div className="rounded-2xl overflow-hidden" style={{ background: "var(--dash-surface)", border: "1px solid var(--dash-border)" }}>
-              {habits.map((habit, i) => {
+              {/* Pending habits first */}
+              {habits.filter(h => !completedHabitsToday.has(h.id)).map((habit, i, arr) => {
                 const cat = categoryColors[habit.categoria] || categoryColors.saude;
-                const done = completedHabitsToday.has(habit.id);
                 return (
-                  <div key={habit.id} className="flex items-center gap-3 px-5 py-4" style={{ borderBottom: i < habits.length - 1 ? "1px solid var(--dash-border)" : "none" }}>
+                  <div key={habit.id} className="flex items-center gap-3 px-5 py-4" style={{ borderBottom: "1px solid var(--dash-border)" }}>
                     <button
                       onClick={() => toggleHabit(habit.id)}
                       className="w-[18px] h-[18px] rounded flex items-center justify-center flex-shrink-0 transition-colors"
-                      style={{ border: done ? "none" : "1.5px solid var(--dash-border-strong)", background: done ? "var(--dash-accent)" : "transparent", color: "var(--dash-text)" }}
-                    >
-                      {done && <CheckIcon />}
-                    </button>
+                      style={{ border: "1.5px solid var(--dash-border-strong)", background: "transparent" }}
+                    />
                     <div className="flex-1 min-w-0">
                       <p style={{ color: "var(--dash-text)", fontSize: 14, fontWeight: 400 }}>{habit.titulo}</p>
                     </div>
@@ -391,6 +403,23 @@ const DashboardContent = () => {
                   </div>
                 );
               })}
+              {/* Completed habits — collapsed summary */}
+              {(() => {
+                const doneHabits = habits.filter(h => completedHabitsToday.has(h.id));
+                if (doneHabits.length === 0) return null;
+                return (
+                  <div className="px-5 py-3" style={{ background: "var(--dash-muted-surface)" }}>
+                    <div className="flex items-center gap-2">
+                      <div className="w-[18px] h-[18px] rounded flex items-center justify-center flex-shrink-0" style={{ background: "var(--dash-accent)", color: "var(--dash-text)" }}>
+                        <CheckIcon />
+                      </div>
+                      <p style={{ color: "var(--dash-text-muted)", fontSize: 12, fontWeight: 400 }}>
+                        {doneHabits.length} hábito{doneHabits.length > 1 ? "s" : ""} concluído{doneHabits.length > 1 ? "s" : ""} hoje
+                      </p>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           )}
         </section>
