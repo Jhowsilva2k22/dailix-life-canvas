@@ -18,8 +18,11 @@ export function useReminders() {
 
     const check = async () => {
       const now = new Date();
-      const todayStr = now.toISOString().slice(0, 10);
-      const currentTime = now.toTimeString().slice(0, 5); // HH:MM
+      const y = now.getFullYear();
+      const m = String(now.getMonth() + 1).padStart(2, "0");
+      const d = String(now.getDate()).padStart(2, "0");
+      const todayStr = `${y}-${m}-${d}`;
+      const currentTime = `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
 
       // Tasks with reminder today at or before current time
       const { data: tasks } = await supabase
