@@ -78,7 +78,6 @@ const QuestionCard = ({ question, stepNumber, totalSteps, onAnswer }: Props) => 
                     : "rgba(255,255,255,0.06)"
                 }`,
                 color: isSelected ? "#00B4D8" : "rgba(255,255,255,0.7)",
-                fontSize: 14,
                 fontWeight: 300,
                 cursor: selected !== null ? "default" : "pointer",
               }}

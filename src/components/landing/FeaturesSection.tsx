@@ -89,7 +89,7 @@ const FeaturesSection = () => {
               >
                 {p.title}
               </h3>
-              <p style={{ fontSize: 14, color: "rgba(255,255,255,0.4)", lineHeight: 1.7, fontWeight: 300 }}>
+              <p style={{ fontSize: 15, color: "rgba(255,255,255,0.4)", lineHeight: 1.75, fontWeight: 300 }}>
                 {p.desc}
               </p>
             </div>
