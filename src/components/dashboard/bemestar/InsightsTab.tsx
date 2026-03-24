@@ -31,6 +31,18 @@ const InsightsTab = () => {
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
   const [visibleCount, setVisibleCount] = useState(INITIAL_SHOW);
+  const [shareInsight, setShareInsight] = useState<{
+    titulo: string; texto: string; categoria: string; categoriaLabel: string;
+  } | null>(null);
+
+  const openShare = (item: Insight) => {
+    setShareInsight({
+      titulo: item.titulo,
+      texto: item.texto,
+      categoria: item.categoria,
+      categoriaLabel: categoryMeta[item.categoria]?.label || item.categoria,
+    });
+  };
 
   useEffect(() => {
     supabase
