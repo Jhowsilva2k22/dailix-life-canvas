@@ -134,14 +134,19 @@ const PushNotificationToggle = () => {
       setState("active");
       toast.success("Notificações ativadas");
     } else {
-      const errorMsg = vapidResult.status === "fulfilled" ? vapidResult.value.error : "Erro";
-
-      if (errorMsg === "Permissão negada") {
+      // Re-check actual system permission before assuming denied
+      const currentPerm = getPushPermission();
+      if (currentPerm === "denied") {
         setState("denied");
         setShowDenied(true);
+      } else if (currentPerm === "granted") {
+        // Permission is granted but registration failed — not a block
+        setState("inactive-with-permission");
+        const errorMsg = vapidResult.status === "fulfilled" ? vapidResult.value.error : "Erro";
+        toast.error(errorMsg || "Erro ao registrar canal de notificações");
       } else {
         setState("inactive");
-        toast.error(errorMsg || "Erro ao ativar notificações");
+        toast.error("Erro ao ativar notificações");
       }
     }
 
