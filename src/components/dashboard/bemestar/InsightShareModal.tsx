@@ -242,11 +242,11 @@ const InsightShareModal = ({ insight, onClose }: InsightShareModalProps) => {
                 key={a.key}
                 onClick={a.handler}
                 disabled={generating}
-                className="flex flex-col items-center gap-1.5 transition-all"
+                className="flex flex-col items-center gap-1.5"
                 style={{ opacity: generating ? 0.5 : 1, minWidth: 56 }}
               >
                 <div
-                  className="flex items-center justify-center rounded-full transition-all"
+                  className="flex items-center justify-center rounded-full"
                   style={{
                     width: 48,
                     height: 48,
