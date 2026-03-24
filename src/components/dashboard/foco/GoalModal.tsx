@@ -69,7 +69,7 @@ const GoalModal = ({ goal, onClose, onSaved }: GoalModalProps) => {
               onChange={(e) => setTitulo(e.target.value)}
               placeholder="Ex: Ler 12 livros este ano"
               className="w-full px-3 py-2.5 text-sm rounded-lg outline-none transition-colors focus:ring-1"
-              style={{ background: "var(--dash-surface)", border: "1px solid var(--dash-border-strong)", color: "var(--dash-text)", ringColor: "var(--dash-accent)" }}
+              style={{ background: "var(--dash-surface)", border: "1px solid var(--dash-border-strong)", color: "var(--dash-text)" }}
             />
           </div>
           <div>
