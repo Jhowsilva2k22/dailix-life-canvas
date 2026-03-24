@@ -82,7 +82,7 @@ const HeroSection = () => {
             }`}
           >
             <button
-              onClick={() => navigate("/cadastro")}
+              onClick={() => navigate("/diagnostico")}
               className="inline-flex items-center gap-2 px-7 py-3.5 text-sm rounded-lg transition-all duration-200 active:scale-[0.97]"
               style={{
                 background: "#00B4D8",
@@ -99,11 +99,11 @@ const HeroSection = () => {
                 e.currentTarget.style.boxShadow = "none";
               }}
             >
-              Começar agora
+              Fazer diagnóstico
               <ArrowRight className="h-4 w-4" />
             </button>
             <a
-              href="#diagnostico"
+              href="#pilares"
               className="inline-flex items-center px-7 py-3.5 text-sm rounded-lg transition-all duration-200"
               style={{
                 color: "rgba(255,255,255,0.6)",
@@ -119,7 +119,7 @@ const HeroSection = () => {
                 e.currentTarget.style.color = "rgba(255,255,255,0.6)";
               }}
             >
-              Ver acesso prioritário
+              Ver como funciona
             </a>
           </div>
         </div>

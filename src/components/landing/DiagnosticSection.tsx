@@ -52,7 +52,7 @@ const DiagnosticSection = () => {
               Uma entrada simples e direta para entender se hoje o seu maior gargalo é foco, constância, organização ou dispersão.
             </p>
             <button
-              onClick={() => navigate("/cadastro")}
+              onClick={() => navigate("/diagnostico")}
               className="inline-flex items-center gap-2 px-7 py-3.5 text-sm rounded-lg transition-all duration-200 active:scale-[0.97]"
               style={{
                 background: "rgba(0,180,216,0.12)",

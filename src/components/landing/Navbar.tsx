@@ -116,17 +116,28 @@ const Navbar = () => {
           }}
         >
           <div className="container py-4 flex flex-col gap-3">
-            {navLinks.map((l) => (
-              <a
-                key={l.href}
-                href={l.href}
-                className="py-2 text-sm"
-                style={{ color: "rgba(255,255,255,0.6)", fontWeight: 300 }}
-                onClick={() => setOpen(false)}
-              >
-                {l.label}
-              </a>
-            ))}
+            {navLinks.map((l) =>
+              l.isRoute ? (
+                <button
+                  key={l.href}
+                  onClick={() => { setOpen(false); navigate(l.href); }}
+                  className="py-2 text-sm text-left"
+                  style={{ color: "rgba(255,255,255,0.6)", fontWeight: 300, background: "none", border: "none", cursor: "pointer" }}
+                >
+                  {l.label}
+                </button>
+              ) : (
+                <a
+                  key={l.href}
+                  href={l.href}
+                  className="py-2 text-sm"
+                  style={{ color: "rgba(255,255,255,0.6)", fontWeight: 300 }}
+                  onClick={() => setOpen(false)}
+                >
+                  {l.label}
+                </a>
+              )
+            )}
             <div className="flex flex-col gap-2 pt-2" style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}>
               <button
                 onClick={() => { setOpen(false); navigate("/login"); }}

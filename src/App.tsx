@@ -14,6 +14,7 @@ import Dashboard from "./pages/Dashboard";
 import Welcome from "./pages/Welcome";
 import RecuperarSenha from "./pages/RecuperarSenha";
 import ResetPassword from "./pages/ResetPassword";
+import Diagnostico from "./pages/Diagnostico";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
+            <Route path="/diagnostico" element={<Diagnostico />} />
             <Route path="/login" element={<Login />} />
             <Route path="/cadastro" element={<Cadastro />} />
             <Route path="/recuperar-senha" element={<RecuperarSenha />} />
