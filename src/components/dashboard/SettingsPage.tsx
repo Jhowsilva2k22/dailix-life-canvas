@@ -83,6 +83,12 @@ const SettingsPage = () => {
           )}
         </div>
 
+        {/* Push Notifications */}
+        <PushNotificationToggle />
+
+        {/* Spacer */}
+        <div className="h-4" />
+
         {/* Danger zone */}
         <div className="p-6 rounded-2xl" style={{ background: "var(--dash-surface)", border: "1px solid var(--dash-border)" }}>
           {!confirmLogout ? (
