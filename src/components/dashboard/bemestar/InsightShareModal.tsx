@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from "react";
 import { toPng } from "html-to-image";
-import { X, Download, Share2 } from "lucide-react";
+import { X, Download } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 
@@ -63,21 +63,40 @@ const InsightShareModal = ({ insight, onClose }: InsightShareModalProps) => {
     toast.success("Imagem salva");
   }, [generate, format]);
 
-  const handleShare = useCallback(async () => {
+  const shareToDestination = useCallback(async (destination: string) => {
     const blob = await generate();
     if (!blob) return;
     const file = new File([blob], `dailix-insight-${format}.png`, { type: "image/png" });
 
+    if (destination === "native" && navigator.canShare?.({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file] });
+        return;
+      } catch (e: any) {
+        if (e.name === "AbortError") return;
+      }
+    }
+
+    // For WhatsApp/Instagram/TikTok on mobile, try native share which lets OS route to the app
+    // On desktop or when native share unavailable, fallback to download
     if (navigator.canShare?.({ files: [file] })) {
       try {
         await navigator.share({ files: [file] });
+        return;
       } catch (e: any) {
-        if (e.name !== "AbortError") handleDownload();
+        if (e.name === "AbortError") return;
       }
-    } else {
-      handleDownload();
     }
-  }, [generate, format, handleDownload]);
+
+    // Final fallback — download
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `dailix-insight-${format}.png`;
+    a.click();
+    URL.revokeObjectURL(url);
+    toast.success("Imagem salva — envie manualmente para o app desejado");
+  }, [generate, format]);
 
   if (!insight) return null;
 
@@ -171,7 +190,40 @@ const InsightShareModal = ({ insight, onClose }: InsightShareModalProps) => {
             </div>
           </div>
 
-          {/* Actions */}
+          {/* Share destinations */}
+          <div className="px-5 pb-2">
+            <span style={{ fontSize: 11, fontWeight: 500, letterSpacing: "0.08em", textTransform: "uppercase" as const, color: "#64748B" }}>
+              Enviar para
+            </span>
+          </div>
+          <div className="grid grid-cols-4 gap-2 px-5 pb-4">
+            {[
+              { id: "whatsapp", label: "WhatsApp", icon: "💬" },
+              { id: "instagram", label: "Instagram", icon: "📷" },
+              { id: "tiktok", label: "TikTok", icon: "🎵" },
+              { id: "native", label: "Mais", icon: "···" },
+            ].map((dest) => (
+              <button
+                key={dest.id}
+                onClick={() => shareToDestination(dest.id)}
+                disabled={generating}
+                className="flex flex-col items-center gap-1.5 py-3 rounded-xl transition-all"
+                style={{
+                  fontSize: 10,
+                  fontWeight: 400,
+                  color: "#94A3B8",
+                  background: "#1A2438",
+                  border: "1px solid #1E2A40",
+                  opacity: generating ? 0.5 : 1,
+                }}
+              >
+                <span style={{ fontSize: 18 }}>{dest.icon}</span>
+                {dest.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Download */}
           <div className="flex gap-3 px-5 pb-5">
             <button
               onClick={handleDownload}
@@ -187,22 +239,7 @@ const InsightShareModal = ({ insight, onClose }: InsightShareModalProps) => {
               }}
             >
               <Download size={15} />
-              Salvar
-            </button>
-            <button
-              onClick={handleShare}
-              disabled={generating}
-              className="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl transition-all"
-              style={{
-                fontSize: 13,
-                fontWeight: 500,
-                color: "#0C1222",
-                background: "#00B4D8",
-                opacity: generating ? 0.6 : 1,
-              }}
-            >
-              <Share2 size={15} />
-              {generating ? "Gerando..." : "Compartilhar"}
+              {generating ? "Gerando..." : "Salvar imagem"}
             </button>
           </div>
         </motion.div>
@@ -303,7 +340,7 @@ const InsightCanvas = ({
           strokeWidth="2"
           strokeLinecap="round"
           strokeLinejoin="round"
-          style={{ opacity: 0.35 }}
+          style={{ opacity: 0.5 }}
         >
           <rect width="7" height="9" x="3" y="3" rx="1" />
           <rect width="7" height="5" x="14" y="3" rx="1" />
@@ -314,9 +351,8 @@ const InsightCanvas = ({
           style={{
             fontSize: isFeed ? 18 : 20,
             fontWeight: 600,
-            color: "#334155",
+            color: "#475569",
             letterSpacing: "0.06em",
-            opacity: 0.5,
           }}
         >
           Dailix
@@ -436,7 +472,7 @@ const InsightCanvas = ({
             via <span style={{ fontWeight: 600, color: "#64748B" }}>Dailix</span>
           </span>
         </div>
-        <span style={{ fontSize: isFeed ? 18 : 22, color: "#3E5068", fontWeight: 400, letterSpacing: "0.02em" }}>
+        <span style={{ fontSize: isFeed ? 18 : 22, color: "#4B6584", fontWeight: 400, letterSpacing: "0.02em" }}>
           dailix.app
         </span>
       </div>
