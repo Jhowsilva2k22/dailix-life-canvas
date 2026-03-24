@@ -1,19 +1,36 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import HabitsTab from "./HabitsTab";
 import InsightsTab from "./InsightsTab";
 import SectionTransitionSkeleton from "@/components/dashboard/SectionTransitionSkeleton";
+import type { SearchFocus } from "@/components/dashboard/GlobalSearchDialog";
 
 const tabs = [
   { key: "habitos", label: "Hábitos" },
   { key: "insights", label: "Insights" },
 ];
 
-const BemEstarPage = () => {
+interface BemEstarPageProps {
+  searchFocus?: SearchFocus | null;
+  onClearSearchFocus?: () => void;
+}
+
+const BemEstarPage = ({ searchFocus, onClearSearchFocus }: BemEstarPageProps) => {
   const [activeTab, setActiveTab] = useState("habitos");
   const [initialLoaded, setInitialLoaded] = useState(false);
   const revealRef = useScrollReveal();
   const loadedTabs = useRef(new Set<string>());
+
+  // React to search focus: auto-select correct tab
+  useEffect(() => {
+    if (!searchFocus || searchFocus.section !== "bem-estar") return;
+    if (searchFocus.type === "habit") {
+      setActiveTab("habitos");
+    } else if (searchFocus.type === "insight") {
+      setActiveTab("insights");
+    }
+    onClearSearchFocus?.();
+  }, [searchFocus, onClearSearchFocus]);
 
   const handleReadyChange = (tabKey: string, ready: boolean) => {
     if (ready) {

@@ -10,13 +10,19 @@ const typeConfig: Record<SearchResultType, { label: string; icon: typeof Search;
   insight: { label: "Insights", icon: Lightbulb, color: "var(--dash-purple-text)" },
 };
 
+export interface SearchFocus {
+  section: string;
+  type: SearchResultType;
+  id: string;
+}
+
 interface Props {
   open: boolean;
   onClose: () => void;
-  onNavigate: (route: string) => void;
+  onSelect: (focus: SearchFocus) => void;
 }
 
-export default function GlobalSearchDialog({ open, onClose, onNavigate }: Props) {
+export default function GlobalSearchDialog({ open, onClose, onSelect }: Props) {
   const { query, setQuery, results, loading, error } = useGlobalSearch();
 
   useEffect(() => {
@@ -39,9 +45,9 @@ export default function GlobalSearchDialog({ open, onClose, onNavigate }: Props)
   }, [open, onClose]);
 
   const handleSelect = useCallback((item: SearchResult) => {
-    onNavigate(item.route);
+    onSelect({ section: item.route, type: item.type, id: item.id });
     onClose();
-  }, [onNavigate, onClose]);
+  }, [onSelect, onClose]);
 
   const grouped = results.reduce<Record<SearchResultType, SearchResult[]>>((acc, r) => {
     if (!acc[r.type]) acc[r.type] = [];

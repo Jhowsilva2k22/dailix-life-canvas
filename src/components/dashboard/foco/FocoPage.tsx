@@ -1,19 +1,36 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import TasksTab from "./TasksTab";
 import GoalsTab from "./GoalsTab";
 import SectionTransitionSkeleton from "@/components/dashboard/SectionTransitionSkeleton";
+import type { SearchFocus } from "@/components/dashboard/GlobalSearchDialog";
 
 const tabs = [
   { key: "tarefas", label: "Tarefas" },
   { key: "metas", label: "Metas" },
 ];
 
-const FocoPage = () => {
+interface FocoPageProps {
+  searchFocus?: SearchFocus | null;
+  onClearSearchFocus?: () => void;
+}
+
+const FocoPage = ({ searchFocus, onClearSearchFocus }: FocoPageProps) => {
   const [activeTab, setActiveTab] = useState("tarefas");
   const [initialLoaded, setInitialLoaded] = useState(false);
   const revealRef = useScrollReveal();
   const loadedTabs = useRef(new Set<string>());
+
+  // React to search focus: auto-select correct tab
+  useEffect(() => {
+    if (!searchFocus || searchFocus.section !== "foco") return;
+    if (searchFocus.type === "task") {
+      setActiveTab("tarefas");
+    } else if (searchFocus.type === "goal") {
+      setActiveTab("metas");
+    }
+    onClearSearchFocus?.();
+  }, [searchFocus, onClearSearchFocus]);
 
   const handleReadyChange = (tabKey: string, ready: boolean) => {
     if (ready) {
