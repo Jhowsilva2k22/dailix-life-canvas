@@ -105,7 +105,7 @@ const ReminderField = ({ lembreteAtivo, lembreteHorario, onToggle, onTimeChange,
       </div>
       {lembreteAtivo && (
         <p style={{ color: "var(--dash-text-muted)", fontSize: 11, marginTop: 6 }}>
-          Notificação enquanto o app estiver aberto
+          Ative notificações push em Configurações para receber lembretes com o app fechado
         </p>
       )}
     </div>
