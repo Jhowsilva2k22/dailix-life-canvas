@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import HabitsTab from "./HabitsTab";
 import InsightsTab from "./InsightsTab";
+import SectionTransitionSkeleton from "@/components/dashboard/SectionTransitionSkeleton";
 
 const tabs = [
   { key: "habitos", label: "Hábitos" },
@@ -10,11 +11,21 @@ const tabs = [
 
 const BemEstarPage = () => {
   const [activeTab, setActiveTab] = useState("habitos");
+  const [activeTabReady, setActiveTabReady] = useState(false);
   const revealRef = useScrollReveal();
 
   return (
-    <div ref={revealRef} className="flex-1 min-h-screen md:ml-[240px]" style={{ background: "var(--dash-bg)" }}>
-      <div className="max-w-4xl mx-auto px-5 md:px-10 pt-20 md:pt-10 pb-24 md:pb-12">
+    <div ref={revealRef} className="relative flex-1 min-h-screen md:ml-[240px]" style={{ background: "var(--dash-bg)" }}>
+      {!activeTabReady && (
+        <div className="absolute inset-0 z-10" style={{ background: "var(--dash-bg)" }}>
+          <SectionTransitionSkeleton />
+        </div>
+      )}
+
+      <div
+        className="max-w-4xl mx-auto px-5 md:px-10 pt-20 md:pt-10 pb-24 md:pb-12"
+        style={{ visibility: activeTabReady ? "visible" : "hidden" }}
+      >
         <div className="mb-8" data-reveal>
           <h1 className="font-display" style={{ color: "var(--dash-text)", fontSize: 24, fontWeight: 400, letterSpacing: "0.01em" }}>
             Bem-estar
@@ -28,7 +39,10 @@ const BemEstarPage = () => {
           {tabs.map((tab) => (
             <button
               key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
+              onClick={() => {
+                setActiveTabReady(false);
+                setActiveTab(tab.key);
+              }}
               className="px-4 py-3 transition-colors relative"
               style={{
                 fontSize: 13,
@@ -46,10 +60,10 @@ const BemEstarPage = () => {
         </div>
 
         <div style={{ display: activeTab === "habitos" ? "block" : "none" }}>
-          <HabitsTab />
+          <HabitsTab isActive={activeTab === "habitos"} onReadyChange={setActiveTabReady} />
         </div>
         <div style={{ display: activeTab === "insights" ? "block" : "none" }}>
-          <InsightsTab />
+          <InsightsTab isActive={activeTab === "insights"} onReadyChange={setActiveTabReady} />
         </div>
       </div>
     </div>

@@ -5,6 +5,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import HabitModal from "./HabitModal";
 
+interface HabitsTabProps {
+  isActive?: boolean;
+  onReadyChange?: (ready: boolean) => void;
+}
+
 interface Habit {
   id: string;
   titulo: string;
@@ -25,13 +30,14 @@ const categoryColors: Record<string, { bg: string; color: string; label: string 
 
 const CheckIcon = () => <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>;
 
-const HabitsTab = () => {
+const HabitsTab = ({ isActive = true, onReadyChange }: HabitsTabProps) => {
   const { user } = useAuth();
   const [habits, setHabits] = useState<Habit[]>([]);
   const [completedToday, setCompletedToday] = useState<Set<string>>(new Set());
   const [showModal, setShowModal] = useState(false);
   const [editingHabit, setEditingHabit] = useState<Habit | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const today = new Date().toISOString().split("T")[0];
 
   const fetchHabits = useCallback(async () => {
@@ -74,7 +80,26 @@ const HabitsTab = () => {
     setHabits(updated);
   }, [habits, calcStreak]);
 
-  useEffect(() => { fetchHabits(); fetchTodayLogs(); }, [fetchHabits, fetchTodayLogs]);
+  useEffect(() => {
+    let cancelled = false;
+
+    const load = async () => {
+      setLoading(true);
+      await Promise.all([fetchHabits(), fetchTodayLogs()]);
+      if (!cancelled) setLoading(false);
+    };
+
+    load();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [fetchHabits, fetchTodayLogs]);
+
+  useEffect(() => {
+    if (isActive) onReadyChange?.(!loading);
+  }, [isActive, loading, onReadyChange]);
+
   useEffect(() => { if (habits.length > 0) refreshStreaks(); }, [habits.length]);
 
   useEffect(() => {
@@ -121,6 +146,33 @@ const HabitsTab = () => {
   const openEdit = (habit: Habit) => { setEditingHabit(habit); setShowModal(true); };
 
   const doneCount = habits.filter((h) => completedToday.has(h.id)).length;
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-6 w-24 rounded-full animate-pulse" style={{ background: "var(--dash-muted-surface-hover)" }} />
+            <div className="h-4 w-px" style={{ background: "var(--dash-border)" }} />
+            <div className="h-5 w-16 rounded-full animate-pulse" style={{ background: "var(--dash-muted-surface-hover)" }} />
+          </div>
+          <div className="h-9 w-24 rounded-full animate-pulse" style={{ background: "var(--dash-muted-surface-hover)" }} />
+        </div>
+        <div className="space-y-3 rounded-2xl p-4" style={{ background: "var(--dash-surface)", border: "1px solid var(--dash-border)" }}>
+          {[1, 2, 3].map((item) => (
+            <div key={item} className="flex items-center gap-3 rounded-xl px-2 py-3" style={{ background: "var(--dash-muted-surface)" }}>
+              <div className="h-[18px] w-[18px] rounded-md animate-pulse" style={{ background: "var(--dash-muted-surface-hover)" }} />
+              <div className="flex-1 space-y-2">
+                <div className="h-3 w-2/5 rounded-full animate-pulse" style={{ background: "var(--dash-muted-surface-hover)" }} />
+                <div className="h-3 w-3/5 rounded-full animate-pulse" style={{ background: "var(--dash-muted-surface-hover)" }} />
+              </div>
+              <div className="h-5 w-14 rounded-full animate-pulse" style={{ background: "var(--dash-muted-surface-hover)" }} />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>

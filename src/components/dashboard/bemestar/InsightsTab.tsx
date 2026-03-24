@@ -4,6 +4,11 @@ import { Lightbulb, Sparkles, Brain, Moon, Target, Zap, Shield, ChevronDown, Sha
 import { motion, AnimatePresence } from "framer-motion";
 import InsightShareModal from "./InsightShareModal";
 
+interface InsightsTabProps {
+  isActive?: boolean;
+  onReadyChange?: (ready: boolean) => void;
+}
+
 interface Insight {
   id: string;
   titulo: string;
@@ -26,7 +31,7 @@ const categoryMeta: Record<string, { label: string; icon: React.ElementType }> =
 const INITIAL_SHOW = 3;
 const LOAD_MORE = 3;
 
-const InsightsTab = () => {
+const InsightsTab = ({ isActive = true, onReadyChange }: InsightsTabProps) => {
   const [insights, setInsights] = useState<Insight[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -55,6 +60,10 @@ const InsightsTab = () => {
         setLoading(false);
       });
   }, []);
+
+  useEffect(() => {
+    if (isActive) onReadyChange?.(!loading);
+  }, [isActive, loading, onReadyChange]);
 
   const insightDoDia = useMemo(() => {
     if (!insights.length) return null;

@@ -5,6 +5,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import AddTaskModal from "../AddTaskModal";
 
+interface TasksTabProps {
+  isActive?: boolean;
+  onReadyChange?: (ready: boolean) => void;
+}
+
 interface Task {
   id: string;
   titulo: string;
@@ -40,15 +45,21 @@ const sortTasks = (list: Task[], mode: string) => {
 
 const CheckIcon = () => <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>;
 
-const TasksTab = () => {
+const TasksTab = ({ isActive = true, onReadyChange }: TasksTabProps) => {
   const { user } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [filter, setFilter] = useState("hoje");
   const [showModal, setShowModal] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [loading, setLoading] = useState(true);
 
   const fetchTasks = async () => {
-    if (!user) return;
+    if (!user) {
+      setTasks([]);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
     try {
       const today = new Date().toISOString().split("T")[0];
       let query = supabase.from("tasks").select("*").eq("user_id", user.id);
@@ -61,9 +72,14 @@ const TasksTab = () => {
       if (error) throw error;
       if (data) setTasks(sortTasks(data as Task[], filter));
     } catch { toast.error("Algo deu errado."); }
+    finally { setLoading(false); }
   };
 
   useEffect(() => { fetchTasks(); }, [user, filter]);
+
+  useEffect(() => {
+    if (isActive) onReadyChange?.(!loading);
+  }, [isActive, loading, onReadyChange]);
 
   useEffect(() => {
     if (!user) return;
@@ -97,6 +113,34 @@ const TasksTab = () => {
 
   const pending = tasks.filter((t) => !t.concluida);
   const done = tasks.filter((t) => t.concluida);
+
+  if (loading) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex gap-2">
+            {[1, 2, 3].map((item) => (
+              <div key={item} className="h-9 rounded-full animate-pulse" style={{ width: 84, background: "var(--dash-muted-surface-hover)" }} />
+            ))}
+          </div>
+          <div className="h-9 w-24 rounded-full animate-pulse" style={{ background: "var(--dash-muted-surface-hover)" }} />
+        </div>
+        <div className="h-3 w-40 rounded-full animate-pulse" style={{ background: "var(--dash-muted-surface-hover)" }} />
+        <div className="space-y-3 rounded-2xl p-4" style={{ background: "var(--dash-surface)", border: "1px solid var(--dash-border)" }}>
+          {[1, 2, 3].map((item) => (
+            <div key={item} className="flex items-center gap-3 rounded-xl px-2 py-3" style={{ background: "var(--dash-muted-surface)" }}>
+              <div className="h-[18px] w-[18px] rounded-md animate-pulse" style={{ background: "var(--dash-muted-surface-hover)" }} />
+              <div className="flex-1 space-y-2">
+                <div className="h-3 w-2/5 rounded-full animate-pulse" style={{ background: "var(--dash-muted-surface-hover)" }} />
+                <div className="h-3 w-4/5 rounded-full animate-pulse" style={{ background: "var(--dash-muted-surface-hover)" }} />
+              </div>
+              <div className="h-5 w-12 rounded-full animate-pulse" style={{ background: "var(--dash-muted-surface-hover)" }} />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
