@@ -25,7 +25,7 @@ const QuestionCard = ({ question, stepNumber, totalSteps, onAnswer }: Props) => 
       <div className="mb-10">
         <div className="flex items-center justify-between mb-3">
           <span
-            className="text-[11px] tracking-[0.14em] uppercase"
+            className="text-[12px] md:text-[11px] tracking-[0.14em] uppercase"
             style={{ color: "rgba(0,180,216,0.5)", fontWeight: 400 }}
           >
             Diagnóstico de Execução
