@@ -1,8 +1,10 @@
+import { Link } from "react-router-dom";
+
 const footerLinks = [
   { label: "Pilares", href: "#pilares" },
   { label: "Produto", href: "#produto" },
-  { label: "Termos", href: "#" },
-  { label: "Privacidade", href: "#" },
+  { label: "Termos", href: "/termos", isRoute: true },
+  { label: "Privacidade", href: "/privacidade", isRoute: true },
 ];
 
 const Footer = () => (
