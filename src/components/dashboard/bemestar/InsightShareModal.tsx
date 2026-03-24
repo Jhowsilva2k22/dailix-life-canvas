@@ -63,30 +63,23 @@ const InsightShareModal = ({ insight, onClose }: InsightShareModalProps) => {
     toast.success("Imagem salva");
   }, [generate, format]);
 
-  const shareNative = useCallback(async (file: File) => {
-    if (navigator.canShare?.({ files: [file] })) {
-      try {
-        await navigator.share({ files: [file], title: "Insight Dailix" });
-        return true;
-      } catch (e: any) {
-        if (e.name === "AbortError") return true; // user cancelled, not an error
-      }
-    }
-    return false;
-  }, []);
-
-  const shareToDestination = useCallback(async (destination: string) => {
+  const handleShare = useCallback(async () => {
     const blob = await generate();
     if (!blob) return;
     const file = new File([blob], `dailix-insight-${format}.png`, { type: "image/png" });
 
-    // All destinations attempt native share (OS handles routing to the correct app)
-    const shared = await shareNative(file);
-    if (shared) return;
-
-    // Desktop fallback: copy to clipboard or inform user
-    toast.info("Use o botão 'Salvar imagem' e envie manualmente");
-  }, [generate, format, shareNative]);
+    if (navigator.canShare?.({ files: [file] })) {
+      try {
+        await navigator.share({ files: [file], title: "Insight Dailix" });
+      } catch (e: any) {
+        if (e.name !== "AbortError") {
+          toast.info("Use 'Salvar imagem' e envie manualmente");
+        }
+      }
+    } else {
+      toast.info("Use 'Salvar imagem' e envie manualmente");
+    }
+  }, [generate, format]);
 
   if (!insight) return null;
 
