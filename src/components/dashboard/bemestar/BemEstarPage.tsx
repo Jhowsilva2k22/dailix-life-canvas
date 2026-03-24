@@ -18,6 +18,7 @@ interface BemEstarPageProps {
 const BemEstarPage = ({ searchFocus, onClearSearchFocus }: BemEstarPageProps) => {
   const [activeTab, setActiveTab] = useState("habitos");
   const [initialLoaded, setInitialLoaded] = useState(false);
+  const [highlightId, setHighlightId] = useState<string | null>(null);
   const revealRef = useScrollReveal();
   const loadedTabs = useRef(new Set<string>());
 
