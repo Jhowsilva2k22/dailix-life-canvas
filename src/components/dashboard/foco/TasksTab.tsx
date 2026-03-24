@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
-import RefreshButton from "../RefreshButton";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -50,7 +49,6 @@ const TasksTab = () => {
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
 
   const fetchTasks = async () => {
     if (!user) return;
@@ -165,11 +163,6 @@ const TasksTab = () => {
 
   return (
     <div>
-      {/* Header with refresh */}
-      <div className="flex items-center gap-2 mb-4">
-        <h2 style={{ color: "#0F172A", fontSize: 16, fontWeight: 500 }}>Tarefas</h2>
-        <RefreshButton refreshing={refreshing} onRefresh={async () => { setRefreshing(true); await fetchTasks(); setRefreshing(false); }} />
-      </div>
       {/* Filters */}
       <div className="mb-2 overflow-x-auto" data-reveal style={{ transitionDelay: "160ms" }}>
         <div className="flex gap-2">

@@ -1,6 +1,5 @@
 import { Component, useEffect, useState, useCallback, type ReactNode } from "react";
-import { Plus, Pencil, Trash2 } from "lucide-react";
-import RefreshButton from "../RefreshButton";
+import { Plus, Pencil, Trash2, ChevronDown, ChevronUp } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -73,8 +72,8 @@ const GoalsTabInner = () => {
   const [fetchError, setFetchError] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [editing, setEditing] = useState<Goal | null>(null);
+  const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);
-  const [refreshing, setRefreshing] = useState(false);
 
   const fetchGoals = useCallback(async () => {
     if (!user) { setLoading(false); return; }
@@ -226,6 +225,13 @@ const GoalsTabInner = () => {
     setEditing(null);
   };
 
+  const toggleExpand = (id: string) => {
+    setExpanded((prev) => {
+      const s = new Set(prev);
+      s.has(id) ? s.delete(id) : s.add(id);
+      return s;
+    });
+  };
 
   /* ---- Loading ---- */
   if (loading) {
@@ -246,56 +252,32 @@ const GoalsTabInner = () => {
     );
   }
 
-  /* ---- Header with inline button ---- */
-  const headerRow = (
-    <div className="flex items-center justify-between mb-4">
-      <div className="flex items-center gap-2">
-        <h2 style={{ color: "#0F172A", fontSize: 16, fontWeight: 500 }}>Metas</h2>
-        <RefreshButton refreshing={refreshing} onRefresh={async () => { setRefreshing(true); await fetchGoals(); setRefreshing(false); }} />
-      </div>
-      <button
-        onClick={() => { setEditing(null); setShowModal(true); }}
-        className="inline-flex items-center gap-1 transition-colors hover:opacity-80"
-        style={{ border: "1px solid #1E3A5F", color: "#1E3A5F", background: "transparent", borderRadius: 8, padding: "8px 16px", fontSize: 13, fontWeight: 400 }}
-      >
-        <Plus size={14} /> Nova meta
-      </button>
-    </div>
-  );
-
   /* ---- Empty ---- */
   if (goals.length === 0) {
     return (
-      <div>
-        {headerRow}
+      <div className="relative pb-20">
         <div data-reveal style={{ background: "rgba(0,180,216,0.03)", border: "1px dashed rgba(0,180,216,0.2)", borderRadius: 14 }} className="flex flex-col items-center justify-center py-16">
           <p style={{ color: "#94A3B8", fontSize: 14, fontWeight: 300 }}>Nenhuma meta criada ainda.</p>
+          <button onClick={() => { setEditing(null); setShowModal(true); }} className="inline-flex items-center gap-1.5 mt-3 transition-colors" style={{ color: "#00B4D8", fontSize: 13, fontWeight: 400, padding: "8px 16px" }}>
+            <Plus size={16} /> Nova meta
+          </button>
         </div>
+        <FloatingButton onClick={() => { setEditing(null); setShowModal(true); }} />
         {showModal && <GoalModal goal={null} onClose={() => { setShowModal(false); setEditing(null); }} onSaved={handleSaved} />}
       </div>
     );
   }
 
-  /* ---- Priority badge helper ---- */
-  const prioBadge = (p: string) => {
-    const map: Record<string, { bg: string; color: string; label: string }> = {
-      alta: { bg: "rgba(239,68,68,0.1)", color: "#EF4444", label: "Alta" },
-      media: { bg: "rgba(245,158,11,0.1)", color: "#F59E0B", label: "Média" },
-      baixa: { bg: "rgba(16,185,129,0.1)", color: "#10B981", label: "Baixa" },
-    };
-    return map[p] ?? map.media;
-  };
-
   /* ---- List ---- */
   return (
-    <div>
-      {headerRow}
+    <div className="relative pb-20">
       <div className="space-y-4" data-reveal>
         {goals.map((goal) => {
           const badge = statusBadge(goal.status);
           const tasks = subTasks[goal.id] || [];
           const progress = tasks.length > 0 ? calcProgress(tasks) : goal.progresso;
           const doneCount = tasks.filter((t) => t.concluida).length;
+          const isExpanded = expanded.has(goal.id);
 
           return (
             <div key={goal.id} className="transition-all duration-200" style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 14, boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
@@ -307,8 +289,8 @@ const GoalsTabInner = () => {
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="px-2 py-0.5 rounded-md" style={{ fontSize: 10, fontWeight: 400, background: badge.bg, color: badge.color }}>{badge.label}</span>
-                    <button onClick={() => { setEditing(goal); setShowModal(true); }} className="p-1" style={{ color: "#94A3B8" }}><Pencil size={14} /></button>
-                    <button onClick={() => setConfirmDelete(goal.id)} className="p-1" style={{ color: "#94A3B8" }}><Trash2 size={14} /></button>
+                    <button onClick={() => { setEditing(goal); setShowModal(true); }} className="md:opacity-0 md:group-hover:opacity-100 p-1" style={{ color: "#94A3B8" }}><Pencil size={14} /></button>
+                    <button onClick={() => setConfirmDelete(goal.id)} className="md:opacity-0 md:group-hover:opacity-100 p-1" style={{ color: "#94A3B8" }}><Trash2 size={14} /></button>
                   </div>
                 </div>
 
@@ -320,6 +302,7 @@ const GoalsTabInner = () => {
                   <span style={{ fontSize: 12, fontWeight: 400, color: "#0F172A", minWidth: 52, textAlign: "right" }}>{progress}% concluido</span>
                 </div>
 
+                {/* Task counter */}
                 {tasks.length > 0 && (
                   <p style={{ fontSize: 13, color: "#94A3B8", fontWeight: 300 }}>
                     {doneCount} de {tasks.length} tarefas concluidas
@@ -331,50 +314,52 @@ const GoalsTabInner = () => {
                     Prazo: {new Date(goal.data_limite + "T12:00:00").toLocaleDateString("pt-BR")}
                   </p>
                 )}
+
+                {/* Expand toggle */}
+                <button onClick={() => toggleExpand(goal.id)} className="inline-flex items-center gap-1 mt-3 transition-colors" style={{ color: "#00B4D8", fontSize: 13, fontWeight: 400 }}>
+                  {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+                  {isExpanded ? "Ocultar tarefas" : `Ver tarefas (${tasks.length})`}
+                </button>
               </div>
 
-              {/* Sub-tasks — always visible */}
-              <div className="px-5 pb-5 pt-0">
-                <div className="border-t" style={{ borderColor: "#E2E8F0" }} />
-                <div className="mt-3 space-y-2">
-                  {tasks.length === 0 ? (
-                    <p style={{ color: "#94A3B8", fontSize: 13, fontWeight: 300, fontStyle: "italic" }}>
-                      Adicione tarefas para acompanhar o progresso desta meta.
-                    </p>
-                  ) : (
-                    tasks.map((task) => {
-                      const pb = prioBadge(task.prioridade);
-                      return (
-                        <div key={task.id} className="flex items-center gap-3 py-2">
-                          <button
-                            onClick={() => toggleSubTask(goal.id, task.id, task.concluida)}
-                            className="w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors"
-                            style={{ borderColor: task.concluida ? "#00B4D8" : "#CBD5E1", background: task.concluida ? "#00B4D8" : "transparent" }}
-                          >
-                            {task.concluida && <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>}
-                          </button>
-                          <p style={{ color: task.concluida ? "#94A3B8" : "#0F172A", textDecoration: task.concluida ? "line-through" : "none", fontSize: 13, fontWeight: 400, flex: 1 }}>{task.titulo}</p>
-                          <span className="px-1.5 py-0.5 rounded" style={{ fontSize: 10, fontWeight: 400, background: pb.bg, color: pb.color }}>{pb.label}</span>
-                        </div>
-                      );
-                    })
-                  )}
+              {/* Expanded sub-tasks */}
+              {isExpanded && (
+                <div className="px-5 pb-5 pt-0">
+                  <div className="border-t" style={{ borderColor: "#E2E8F0" }} />
+                  <div className="mt-3 space-y-2">
+                    {tasks.map((task) => (
+                      <div key={task.id} className="flex items-center gap-3 py-2">
+                        <button
+                          onClick={() => toggleSubTask(goal.id, task.id, task.concluida)}
+                          className="w-4 h-4 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors"
+                          style={{ borderColor: task.concluida ? "#00B4D8" : "#CBD5E1", background: task.concluida ? "#00B4D8" : "transparent" }}
+                        >
+                          {task.concluida && <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+                        </button>
+                        <p style={{ color: task.concluida ? "#94A3B8" : "#0F172A", textDecoration: task.concluida ? "line-through" : "none", fontSize: 13, fontWeight: 400, flex: 1 }}>{task.titulo}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <InlineAddTask goalId={goal.id} onAdded={(task) => {
+                    setSubTasks((prev) => ({ ...prev, [goal.id]: [...(prev[goal.id] || []), task] }));
+                    // Update progress
+                    const updated = [...(subTasks[goal.id] || []), task];
+                    const newProgress = calcProgress(updated);
+                    supabase.from("goals").update({ progresso: newProgress }).eq("id", goal.id);
+                    setGoals((prev) => prev.map((g) => g.id === goal.id ? { ...g, progresso: newProgress } : g));
+                  }} />
                 </div>
-                <InlineAddTask goalId={goal.id} onAdded={(task) => {
-                  setSubTasks((prev) => ({ ...prev, [goal.id]: [...(prev[goal.id] || []), task] }));
-                  const updated = [...(subTasks[goal.id] || []), task];
-                  const newProgress = calcProgress(updated);
-                  supabase.from("goals").update({ progresso: newProgress }).eq("id", goal.id);
-                  setGoals((prev) => prev.map((g) => g.id === goal.id ? { ...g, progresso: newProgress } : g));
-                }} />
-              </div>
+              )}
             </div>
           );
         })}
       </div>
 
+      <FloatingButton onClick={() => { setEditing(null); setShowModal(true); }} />
+
       {showModal && <GoalModal goal={editing} onClose={() => { setShowModal(false); setEditing(null); }} onSaved={handleSaved} />}
 
+      {/* Delete confirmation */}
       {confirmDelete && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.4)" }} onClick={() => setConfirmDelete(null)}>
           <div className="w-full max-w-sm rounded-2xl p-6" style={{ background: "#FFFFFF", boxShadow: "0 8px 32px rgba(0,0,0,0.12)" }} onClick={(e) => e.stopPropagation()}>
@@ -458,6 +443,13 @@ const InlineAddTask = ({ goalId, onAdded }: { goalId: string; onAdded: (t: SubTa
     </div>
   );
 };
+
+/* ---- Floating Button ---- */
+const FloatingButton = ({ onClick }: { onClick: () => void }) => (
+  <button onClick={onClick} className="fixed bottom-6 right-6 md:absolute md:bottom-0 md:right-0 flex items-center gap-2 text-white transition-transform hover:-translate-y-0.5 z-40" style={{ background: "linear-gradient(135deg, #1E3A5F, #00B4D8)", borderRadius: 50, padding: "12px 20px", fontSize: 13, fontWeight: 400, boxShadow: "0 4px 16px rgba(0,0,0,0.15)" }}>
+    <Plus size={16} /> Nova meta
+  </button>
+);
 
 /* ---- Goal Modal (no progress slider) ---- */
 const GoalModal = ({ goal, onClose, onSaved }: { goal: Goal | null; onClose: () => void; onSaved: (g: Goal, isEdit: boolean) => void }) => {

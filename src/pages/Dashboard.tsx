@@ -51,13 +51,7 @@ const Dashboard = () => {
     }
   };
 
-  if (!ready) {
-    return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: "#F1F5F9" }}>
-        <div className="w-6 h-6 border-2 rounded-full animate-spin" style={{ borderColor: "#E2E8F0", borderTopColor: "#00B4D8" }} />
-      </div>
-    );
-  }
+  if (!ready) return null;
 
   return (
     <div className="min-h-screen" style={{ background: "#F1F5F9" }}>
