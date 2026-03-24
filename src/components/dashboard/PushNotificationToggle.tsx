@@ -69,7 +69,10 @@ const PushNotificationToggle = () => {
   const handleDisable = async () => {
     if (!user || busy) return;
     setBusy(true);
-    await unsubscribeFromPush(user.id);
+    await Promise.allSettled([
+      unsubscribeFromPush(user.id),
+      unregisterFCMToken(user.id),
+    ]);
     setState("inactive");
     toast.success("Notificações push desativadas");
     setBusy(false);
