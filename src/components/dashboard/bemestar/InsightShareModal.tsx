@@ -243,7 +243,7 @@ const InsightShareModal = ({ insight, onClose }: InsightShareModalProps) => {
                 onClick={a.handler}
                 disabled={generating}
                 className="flex flex-col items-center gap-1.5"
-                style={{ opacity: generating ? 0.5 : 1, minWidth: 56 }}
+                style={{ minWidth: 56, cursor: generating ? "wait" : "pointer" }}
               >
                 <div
                   className="flex items-center justify-center rounded-full"
@@ -258,7 +258,7 @@ const InsightShareModal = ({ insight, onClose }: InsightShareModalProps) => {
                   {a.icon}
                 </div>
                 <span style={{ fontSize: 11, fontWeight: 400, color: "#94A3B8" }}>
-                  {generating ? "..." : a.label}
+                  {a.label}
                 </span>
               </button>
             ))}
