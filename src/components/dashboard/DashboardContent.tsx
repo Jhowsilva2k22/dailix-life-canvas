@@ -63,7 +63,7 @@ const priorityStyles: Record<string, { color: string; bg: string }> = {
 };
 
 const DashboardContent = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const [profile, setProfile] = useState<Profile>({ display_name: null, first_goal: null, modules: null });
   const [tasks, setTasks] = useState<Task[]>([]);
   const [habits, setHabits] = useState<Habit[]>([]);
@@ -77,10 +77,7 @@ const DashboardContent = () => {
   const today = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
-    if (!user) {
-      setLoading(false);
-      return;
-    }
+    if (authLoading || !user) return;
 
     let cancelled = false;
 
@@ -101,7 +98,7 @@ const DashboardContent = () => {
     return () => {
       cancelled = true;
     };
-  }, [user]);
+  }, [authLoading, user]);
 
   useEffect(() => {
     if (!user) return;
@@ -213,7 +210,7 @@ const DashboardContent = () => {
 
   const CheckIcon = () => <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>;
 
-  if (loading) {
+  if (authLoading || loading) {
     return (
       <div className="flex-1 min-h-screen md:ml-[240px]" style={{ background: "var(--dash-bg)" }}>
         <SectionTransitionSkeleton showTabs={false} />
