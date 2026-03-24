@@ -126,7 +126,7 @@ const DashboardContent = () => {
 
   const fetchTasks = async () => {
     if (!user) return;
-    const { data } = await supabase.from("tasks").select("*").eq("user_id", user.id).order("created_at", { ascending: false });
+    const { data } = await supabase.from("tasks").select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(100);
     if (data) setTasks(data as Task[]);
   };
 
