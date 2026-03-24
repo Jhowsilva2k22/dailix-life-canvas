@@ -44,8 +44,8 @@ const MobileNav = ({ activeItem, onNavigate, onOpenSearch }: MobileNavProps) => 
       >
         <span className="font-display text-base font-bold" style={{ color: "var(--dash-text)" }}>Dailix</span>
         <div className="flex items-center gap-2">
-          <button onClick={onOpenSearch} className="p-1.5" style={{ color: "var(--dash-text-muted)" }}>
-            <Search size={20} strokeWidth={1.5} />
+          <button onClick={onOpenSearch} className="p-1.5 touch-compact" style={{ color: "var(--dash-text-muted)" }}>
+            <Search size={22} strokeWidth={1.5} />
           </button>
           <div className="relative" ref={menuRef}>
           <button onClick={() => setMenuOpen((v) => !v)}>
@@ -103,7 +103,7 @@ const MobileNav = ({ activeItem, onNavigate, onOpenSearch }: MobileNavProps) => 
         {navItems.map((item) => {
           const isActive = activeItem === item.path;
           return (
-            <button key={item.path} onClick={() => onNavigate(item.path)} className="flex flex-col items-center gap-1 py-1.5 px-2">
+            <button key={item.path} onClick={() => onNavigate(item.path)} className="flex flex-col items-center gap-1 py-1.5 px-2 touch-compact">
               <item.icon size={20} style={{ color: isActive ? "var(--dash-accent)" : "var(--dash-text-muted)" }} strokeWidth={isActive ? 2 : 1.5} />
               <span style={{ fontSize: 10, fontWeight: isActive ? 500 : 400, color: isActive ? "var(--dash-accent)" : "var(--dash-text-muted)" }}>
                 {item.label}

@@ -91,8 +91,46 @@
     @apply border-border;
   }
 
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    overflow-x: hidden;
+  }
+
   body {
     @apply bg-background text-foreground font-sans antialiased;
+    overflow-x: hidden;
+    overscroll-behavior-x: none;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Prevent iOS auto-zoom on input focus — must be >=16px */
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+
+  @media (min-width: 768px) {
+    input, textarea, select {
+      font-size: inherit !important;
+    }
+  }
+
+  /* Mobile base font & comfortable touch targets */
+  @media (max-width: 767px) {
+    html {
+      font-size: 16px;
+    }
+
+    button, a, [role="button"], label {
+      min-height: 44px;
+      min-width: 44px;
+    }
+
+    /* Allow inline small buttons (icons etc.) to stay compact only if explicit */
+    .touch-compact {
+      min-height: unset;
+      min-width: unset;
+    }
   }
 
   h1, h2, h3, h4, h5, h6 {
