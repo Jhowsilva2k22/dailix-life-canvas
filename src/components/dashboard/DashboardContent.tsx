@@ -328,10 +328,10 @@ const DashboardContent = () => {
           )}
         </section>
 
-        {/* A seguir */}
+        {/* Próximas tarefas */}
         <section className="mb-12" data-reveal>
           <div className="flex items-center justify-between mb-4">
-            <span style={{ color: "var(--dash-text-muted)", fontSize: 11, fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase" as const }}>A seguir</span>
+            <span style={{ color: "var(--dash-text-muted)", fontSize: 11, fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase" as const }}>Próximas tarefas</span>
           </div>
           {upcomingTasks.length === 0 ? (
             <div className="flex items-center justify-center py-8 rounded-2xl" style={{ background: "var(--dash-surface)", border: "1px solid var(--dash-border)" }}>
