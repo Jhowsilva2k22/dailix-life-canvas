@@ -106,11 +106,25 @@ export default function GlobalSearchDialog({ open, onClose, onSelect }: Props) {
             placeholder="Buscar tarefas, metas, hábitos..."
             className="flex-1 bg-transparent outline-none text-base touch-compact"
             style={{
-              color: "var(--dash-text)",
-              caretColor: "var(--dash-accent)",
+              color: "#E2E8F0",
+              caretColor: "#00B4D8",
+              WebkitTextFillColor: "#E2E8F0",
               fontSize: 16,
               lineHeight: "1.5",
             }}
+          />
+          <style>{`
+            .search-dialog-content input::placeholder {
+              color: #64748B !important;
+              -webkit-text-fill-color: #64748B !important;
+              opacity: 1 !important;
+            }
+            .search-dialog-content input::selection {
+              background: rgba(0, 180, 216, 0.35);
+              color: #F1F5F9;
+              -webkit-text-fill-color: #F1F5F9;
+            }
+          `}</style>
           />
           {loading && <Loader2 size={16} className="animate-spin flex-shrink-0" style={{ color: "var(--dash-text-muted)" }} />}
           {/* Mobile close button */}
