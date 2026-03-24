@@ -342,7 +342,7 @@ const InsightCanvas = ({
       {/* Footer */}
       <div
         style={{
-          padding: "0 72px 56px",
+          padding: "0 80px 64px",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
