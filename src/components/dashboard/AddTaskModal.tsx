@@ -154,6 +154,13 @@ const AddTaskModal = ({ onClose, onSaved, defaultGoalId, editingTask }: AddTaskM
               </select>
             </div>
           )}
+          <ReminderField
+            lembreteAtivo={lembreteAtivo}
+            lembreteHorario={lembreteHorario}
+            onToggle={setLembreteAtivo}
+            onTimeChange={setLembreteHorario}
+            needsDate={!prazo}
+          />
         </div>
 
         <button onClick={handleSave} disabled={!titulo.trim() || saving} className="w-full mt-6 py-3 text-sm rounded-lg transition-all duration-150 disabled:opacity-50 active:scale-[0.98]" style={{ background: "var(--dash-gradient-primary)", color: "var(--dash-text)", fontWeight: 400, letterSpacing: "0.02em" }}>
