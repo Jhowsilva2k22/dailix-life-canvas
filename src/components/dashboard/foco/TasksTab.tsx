@@ -9,6 +9,8 @@ import AddTaskModal from "../AddTaskModal";
 interface TasksTabProps {
   isActive?: boolean;
   onReadyChange?: (ready: boolean) => void;
+  highlightId?: string | null;
+  onHighlightConsumed?: () => void;
 }
 
 interface Task {
