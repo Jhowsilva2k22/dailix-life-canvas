@@ -10,10 +10,16 @@ const typeConfig: Record<SearchResultType, { label: string; icon: typeof Search;
   insight: { label: "Insights", icon: Lightbulb, color: "var(--dash-purple-text)" },
 };
 
+export interface SearchFocus {
+  section: string;
+  type: SearchResultType;
+  id: string;
+}
+
 interface Props {
   open: boolean;
   onClose: () => void;
-  onNavigate: (route: string) => void;
+  onSelect: (focus: SearchFocus) => void;
 }
 
 export default function GlobalSearchDialog({ open, onClose, onNavigate }: Props) {
