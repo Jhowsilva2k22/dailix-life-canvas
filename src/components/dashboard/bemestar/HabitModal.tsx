@@ -155,6 +155,12 @@ const HabitModal = ({ onClose, onSaved, editingHabit }: HabitModalProps) => {
               ))}
             </div>
           </div>
+          <ReminderField
+            lembreteAtivo={lembreteAtivo}
+            lembreteHorario={lembreteHorario}
+            onToggle={setLembreteAtivo}
+            onTimeChange={setLembreteHorario}
+          />
         </div>
 
         <div className="flex gap-3 mt-6">
