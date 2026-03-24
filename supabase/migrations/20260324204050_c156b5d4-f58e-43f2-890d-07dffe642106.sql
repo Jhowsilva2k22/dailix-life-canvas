@@ -1,0 +1,1 @@
+ALTER TABLE public.habit_logs ADD CONSTRAINT habit_logs_habit_id_data_unique UNIQUE (habit_id, data);
