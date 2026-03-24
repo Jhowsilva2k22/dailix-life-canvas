@@ -352,7 +352,7 @@ const GoalsTabInner = () => {
 
   /* Content */
   return (
-    <div>
+    <div className="overflow-x-hidden">
       {/* Summary + action */}
       <div className="flex items-center justify-between flex-wrap gap-3 mb-1">
         <SummaryStrip goals={goals} />
