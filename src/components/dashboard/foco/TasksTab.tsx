@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSearchHighlight } from "@/hooks/useSearchHighlight";
 import { Plus, Trash2, Pencil, CheckSquare } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
