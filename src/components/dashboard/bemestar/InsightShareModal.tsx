@@ -38,7 +38,7 @@ const InsightShareModal = ({ insight, onClose }: InsightShareModalProps) => {
       const dataUrl = await toPng(canvasRef.current, {
         width: cfg.w,
         height: cfg.h,
-        pixelRatio: 1,
+        pixelRatio: 3,
         cacheBust: true,
       });
       const res = await fetch(dataUrl);
@@ -264,7 +264,7 @@ const InsightCanvas = ({
           display: "flex",
           flexDirection: "column",
           justifyContent: "center",
-          padding: isFeed ? "80px 72px" : "120px 72px",
+          padding: isFeed ? "100px 80px" : "140px 80px",
         }}
       >
         {/* Category pill */}
@@ -288,7 +288,7 @@ const InsightCanvas = ({
           />
           <span
             style={{
-              fontSize: 20,
+              fontSize: 22,
               fontWeight: 400,
               letterSpacing: "0.12em",
               textTransform: "uppercase" as const,
@@ -303,7 +303,7 @@ const InsightCanvas = ({
         {/* Title */}
         <h2
           style={{
-            fontSize: isFeed ? 52 : 56,
+            fontSize: isFeed ? 58 : 64,
             fontWeight: 600,
             lineHeight: 1.25,
             color: "#F1F5F9",
@@ -328,7 +328,7 @@ const InsightCanvas = ({
         {/* Body text */}
         <p
           style={{
-            fontSize: isFeed ? 26 : 28,
+            fontSize: isFeed ? 28 : 32,
             fontWeight: 300,
             lineHeight: 1.7,
             color: "#94A3B8",
@@ -342,7 +342,7 @@ const InsightCanvas = ({
       {/* Footer */}
       <div
         style={{
-          padding: "0 72px 56px",
+          padding: "0 80px 64px",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
