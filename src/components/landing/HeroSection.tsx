@@ -1,16 +1,8 @@
-import { Check, ArrowRight } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { ArrowRight } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const benefits = [
-  "Tarefas, metas e habitos em um so lugar",
-  "Conteudo curado em video para cada area",
-  "Insights educacionais integrados",
-];
-
-
 const HeroSection = () => {
-  const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
   const navigate = useNavigate();
 
@@ -21,162 +13,123 @@ const HeroSection = () => {
 
   return (
     <section
-      ref={ref}
-      className="relative pt-28 pb-20 md:pt-36 md:pb-28 overflow-hidden"
-      style={{ background: "#F8FAFC" }}
+      className="relative pt-32 pb-24 md:pt-44 md:pb-36 overflow-hidden"
+      style={{ background: "#0C1222" }}
     >
-      {/* Grid pattern */}
+      {/* Subtle grid */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage:
-            "linear-gradient(rgba(30,58,95,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(30,58,95,0.04) 1px, transparent 1px)",
-          backgroundSize: "40px 40px",
+            "linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px)",
+          backgroundSize: "48px 48px",
         }}
       />
 
-      {/* Orbs */}
+      {/* Accent orb */}
       <div
-        className="absolute pointer-events-none animate-orb-1"
+        className="absolute pointer-events-none"
         style={{
-          top: "-5%",
-          right: "-5%",
-          width: 600,
-          height: 600,
-          background: "radial-gradient(circle, rgba(0,180,216,0.12) 0%, transparent 70%)",
-          filter: "blur(80px)",
-        }}
-      />
-      <div
-        className="absolute pointer-events-none animate-orb-2"
-        style={{
-          bottom: "-10%",
-          left: "-5%",
+          top: "10%",
+          right: "5%",
           width: 500,
           height: 500,
-          background: "radial-gradient(circle, rgba(30,58,95,0.08) 0%, transparent 70%)",
-          filter: "blur(80px)",
-        }}
-      />
-      <div
-        className="absolute pointer-events-none animate-orb-3"
-        style={{
-          top: "30%",
-          left: "35%",
-          width: 400,
-          height: 400,
-          background: "radial-gradient(circle, rgba(0,180,216,0.07) 0%, transparent 70%)",
+          background: "radial-gradient(circle, rgba(0,180,216,0.06) 0%, transparent 70%)",
           filter: "blur(80px)",
         }}
       />
 
-      {/* Content */}
       <div className="container relative z-10">
-        <div className="max-w-[60%] max-md:max-w-full">
-          {/* Left column */}
-          <div className="flex flex-col gap-6">
-            {/* Badge */}
-            <div
-              className={`transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+        <div className="max-w-2xl">
+          {/* Badge */}
+          <div
+            className={`mb-8 transition-all duration-700 ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}
+          >
+            <span
+              className="text-[11px] tracking-[0.14em] uppercase"
+              style={{ color: "rgba(0,180,216,0.7)", fontWeight: 400 }}
             >
-              <span
-                className="text-[13px] font-medium"
-                style={{
-                  color: "#00B4D8",
-                  letterSpacing: "0.08em",
-                }}
-              >
-                Organize · Evolua · Viva
-              </span>
-            </div>
+              Sistema pessoal de execução
+            </span>
+          </div>
 
-            {/* Headline */}
-            <h1
-              className={`font-display text-[2.5rem] md:text-[3.25rem] lg:text-[3.5rem] font-bold tracking-tight transition-all duration-700 delay-100 ${
-                visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-              }`}
-              style={{ color: "#0F172A", lineHeight: 1.1 }}
-            >
-              Organize sua vida.
-              <br />
-              Do seu{" "}
-              <span className="hero-gradient-text">jeito.</span>
-            </h1>
+          {/* Headline */}
+          <h1
+            className={`font-display text-[2.25rem] md:text-[3rem] lg:text-[3.5rem] tracking-tight transition-all duration-700 delay-100 ${
+              visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            }`}
+            style={{ color: "#fff", lineHeight: 1.08, fontWeight: 400 }}
+          >
+            Seu sistema pessoal
+            <br />
+            premium de execução.
+          </h1>
 
-            {/* Subtitle */}
-            <p
-              className={`max-w-lg transition-all duration-700 delay-200 ${
-                visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-              }`}
-              style={{ fontSize: 18, color: "#64748B", lineHeight: 1.6 }}
-            >
-              Uma plataforma para reunir produtividade, familia, negocios e bem-estar — com conteudo
-              e inteligencia para te ajudar a evoluir.
-            </p>
+          {/* Subheadline */}
+          <p
+            className={`mt-6 max-w-lg transition-all duration-700 delay-200 ${
+              visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            }`}
+            style={{ fontSize: 16, color: "rgba(255,255,255,0.5)", lineHeight: 1.7, fontWeight: 300 }}
+          >
+            Organize tarefas, metas, hábitos e insights em um ambiente claro, sóbrio e feito para manter constância real.
+          </p>
 
-            {/* Bullets */}
-            <ul
-              className={`flex flex-col gap-2.5 transition-all duration-700 delay-300 ${
-                visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-              }`}
+          {/* CTAs */}
+          <div
+            className={`flex flex-wrap gap-4 mt-10 transition-all duration-700 delay-300 ${
+              visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
+            }`}
+          >
+            <button
+              onClick={() => navigate("/cadastro")}
+              className="inline-flex items-center gap-2 px-7 py-3.5 text-sm rounded-lg transition-all duration-200 active:scale-[0.97]"
+              style={{
+                background: "#00B4D8",
+                color: "#0C1222",
+                fontWeight: 400,
+                letterSpacing: "0.02em",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "#00C9F0";
+                e.currentTarget.style.boxShadow = "0 8px 32px rgba(0,180,216,0.3)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "#00B4D8";
+                e.currentTarget.style.boxShadow = "none";
+              }}
             >
-              {benefits.map((b) => (
-                <li key={b} className="flex items-center gap-2.5 text-sm" style={{ color: "#64748B" }}>
-                  <Check className="h-4 w-4 shrink-0" style={{ color: "#00B4D8" }} />
-                  {b}
-                </li>
-              ))}
-            </ul>
-
-            {/* Buttons */}
-            <div
-              className={`flex flex-wrap gap-3 pt-2 transition-all duration-700 delay-[400ms] ${
-                visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"
-              }`}
+              Começar agora
+              <ArrowRight className="h-4 w-4" />
+            </button>
+            <a
+              href="#pilares"
+              className="inline-flex items-center px-7 py-3.5 text-sm rounded-lg transition-all duration-200"
+              style={{
+                color: "rgba(255,255,255,0.6)",
+                border: "1px solid rgba(255,255,255,0.1)",
+                fontWeight: 300,
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)";
+                e.currentTarget.style.color = "rgba(255,255,255,0.85)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)";
+                e.currentTarget.style.color = "rgba(255,255,255,0.6)";
+              }}
             >
-              <button
-                onClick={() => navigate("/cadastro")}
-                className="inline-flex items-center gap-2 px-7 py-3.5 text-sm text-white rounded-[10px] transition-all duration-200 active:scale-[0.97]"
-                style={{
-                  background: "linear-gradient(135deg, #1E3A5F, #00B4D8)",
-                  boxShadow: "0 8px 32px rgba(0,180,216,0.35)",
-                  fontWeight: 400,
-                  letterSpacing: "0.02em",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow = "0 12px 40px rgba(0,180,216,0.5)";
-                  e.currentTarget.style.transform = "translateY(-1px)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.boxShadow = "0 8px 32px rgba(0,180,216,0.35)";
-                  e.currentTarget.style.transform = "translateY(0)";
-                }}
-              >
-                Comece gratis
-                <ArrowRight className="h-4 w-4" />
-              </button>
-              <button
-                className="px-7 py-3.5 text-sm rounded-[10px] transition-all duration-200 active:scale-[0.97]"
-                style={{
-                  border: "1.5px solid #1E3A5F",
-                  color: "#1E3A5F",
-                  background: "transparent",
-                  fontWeight: 400,
-                  letterSpacing: "0.02em",
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.background = "rgba(30,58,95,0.04)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.background = "transparent";
-                }}
-              >
-                Ver demo
-              </button>
-            </div>
+              Ver como funciona
+            </a>
           </div>
         </div>
       </div>
+
+      {/* Bottom fade line */}
+      <div
+        className="absolute bottom-0 left-0 right-0 h-px"
+        style={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent)" }}
+      />
     </section>
   );
 };
