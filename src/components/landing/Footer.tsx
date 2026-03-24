@@ -18,18 +18,31 @@ const Footer = () => (
           Dailix
         </span>
         <div className="flex items-center gap-6">
-          {footerLinks.map((l) => (
-            <a
-              key={l.label}
-              href={l.href}
-              className="text-sm transition-colors duration-200"
-              style={{ color: "rgba(255,255,255,0.3)", fontWeight: 300 }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.7)")}
-              onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.3)")}
-            >
-              {l.label}
-            </a>
-          ))}
+          {footerLinks.map((l) =>
+            l.isRoute ? (
+              <Link
+                key={l.label}
+                to={l.href}
+                className="text-sm transition-colors duration-200"
+                style={{ color: "rgba(255,255,255,0.3)", fontWeight: 300 }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.7)")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.3)")}
+              >
+                {l.label}
+              </Link>
+            ) : (
+              <a
+                key={l.label}
+                href={l.href}
+                className="text-sm transition-colors duration-200"
+                style={{ color: "rgba(255,255,255,0.3)", fontWeight: 300 }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.7)")}
+                onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(255,255,255,0.3)")}
+              >
+                {l.label}
+              </a>
+            )
+          )}
         </div>
       </div>
       <div style={{ borderTop: "1px solid rgba(255,255,255,0.04)" }} className="pt-6">
