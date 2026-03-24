@@ -353,18 +353,18 @@ const GoalsTabInner = () => {
   /* Content */
   return (
     <div>
-      {/* Header row: summary + action */}
-      <div className="flex items-center justify-between mb-1">
+      {/* Summary + action */}
+      <div className="flex items-center justify-between flex-wrap gap-3 mb-1">
         <SummaryStrip goals={goals} />
         <button
           onClick={openCreate}
-          className="inline-flex items-center gap-1.5 rounded-lg transition-colors flex-shrink-0"
+          className="inline-flex items-center gap-1.5 rounded-lg transition-colors"
           style={{
             border: "1px solid var(--dash-primary)",
             color: "var(--dash-text-secondary)",
             fontSize: 13,
             fontWeight: 400,
-            padding: "8px 14px",
+            padding: "7px 12px",
           }}
         >
           <Plus size={14} /> Nova meta
