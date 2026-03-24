@@ -88,11 +88,13 @@ export type Database = {
       habits: {
         Row: {
           ativo: boolean
+          best_streak: number
           categoria: string
           created_at: string
           descricao: string | null
           frequencia: string
           id: string
+          last_completed_date: string | null
           lembrete_ativo: boolean
           lembrete_horario: string | null
           streak: number
@@ -101,11 +103,13 @@ export type Database = {
         }
         Insert: {
           ativo?: boolean
+          best_streak?: number
           categoria?: string
           created_at?: string
           descricao?: string | null
           frequencia?: string
           id?: string
+          last_completed_date?: string | null
           lembrete_ativo?: boolean
           lembrete_horario?: string | null
           streak?: number
@@ -114,11 +118,13 @@ export type Database = {
         }
         Update: {
           ativo?: boolean
+          best_streak?: number
           categoria?: string
           created_at?: string
           descricao?: string | null
           frequencia?: string
           id?: string
+          last_completed_date?: string | null
           lembrete_ativo?: boolean
           lembrete_horario?: string | null
           streak?: number
