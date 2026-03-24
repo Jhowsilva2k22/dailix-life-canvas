@@ -8,6 +8,8 @@ import InsightShareModal from "./InsightShareModal";
 interface InsightsTabProps {
   isActive?: boolean;
   onReadyChange?: (ready: boolean) => void;
+  highlightId?: string | null;
+  onHighlightConsumed?: () => void;
 }
 
 interface Insight {
