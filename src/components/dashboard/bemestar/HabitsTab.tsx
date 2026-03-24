@@ -88,21 +88,29 @@ const HabitsTab = () => {
     return streak;
   }, [user]);
 
-  const refreshStreaks = useCallback(async () => {
-    const updated = await Promise.all(
-      habits.map(async (h) => {
-        const streak = await calcStreak(h.id);
-        if (streak !== h.streak) {
-          await supabase.from("habits").update({ streak }).eq("id", h.id);
-        }
-        return { ...h, streak };
-      })
-    );
-    setHabits(updated);
-  }, [habits, calcStreak]);
-
   useEffect(() => { fetchHabits(); fetchTodayLogs(); }, [fetchHabits, fetchTodayLogs]);
-  useEffect(() => { if (habits.length > 0) refreshStreaks(); }, [habits.length]);
+
+  // Refresh streaks once after initial load
+  useEffect(() => {
+    if (habits.length > 0) {
+      let mounted = true;
+      const doRefresh = async () => {
+        const updated = await Promise.all(
+          habits.map(async (h) => {
+            const streak = await calcStreak(h.id);
+            if (streak !== h.streak) {
+              await supabase.from("habits").update({ streak }).eq("id", h.id);
+            }
+            return { ...h, streak };
+          })
+        );
+        if (mounted) setHabits(updated);
+      };
+      doRefresh();
+      return () => { mounted = false; };
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Realtime subscriptions
   useEffect(() => {
