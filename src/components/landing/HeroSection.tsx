@@ -60,11 +60,9 @@ const HeroSection = () => {
             }`}
             style={{ color: "#fff", lineHeight: 1.08, fontWeight: 400 }}
           >
-            Pare de organizar sua vida
+            Descubra o que está travando
             <br />
-            em pedaços. Centralize sua
-            <br />
-            execução em um único sistema.
+            sua execução.
           </h1>
 
           {/* Subheadline */}
