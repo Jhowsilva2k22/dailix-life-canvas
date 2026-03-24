@@ -72,8 +72,8 @@ const DiagnosticResult = ({ principal, secundario }: Props) => {
             <p
               style={{
                 color: "rgba(255,255,255,0.6)",
-                fontSize: 14,
-                lineHeight: 1.8,
+                fontSize: 15,
+                lineHeight: 1.85,
                 fontWeight: 300,
               }}
             >
