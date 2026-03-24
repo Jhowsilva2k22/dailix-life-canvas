@@ -88,22 +88,9 @@ const HabitsTab = () => {
     return streak;
   }, [user]);
 
-  const refreshStreaks = useCallback(async () => {
-    const updated = await Promise.all(
-      habits.map(async (h) => {
-        const streak = await calcStreak(h.id);
-        if (streak !== h.streak) {
-          await supabase.from("habits").update({ streak }).eq("id", h.id);
-        }
-        return { ...h, streak };
-      })
-    );
-    setHabits(updated);
-  }, [habits, calcStreak]);
-
   useEffect(() => { fetchHabits(); fetchTodayLogs(); }, [fetchHabits, fetchTodayLogs]);
-  // Refresh streaks once after initial fetch (use a ref to avoid loops)
-  const streaksRefreshed = useState(false)[1];
+
+  // Refresh streaks once after initial load
   useEffect(() => {
     if (habits.length > 0) {
       let mounted = true;
