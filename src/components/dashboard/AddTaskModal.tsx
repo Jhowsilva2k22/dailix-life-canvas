@@ -43,6 +43,8 @@ const AddTaskModal = ({ onClose, onSaved, defaultGoalId, editingTask }: AddTaskM
   const [goalId, setGoalId] = useState<string>(editingTask?.goal_id ?? defaultGoalId ?? "");
   const [goals, setGoals] = useState<GoalOption[]>([]);
   const [saving, setSaving] = useState(false);
+  const [lembreteAtivo, setLembreteAtivo] = useState((editingTask as any)?.lembrete_ativo ?? false);
+  const [lembreteHorario, setLembreteHorario] = useState((editingTask as any)?.lembrete_horario?.slice(0, 5) ?? "");
 
   useEffect(() => {
     if (!user) return;
