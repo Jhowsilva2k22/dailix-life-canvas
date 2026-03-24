@@ -336,11 +336,12 @@ const HabitsTab = ({ isActive = true, onReadyChange, highlightId = null, onHighl
                   <div className="flex items-center gap-2 flex-shrink-0">
                     {habit.streak > 0 && (
                       <span
-                        className="font-display tracking-wide"
+                        className="inline-flex items-center gap-1 font-display tracking-wide"
                         style={{ fontSize: 11, color: "var(--dash-accent)", fontWeight: 500, letterSpacing: "0.04em" }}
                         title={`Sequência atual: ${habit.streak} dia${habit.streak > 1 ? "s" : ""}`}
                       >
-                        {habit.streak}<span style={{ fontSize: 9, fontWeight: 300, color: "var(--dash-text-muted)", marginLeft: 2 }}>d</span>
+                        <Activity size={11} strokeWidth={1.5} />
+                        {habit.streak}<span style={{ fontSize: 9, fontWeight: 300, color: "var(--dash-text-muted)", marginLeft: 1 }}>d</span>
                       </span>
                     )}
                     {habit.best_streak > 0 && habit.best_streak > habit.streak && (
