@@ -67,7 +67,7 @@ const QuestionCard = ({ question, stepNumber, totalSteps, onAnswer }: Props) => 
             <button
               key={idx}
               onClick={() => handleSelect(idx)}
-              className="w-full text-left px-5 py-4 rounded-xl transition-all duration-200 active:scale-[0.98]"
+              className="w-full text-left px-5 py-4 rounded-xl transition-all duration-200 active:scale-[0.98] text-[15px] md:text-sm"
               style={{
                 background: isSelected
                   ? "rgba(0,180,216,0.1)"
