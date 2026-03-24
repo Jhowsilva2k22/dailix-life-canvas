@@ -257,6 +257,19 @@
   }
 }
 
+/* Search input text visibility — Safari/iOS fix */
+.search-dialog-content input::placeholder {
+  color: #64748B !important;
+  -webkit-text-fill-color: #64748B !important;
+  opacity: 1 !important;
+}
+
+.search-dialog-content input::selection {
+  background: rgba(0, 180, 216, 0.35);
+  color: #F1F5F9;
+  -webkit-text-fill-color: #F1F5F9;
+}
+
 /* Scroll reveal */
 [data-reveal] {
   opacity: 0;
