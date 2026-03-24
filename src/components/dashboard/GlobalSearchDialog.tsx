@@ -106,8 +106,9 @@ export default function GlobalSearchDialog({ open, onClose, onSelect }: Props) {
             placeholder="Buscar tarefas, metas, hábitos..."
             className="flex-1 bg-transparent outline-none text-base touch-compact"
             style={{
-              color: "var(--dash-text)",
-              caretColor: "var(--dash-accent)",
+              color: "#E2E8F0",
+              caretColor: "#00B4D8",
+              WebkitTextFillColor: "#E2E8F0",
               fontSize: 16,
               lineHeight: "1.5",
             }}
