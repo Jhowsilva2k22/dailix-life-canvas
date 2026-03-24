@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import DashboardContent from "@/components/dashboard/DashboardContent";
 import MobileNav from "@/components/dashboard/MobileNav";
@@ -53,17 +53,14 @@ const Dashboard = () => {
     <div className="dashboard-shell min-h-screen" style={{ background: "var(--dash-bg)" }}>
       <DashboardSidebar activeItem={activeItem} onNavigate={setActiveItem} />
       <MobileNav activeItem={activeItem} onNavigate={setActiveItem} />
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={activeItem}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.15, ease: "easeOut" }}
-        >
-          {renderContent()}
-        </motion.div>
-      </AnimatePresence>
+      <motion.div
+        key={activeItem}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.15, ease: "easeOut" }}
+      >
+        {renderContent()}
+      </motion.div>
     </div>
   );
 };
