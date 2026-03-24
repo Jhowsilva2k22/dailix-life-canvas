@@ -281,6 +281,8 @@ const InsightsTab = () => {
           </p>
         </div>
       )}
+
+      <InsightShareModal insight={shareInsight} onClose={() => setShareInsight(null)} />
     </div>
   );
 };
