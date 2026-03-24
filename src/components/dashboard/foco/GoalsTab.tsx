@@ -142,7 +142,7 @@ const GoalCard = ({
   const doneCount = tasks.filter((t) => t.concluida).length;
 
   return (
-    <div className="rounded-2xl overflow-hidden transition-all duration-200" style={{ background: "var(--dash-surface)", border: "1px solid var(--dash-border)" }}>
+    <div data-search-id={goal.id} className={`rounded-2xl overflow-hidden transition-all duration-500 ${isHighlighted(goal.id) ? "search-highlight" : ""}`} style={{ background: "var(--dash-surface)", border: isHighlighted(goal.id) ? "1px solid var(--dash-accent)" : "1px solid var(--dash-border)" }}>
       <div className="p-5">
         {/* Header */}
         <div className="flex items-start justify-between mb-3">

@@ -223,9 +223,9 @@ const HabitsTab = ({ isActive = true, onReadyChange, highlightId = null, onHighl
             const cat = categoryColors[habit.categoria] || categoryColors.saude;
             const done = completedToday.has(habit.id);
             return (
-              <div key={habit.id} className="flex items-center gap-3 px-5 py-4 group transition-colors" style={{ borderBottom: i < habits.length - 1 ? "1px solid var(--dash-border)" : "none" }}
+              <div key={habit.id} data-search-id={habit.id} className={`flex items-center gap-3 px-5 py-4 group transition-all duration-500 ${isHighlighted(habit.id) ? "search-highlight" : ""}`} style={{ borderBottom: i < habits.length - 1 ? "1px solid var(--dash-border)" : "none" }}
                 onMouseEnter={(e) => { e.currentTarget.style.background = "var(--dash-muted-surface)"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
+                onMouseLeave={(e) => { if (!isHighlighted(habit.id)) e.currentTarget.style.background = "transparent"; }}
               >
                 <button
                   onClick={() => toggleHabit(habit.id)}
