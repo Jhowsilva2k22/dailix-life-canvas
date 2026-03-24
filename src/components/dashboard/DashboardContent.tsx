@@ -63,6 +63,8 @@ const DashboardContent = () => {
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [fetchError, setFetchError] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [fetchError, setFetchError] = useState(false);
   const revealRef = useScrollReveal();
 
   const today = new Date().toISOString().split("T")[0];
