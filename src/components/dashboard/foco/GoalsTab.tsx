@@ -58,26 +58,24 @@ const SummaryStrip = ({ goals }: { goals: Goal[] }) => {
   const concluidas = goals.filter((g) => g.status === "concluida").length;
 
   return (
-    <div className="flex items-center gap-6 mb-6 px-1">
+    <div className="flex items-center gap-4 flex-wrap mb-5">
       <div>
-        <span style={{ color: "var(--dash-text)", fontSize: 20, fontWeight: 500 }}>{total}</span>
-        <span className="ml-1.5" style={{ color: "var(--dash-text-muted)", fontSize: 12, fontWeight: 300 }}>
+        <span style={{ color: "var(--dash-text)", fontSize: 18, fontWeight: 500 }}>{total}</span>
+        <span className="ml-1" style={{ color: "var(--dash-text-muted)", fontSize: 12, fontWeight: 300 }}>
           {total === 1 ? "meta" : "metas"}
         </span>
       </div>
-      <div style={{ width: 1, height: 20, background: "var(--dash-border)" }} />
+      <div style={{ width: 1, height: 16, background: "var(--dash-border)" }} />
       <div>
-        <span style={{ color: "var(--dash-accent)", fontSize: 16, fontWeight: 500 }}>{ativas}</span>
-        <span className="ml-1.5" style={{ color: "var(--dash-text-muted)", fontSize: 12, fontWeight: 300 }}>
-          {ativas === 1 ? "em andamento" : "em andamento"}
-        </span>
+        <span style={{ color: "var(--dash-accent)", fontSize: 14, fontWeight: 500 }}>{ativas}</span>
+        <span className="ml-1" style={{ color: "var(--dash-text-muted)", fontSize: 11, fontWeight: 300 }}>ativas</span>
       </div>
       {concluidas > 0 && (
         <>
-          <div style={{ width: 1, height: 20, background: "var(--dash-border)" }} />
+          <div style={{ width: 1, height: 16, background: "var(--dash-border)" }} />
           <div>
-            <span style={{ color: "var(--dash-success-text)", fontSize: 16, fontWeight: 500 }}>{concluidas}</span>
-            <span className="ml-1.5" style={{ color: "var(--dash-text-muted)", fontSize: 12, fontWeight: 300 }}>
+            <span style={{ color: "var(--dash-success-text)", fontSize: 14, fontWeight: 500 }}>{concluidas}</span>
+            <span className="ml-1" style={{ color: "var(--dash-text-muted)", fontSize: 11, fontWeight: 300 }}>
               {concluidas === 1 ? "concluída" : "concluídas"}
             </span>
           </div>
@@ -354,19 +352,19 @@ const GoalsTabInner = () => {
 
   /* Content */
   return (
-    <div>
-      {/* Header row: summary + action */}
-      <div className="flex items-center justify-between mb-1">
+    <div className="overflow-x-hidden">
+      {/* Summary + action */}
+      <div className="flex items-center justify-between flex-wrap gap-3 mb-1">
         <SummaryStrip goals={goals} />
         <button
           onClick={openCreate}
-          className="inline-flex items-center gap-1.5 rounded-lg transition-colors flex-shrink-0"
+          className="inline-flex items-center gap-1.5 rounded-lg transition-colors"
           style={{
             border: "1px solid var(--dash-primary)",
             color: "var(--dash-text-secondary)",
             fontSize: 13,
             fontWeight: 400,
-            padding: "8px 14px",
+            padding: "7px 12px",
           }}
         >
           <Plus size={14} /> Nova meta
