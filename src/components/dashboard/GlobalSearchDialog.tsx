@@ -1,13 +1,13 @@
-import { useEffect, useCallback } from "react";
-import { Search, FileText, Target, Heart, Lightbulb, Loader2 } from "lucide-react";
+import { useEffect, useCallback, useRef } from "react";
+import { Search, FileText, Target, Heart, Lightbulb, Loader2, X, ArrowRight } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useGlobalSearch, SearchResult, SearchResultType } from "@/hooks/useGlobalSearch";
 
-const typeConfig: Record<SearchResultType, { label: string; icon: typeof Search; color: string }> = {
-  task: { label: "Tarefas", icon: FileText, color: "var(--dash-accent)" },
-  goal: { label: "Metas", icon: Target, color: "var(--dash-warning-text)" },
-  habit: { label: "Hábitos", icon: Heart, color: "var(--dash-success-text)" },
-  insight: { label: "Insights", icon: Lightbulb, color: "var(--dash-purple-text)" },
+const typeConfig: Record<SearchResultType, { label: string; labelPlural: string; icon: typeof Search; color: string }> = {
+  task: { label: "Tarefa", labelPlural: "Tarefas", icon: FileText, color: "var(--dash-accent)" },
+  goal: { label: "Meta", labelPlural: "Metas", icon: Target, color: "var(--dash-warning-text)" },
+  habit: { label: "Hábito", labelPlural: "Hábitos", icon: Heart, color: "var(--dash-success-text)" },
+  insight: { label: "Insight", labelPlural: "Insights", icon: Lightbulb, color: "var(--dash-purple-text)" },
 };
 
 export interface SearchFocus {
@@ -22,12 +22,27 @@ interface Props {
   onSelect: (focus: SearchFocus) => void;
 }
 
+const quickLinks: { type: SearchResultType; section: string }[] = [
+  { type: "task", section: "foco" },
+  { type: "goal", section: "foco" },
+  { type: "habit", section: "bem-estar" },
+  { type: "insight", section: "inicio" },
+];
+
 export default function GlobalSearchDialog({ open, onClose, onSelect }: Props) {
   const { query, setQuery, results, loading, error } = useGlobalSearch();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (!open) setQuery("");
   }, [open, setQuery]);
+
+  // Focus input when opened
+  useEffect(() => {
+    if (open) {
+      setTimeout(() => inputRef.current?.focus(), 50);
+    }
+  }, [open]);
 
   // Keyboard shortcut: Cmd/Ctrl+K
   useEffect(() => {
@@ -35,14 +50,19 @@ export default function GlobalSearchDialog({ open, onClose, onSelect }: Props) {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
         e.preventDefault();
         if (open) onClose();
-        else {
-          // parent handles open
-        }
       }
     };
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
   }, [open, onClose]);
+
+  // Lock body scroll on mobile when open
+  useEffect(() => {
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, [open]);
 
   const handleSelect = useCallback((item: SearchResult) => {
     onSelect({ section: item.route, type: item.type, id: item.id });
@@ -57,38 +77,53 @@ export default function GlobalSearchDialog({ open, onClose, onSelect }: Props) {
 
   const groupOrder: SearchResultType[] = ["task", "goal", "habit", "insight"];
   const hasResults = results.length > 0;
-  const showEmpty = !loading && !error && !hasResults && query.trim().length >= 2;
+  const trimmedLen = query.trim().length;
+  const showEmpty = !loading && !error && !hasResults && trimmedLen >= 2;
+  const showSuggestions = trimmedLen < 2 && !loading;
 
   return (
     <Dialog open={open} onOpenChange={(v) => !v && onClose()}>
+      {/* Desktop: centered modal | Mobile: fullscreen overlay */}
       <DialogContent
-        className="p-0 gap-0 overflow-hidden"
+        className="p-0 gap-0 overflow-hidden search-dialog-content"
         style={{
           background: "var(--dash-surface-elevated)",
           border: "1px solid var(--dash-border-strong)",
-          borderRadius: 16,
           boxShadow: "var(--dash-shadow-modal)",
-          maxWidth: 520,
-          width: "calc(100% - 32px)",
         }}
       >
-        {/* Search input */}
+        {/* Fixed search header */}
         <div
-          className="flex items-center gap-3 px-4"
+          className="flex items-center gap-3 px-4 flex-shrink-0"
           style={{ borderBottom: "1px solid var(--dash-border)", height: 52 }}
         >
           <Search size={18} style={{ color: "var(--dash-text-muted)", flexShrink: 0 }} />
           <input
+            ref={inputRef}
             autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Buscar tarefas, metas, hábitos, insights..."
-            className="flex-1 bg-transparent outline-none text-sm"
-            style={{ color: "var(--dash-text)", caretColor: "var(--dash-accent)" }}
+            placeholder="Buscar tarefas, metas, hábitos..."
+            className="flex-1 bg-transparent outline-none text-base touch-compact"
+            style={{
+              color: "var(--dash-text)",
+              caretColor: "var(--dash-accent)",
+              fontSize: 16,
+              lineHeight: "1.5",
+            }}
           />
-          {loading && <Loader2 size={16} className="animate-spin" style={{ color: "var(--dash-text-muted)" }} />}
+          {loading && <Loader2 size={16} className="animate-spin flex-shrink-0" style={{ color: "var(--dash-text-muted)" }} />}
+          {/* Mobile close button */}
+          <button
+            onClick={onClose}
+            className="md:hidden flex items-center justify-center touch-compact"
+            style={{ color: "var(--dash-text-muted)", width: 32, height: 32 }}
+          >
+            <X size={18} />
+          </button>
+          {/* Desktop ESC hint */}
           <kbd
-            className="hidden sm:inline-flex items-center px-1.5 py-0.5 rounded text-[10px]"
+            className="hidden md:inline-flex items-center px-1.5 py-0.5 rounded text-[10px] touch-compact"
             style={{
               background: "var(--dash-muted-surface-hover)",
               color: "var(--dash-text-muted)",
@@ -100,17 +135,65 @@ export default function GlobalSearchDialog({ open, onClose, onSelect }: Props) {
           </kbd>
         </div>
 
-        {/* Results area */}
-        <div
-          className="overflow-y-auto"
-          style={{ maxHeight: 360, minHeight: query.trim().length >= 2 ? 120 : 0 }}
-        >
+        {/* Scrollable results area */}
+        <div className="search-results-scroll overflow-y-auto flex-1">
+          {/* Initial suggestions when query is empty */}
+          {showSuggestions && (
+            <div className="px-3 py-3">
+              <p
+                className="px-2 pb-2 text-xs font-medium"
+                style={{ color: "var(--dash-text-muted)", letterSpacing: "0.04em", textTransform: "uppercase" }}
+              >
+                Buscar em
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {quickLinks.map(({ type, section }) => {
+                  const config = typeConfig[type];
+                  const Icon = config.icon;
+                  return (
+                    <button
+                      key={type}
+                      onClick={() => setQuery(config.labelPlural.toLowerCase().slice(0, 3))}
+                      className="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors touch-compact"
+                      style={{
+                        background: "var(--dash-muted-surface)",
+                        border: "1px solid var(--dash-border)",
+                        color: "var(--dash-text-secondary)",
+                        fontSize: 13,
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.background = "var(--dash-muted-surface-hover)"; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.background = "var(--dash-muted-surface)"; }}
+                    >
+                      <Icon size={14} style={{ color: config.color }} />
+                      {config.labelPlural}
+                      <ArrowRight size={12} style={{ opacity: 0.4 }} />
+                    </button>
+                  );
+                })}
+              </div>
+
+              {trimmedLen === 0 && (
+                <p className="px-2 pt-4 text-xs" style={{ color: "var(--dash-text-muted)", opacity: 0.6 }}>
+                  Digite para buscar por título ou descrição
+                </p>
+              )}
+
+              {trimmedLen === 1 && (
+                <p className="px-2 pt-4 text-xs" style={{ color: "var(--dash-text-muted)" }}>
+                  Mais um caractere para iniciar a busca...
+                </p>
+              )}
+            </div>
+          )}
+
+          {/* Error */}
           {error && (
             <div className="px-4 py-6 text-center text-sm" style={{ color: "var(--dash-danger-text)" }}>
               {error}
             </div>
           )}
 
+          {/* Empty state */}
           {showEmpty && (
             <div className="px-4 py-8 text-center" style={{ color: "var(--dash-text-muted)" }}>
               <Search size={28} className="mx-auto mb-2 opacity-40" />
@@ -119,6 +202,7 @@ export default function GlobalSearchDialog({ open, onClose, onSelect }: Props) {
             </div>
           )}
 
+          {/* Grouped results */}
           {hasResults && groupOrder.map((type) => {
             const items = grouped[type];
             if (!items || items.length === 0) return null;
@@ -132,13 +216,13 @@ export default function GlobalSearchDialog({ open, onClose, onSelect }: Props) {
                   style={{ color: "var(--dash-text-muted)", fontSize: 11, fontWeight: 500, letterSpacing: "0.04em", textTransform: "uppercase" }}
                 >
                   <Icon size={13} style={{ color: config.color }} />
-                  {config.label}
+                  {config.labelPlural}
                 </div>
                 {items.map((item) => (
                   <button
                     key={item.id}
                     onClick={() => handleSelect(item)}
-                    className="flex items-start gap-3 w-full px-4 py-2.5 text-left transition-colors"
+                    className="flex items-start gap-3 w-full px-4 py-3 text-left transition-colors touch-compact"
                     style={{ borderRadius: 0 }}
                     onMouseEnter={(e) => { e.currentTarget.style.background = "var(--dash-muted-surface-hover)"; }}
                     onMouseLeave={(e) => { e.currentTarget.style.background = "transparent"; }}
@@ -159,16 +243,6 @@ export default function GlobalSearchDialog({ open, onClose, onSelect }: Props) {
             );
           })}
         </div>
-
-        {/* Footer hint */}
-        {query.trim().length < 2 && (
-          <div
-            className="px-4 py-3 text-center text-xs"
-            style={{ color: "var(--dash-text-muted)", borderTop: "1px solid var(--dash-border)" }}
-          >
-            Digite pelo menos 2 caracteres para buscar
-          </div>
-        )}
       </DialogContent>
     </Dialog>
   );
