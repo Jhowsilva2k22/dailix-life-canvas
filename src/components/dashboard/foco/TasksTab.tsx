@@ -166,6 +166,11 @@ const TasksTab = () => {
 
   return (
     <div>
+      {/* Header with refresh */}
+      <div className="flex items-center gap-2 mb-4">
+        <h2 style={{ color: "#0F172A", fontSize: 16, fontWeight: 500 }}>Tarefas</h2>
+        <RefreshButton refreshing={refreshing} onRefresh={async () => { setRefreshing(true); await fetchTasks(); setRefreshing(false); }} />
+      </div>
       {/* Filters */}
       <div className="mb-2 overflow-x-auto" data-reveal style={{ transitionDelay: "160ms" }}>
         <div className="flex gap-2">
