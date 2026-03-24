@@ -1,5 +1,5 @@
-import { useEffect, useState, useCallback } from "react";
-import { Plus, Flame } from "lucide-react";
+import { useEffect, useState, useCallback, useMemo } from "react";
+import { Plus, Flame, ArrowRight } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
@@ -167,6 +167,23 @@ const DashboardContent = () => {
   const pendingTasks = todayTasks.filter((t) => !t.concluida);
   const doneTasks = todayTasks.filter((t) => t.concluida);
 
+  const upcomingTasks = useMemo(() => {
+    return tasks
+      .filter((t) => !t.concluida && t.prazo && t.prazo > today)
+      .sort((a, b) => (a.prazo! > b.prazo! ? 1 : -1))
+      .slice(0, 3);
+  }, [tasks, today]);
+
+  const getRelativeDate = (dateStr: string) => {
+    const target = new Date(dateStr + "T00:00:00");
+    const now = new Date();
+    const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const diff = Math.round((target.getTime() - todayDate.getTime()) / (1000 * 60 * 60 * 24));
+    if (diff === 1) return "amanhã";
+    if (diff <= 7) return `em ${diff} dias`;
+    return target.toLocaleDateString("pt-BR", { day: "numeric", month: "short" });
+  };
+
   const goalTitle = activeGoal ? (activeGoal.titulo.length > 24 ? activeGoal.titulo.slice(0, 24) + "…" : activeGoal.titulo) : profile.first_goal ? (profile.first_goal.length > 24 ? profile.first_goal.slice(0, 24) + "…" : profile.first_goal) : "—";
   const goalProgress = activeGoal?.progresso ?? 0;
   const goalHasLinkedTasks = activeGoal?.hasLinkedTasks ?? false;
@@ -311,7 +328,35 @@ const DashboardContent = () => {
           )}
         </section>
 
-        {/* Habits */}
+        {/* A seguir */}
+        <section className="mb-12" data-reveal>
+          <div className="flex items-center justify-between mb-4">
+            <span style={{ color: "var(--dash-text-muted)", fontSize: 11, fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase" as const }}>A seguir</span>
+          </div>
+          {upcomingTasks.length === 0 ? (
+            <div className="flex items-center justify-center py-8 rounded-2xl" style={{ background: "var(--dash-surface)", border: "1px solid var(--dash-border)" }}>
+              <p style={{ color: "var(--dash-text-muted)", fontSize: 13, fontWeight: 300 }}>Nenhuma tarefa agendada para os próximos dias</p>
+            </div>
+          ) : (
+            <div className="rounded-2xl overflow-hidden" style={{ background: "var(--dash-surface)", border: "1px solid var(--dash-border)" }}>
+              {upcomingTasks.map((task, i) => {
+                const ps = priorityStyles[task.prioridade] || priorityStyles.media;
+                return (
+                  <div key={task.id} className="flex items-center gap-3 px-5 py-3.5" style={{ borderBottom: i < upcomingTasks.length - 1 ? "1px solid var(--dash-border)" : "none" }}>
+                    <ArrowRight size={14} style={{ color: "var(--dash-text-muted)", opacity: 0.5, flexShrink: 0 }} />
+                    <div className="flex-1 min-w-0">
+                      <p style={{ color: "var(--dash-text-secondary)", fontSize: 13, fontWeight: 400 }}>{task.titulo}</p>
+                    </div>
+                    <span style={{ color: "var(--dash-text-muted)", fontSize: 11, fontWeight: 300, flexShrink: 0 }}>{getRelativeDate(task.prazo!)}</span>
+                    <span className="px-2 py-0.5 rounded" style={{ fontSize: 10, fontWeight: 400, background: ps.bg, color: ps.color }}>{task.prioridade}</span>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </section>
+
+
         <section className="mb-12" data-reveal>
           <div className="flex items-center justify-between mb-4">
             <span style={{ color: "var(--dash-text-muted)", fontSize: 11, fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase" as const }}>Habitos</span>
