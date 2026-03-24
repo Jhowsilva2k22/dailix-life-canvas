@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from "react";
 import { toPng } from "html-to-image";
-import { X, Download, Share2 } from "lucide-react";
+import { X, Download } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 
