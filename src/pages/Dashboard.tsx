@@ -37,10 +37,18 @@ const Dashboard = () => {
     <div className="dashboard-shell min-h-screen" style={{ background: "var(--dash-bg)" }}>
       <DashboardSidebar activeItem={activeItem} onNavigate={setActiveItem} />
       <MobileNav activeItem={activeItem} onNavigate={setActiveItem} />
-      {activeItem === "inicio" && <DashboardContent />}
-      {activeItem === "foco" && <FocoPage />}
-      {activeItem === "bem-estar" && <BemEstarPage />}
-      {activeItem === "configuracoes" && <SettingsPage />}
+      <div style={{ display: activeItem === "inicio" ? "block" : "none" }}>
+        <DashboardContent />
+      </div>
+      <div style={{ display: activeItem === "foco" ? "block" : "none" }}>
+        <FocoPage />
+      </div>
+      <div style={{ display: activeItem === "bem-estar" ? "block" : "none" }}>
+        <BemEstarPage />
+      </div>
+      <div style={{ display: activeItem === "configuracoes" ? "block" : "none" }}>
+        <SettingsPage />
+      </div>
     </div>
   );
 };
