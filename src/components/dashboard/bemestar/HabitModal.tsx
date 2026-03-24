@@ -49,6 +49,8 @@ const HabitModal = ({ onClose, onSaved, editingHabit }: HabitModalProps) => {
         descricao: descricao.trim() || null,
         categoria,
         frequencia,
+        lembrete_ativo: lembreteAtivo,
+        lembrete_horario: lembreteAtivo && lembreteHorario ? lembreteHorario + ":00" : null,
       };
       if (isEdit && editingHabit) {
         const { error } = await supabase.from("habits").update(payload).eq("id", editingHabit.id);
