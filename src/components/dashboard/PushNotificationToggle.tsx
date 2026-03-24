@@ -35,6 +35,16 @@ const PushNotificationToggle = () => {
 
   useEffect(() => {
     detectState();
+
+    const recheck = () => {
+      if (document.visibilityState === "visible") detectState();
+    };
+    document.addEventListener("visibilitychange", recheck);
+    window.addEventListener("focus", recheck);
+    return () => {
+      document.removeEventListener("visibilitychange", recheck);
+      window.removeEventListener("focus", recheck);
+    };
   }, [user]);
 
   const detectState = async () => {
