@@ -36,11 +36,15 @@ interface Habit {
   streak: number;
 }
 
+const capitalize = (s: string) =>
+  s.trim().split(/\s+/).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(" ");
+
 const getGreeting = (name: string) => {
+  const formatted = capitalize(name);
   const hour = new Date().getHours();
-  if (hour >= 5 && hour < 12) return `Bom dia, ${name}.`;
-  if (hour >= 12 && hour < 18) return `Boa tarde, ${name}.`;
-  return `Boa noite, ${name}.`;
+  if (hour >= 5 && hour < 12) return `Bom dia, ${formatted}`;
+  if (hour >= 12 && hour < 18) return `Boa tarde, ${formatted}`;
+  return `Boa noite, ${formatted}`;
 };
 
 const categoryColors: Record<string, { bg: string; color: string; label: string }> = {
