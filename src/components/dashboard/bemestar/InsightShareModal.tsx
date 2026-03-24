@@ -26,19 +26,19 @@ const FORMAT_CONFIG: Record<Format, { w: number; h: number; label: string }> = {
 const InsightShareModal = ({ insight, onClose }: InsightShareModalProps) => {
   const [format, setFormat] = useState<Format>("feed");
   const [generating, setGenerating] = useState(false);
-  const canvasRef = useRef<HTMLDivElement>(null);
+  const exportRef = useRef<HTMLDivElement>(null);
 
   const cfg = FORMAT_CONFIG[format];
   const previewScale = format === "feed" ? 0.28 : 0.2;
 
   const generate = useCallback(async (): Promise<Blob | null> => {
-    if (!canvasRef.current) return null;
+    if (!exportRef.current) return null;
     setGenerating(true);
     try {
-      const dataUrl = await toPng(canvasRef.current, {
+      const dataUrl = await toPng(exportRef.current, {
         width: cfg.w,
         height: cfg.h,
-        pixelRatio: 3,
+        pixelRatio: 1,
         cacheBust: true,
       });
       const res = await fetch(dataUrl);
@@ -131,7 +131,7 @@ const InsightShareModal = ({ insight, onClose }: InsightShareModalProps) => {
             })}
           </div>
 
-          {/* Preview container */}
+          {/* Preview container (scaled for display only) */}
           <div className="flex justify-center px-5 py-5">
             <div
               className="overflow-hidden rounded-xl"
@@ -142,7 +142,6 @@ const InsightShareModal = ({ insight, onClose }: InsightShareModalProps) => {
               }}
             >
               <div
-                ref={canvasRef}
                 style={{
                   width: cfg.w,
                   height: cfg.h,
@@ -152,6 +151,23 @@ const InsightShareModal = ({ insight, onClose }: InsightShareModalProps) => {
               >
                 <InsightCanvas insight={insight} format={format} />
               </div>
+            </div>
+          </div>
+
+          {/* Offscreen full-size node for export only */}
+          <div
+            style={{
+              position: "fixed",
+              left: "-9999px",
+              top: 0,
+              pointerEvents: "none",
+            }}
+          >
+            <div
+              ref={exportRef}
+              style={{ width: cfg.w, height: cfg.h }}
+            >
+              <InsightCanvas insight={insight} format={format} />
             </div>
           </div>
 
