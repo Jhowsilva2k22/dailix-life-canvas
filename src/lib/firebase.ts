@@ -30,7 +30,8 @@ export async function getFCMToken(): Promise<string | null> {
     const messaging = await getFirebaseMessaging();
     if (!messaging) return null;
 
-    const registration = await navigator.serviceWorker.register("/firebase-messaging-sw.js");
+    // Use the unified sw.js which includes Firebase compat scripts
+    const registration = await navigator.serviceWorker.register("/sw.js");
 
     const token = await getToken(messaging, {
       vapidKey: FCM_VAPID_KEY,
