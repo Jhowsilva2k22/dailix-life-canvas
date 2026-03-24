@@ -17,7 +17,7 @@ interface DashboardSidebarProps {
   onOpenSearch?: () => void;
 }
 
-const DashboardSidebar = ({ activeItem, onNavigate }: DashboardSidebarProps) => {
+const DashboardSidebar = ({ activeItem, onNavigate, onOpenSearch }: DashboardSidebarProps) => {
   const { signOut } = useAuth();
   const { avatarUrl, displayName, plano } = useAvatar();
   const [showAvatarUpload, setShowAvatarUpload] = useState(false);
