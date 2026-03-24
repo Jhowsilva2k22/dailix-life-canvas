@@ -77,28 +77,23 @@ const DashboardContent = () => {
   const today = new Date().toISOString().split("T")[0];
 
   useEffect(() => {
-    if (authLoading || !user) return;
-
-    let cancelled = false;
-
+    if (!user) return;
+    let active = true;
     const load = async () => {
-      setLoading(true);
-      await Promise.all([
-        supabase.from("profiles").select("display_name, first_goal, modules").eq("user_id", user.id).single().then(({ data }) => { if (data) setProfile(data); }),
-        fetchTasks(),
-        fetchHabits(),
-        fetchActiveGoal(),
-      ]);
-
-      if (!cancelled) setLoading(false);
+      try {
+        await Promise.all([
+          supabase.from("profiles").select("display_name, first_goal, modules").eq("user_id", user.id).single().then(({ data }) => { if (data) setProfile(data); }),
+          fetchTasks(),
+          fetchHabits(),
+          fetchActiveGoal(),
+        ]);
+      } finally {
+        if (active) setLoading(false);
+      }
     };
-
     load();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [authLoading, user]);
+    return () => { active = false; };
+  }, [user]);
 
   useEffect(() => {
     if (!user) return;
@@ -210,7 +205,7 @@ const DashboardContent = () => {
 
   const CheckIcon = () => <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" /></svg>;
 
-  if (authLoading || loading) {
+  if (loading) {
     return (
       <div className="flex-1 min-h-screen md:ml-[240px]" style={{ background: "var(--dash-bg)" }}>
         <SectionTransitionSkeleton showTabs={false} />
