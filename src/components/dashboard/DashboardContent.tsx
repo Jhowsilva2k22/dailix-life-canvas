@@ -459,9 +459,11 @@ const DashboardContent = () => {
 
         {/* Habitos de hoje */}
         <section className="mb-10" data-reveal style={{ transitionDelay: "240ms" }}>
-          <h2 className="font-display mb-4" style={{ color: "#0F172A", fontSize: 16, fontWeight: 400, letterSpacing: "0.01em" }}>
-            Habitos de hoje
-          </h2>
+          <div className="flex items-center gap-2 mb-4">
+            <h2 className="font-display" style={{ color: "#0F172A", fontSize: 16, fontWeight: 400, letterSpacing: "0.01em" }}>
+              Habitos de hoje
+            </h2>
+          </div>
           {habits.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8" style={{ background: "rgba(0,180,216,0.03)", border: "1px dashed rgba(0,180,216,0.2)", borderRadius: 12 }}>
               <p style={{ color: "#94A3B8", fontSize: 14, fontWeight: 300 }}>Nenhum habito configurado.</p>
