@@ -18,9 +18,9 @@ const buttonVariants = cva(
         hero: "bg-accent text-accent-foreground shadow-soft hover:shadow-elevated hover:brightness-110",
       },
       size: {
-        default: "h-10 px-5 py-2",
-        sm: "h-9 rounded-lg px-3",
-        lg: "h-12 rounded-lg px-8 text-base",
+        default: "h-12 md:h-10 px-5 py-2",
+        sm: "h-10 md:h-9 rounded-lg px-3",
+        lg: "h-14 md:h-12 rounded-lg px-8 text-base",
         icon: "h-10 w-10",
       },
     },
