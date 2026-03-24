@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import DashboardSidebar from "@/components/dashboard/DashboardSidebar";
 import DashboardContent from "@/components/dashboard/DashboardContent";
@@ -6,7 +6,7 @@ import MobileNav from "@/components/dashboard/MobileNav";
 import FocoPage from "@/components/dashboard/foco/FocoPage";
 import BemEstarPage from "@/components/dashboard/bemestar/BemEstarPage";
 import SettingsPage from "@/components/dashboard/SettingsPage";
-import GlobalSearchDialog from "@/components/dashboard/GlobalSearchDialog";
+import GlobalSearchDialog, { type SearchFocus } from "@/components/dashboard/GlobalSearchDialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { useReminders } from "@/hooks/useReminders";
@@ -17,6 +17,7 @@ const Dashboard = () => {
   const [activeItem, setActiveItem] = useState("inicio");
   const [ready, setReady] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [searchFocus, setSearchFocus] = useState<SearchFocus | null>(null);
   useReminders();
 
   useEffect(() => {
@@ -47,21 +48,31 @@ const Dashboard = () => {
     return () => document.removeEventListener("keydown", handler);
   }, []);
 
+  const handleSearchSelect = useCallback((focus: SearchFocus) => {
+    setActiveItem(focus.section);
+    setSearchFocus(focus);
+  }, []);
+
+  // Clear searchFocus after sub-pages consume it
+  const clearSearchFocus = useCallback(() => {
+    setSearchFocus(null);
+  }, []);
+
   if (!ready) return null;
 
   return (
     <div className="dashboard-shell min-h-screen" style={{ background: "var(--dash-bg)" }}>
       <DashboardSidebar activeItem={activeItem} onNavigate={setActiveItem} onOpenSearch={() => setSearchOpen(true)} />
       <MobileNav activeItem={activeItem} onNavigate={setActiveItem} onOpenSearch={() => setSearchOpen(true)} />
-      <GlobalSearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} onNavigate={setActiveItem} />
+      <GlobalSearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} onSelect={handleSearchSelect} />
       <div style={{ display: activeItem === "inicio" ? "block" : "none" }}>
         <DashboardContent />
       </div>
       <div style={{ display: activeItem === "foco" ? "block" : "none" }}>
-        <FocoPage />
+        <FocoPage searchFocus={searchFocus} onClearSearchFocus={clearSearchFocus} />
       </div>
       <div style={{ display: activeItem === "bem-estar" ? "block" : "none" }}>
-        <BemEstarPage />
+        <BemEstarPage searchFocus={searchFocus} onClearSearchFocus={clearSearchFocus} />
       </div>
       <div style={{ display: activeItem === "configuracoes" ? "block" : "none" }}>
         <SettingsPage />
