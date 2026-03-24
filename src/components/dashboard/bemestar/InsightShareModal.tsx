@@ -4,7 +4,7 @@ import { X, Download, MoreHorizontal } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
 
-const CANONICAL_LINK = "https://dailix-life-canvas.lovable.app/cadastro";
+const CANONICAL_LINK = "https://dailix-life-canvas.lovable.app";
 
 const SHARE_TEXT = (titulo: string) =>
   `"${titulo}"\n\nCrie sua conta no Dailix\n${CANONICAL_LINK}`;
