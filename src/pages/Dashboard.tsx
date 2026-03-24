@@ -8,6 +8,7 @@ import BemEstarPage from "@/components/dashboard/bemestar/BemEstarPage";
 import SettingsPage from "@/components/dashboard/SettingsPage";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import { useReminders } from "@/hooks/useReminders";
 
 const Dashboard = () => {
   const { user } = useAuth();
