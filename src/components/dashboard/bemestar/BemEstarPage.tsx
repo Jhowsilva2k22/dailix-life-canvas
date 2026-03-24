@@ -30,6 +30,7 @@ const BemEstarPage = ({ searchFocus, onClearSearchFocus }: BemEstarPageProps) =>
     } else if (searchFocus.type === "insight") {
       setActiveTab("insights");
     }
+    setHighlightId(searchFocus.id);
     onClearSearchFocus?.();
   }, [searchFocus, onClearSearchFocus]);
 
