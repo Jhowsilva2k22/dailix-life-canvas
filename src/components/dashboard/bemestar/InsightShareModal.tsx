@@ -328,7 +328,7 @@ const InsightCanvas = ({
         {/* Body text */}
         <p
           style={{
-            fontSize: isFeed ? 26 : 28,
+            fontSize: isFeed ? 28 : 32,
             fontWeight: 300,
             lineHeight: 1.7,
             color: "#94A3B8",
