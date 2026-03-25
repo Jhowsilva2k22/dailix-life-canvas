@@ -400,7 +400,7 @@ const Setup = () => {
                   {!submitting && <ArrowRight className="h-4 w-4" />}
                 </PrimaryBtn>
                 <p className="text-[13px]" style={{ color: "rgba(255,255,255,0.3)", fontWeight: 300 }}>
-                  Acesso imediato. Cancelamento simples. Pix e cartão.
+                  Acesso imediato. Cancelamento simples.
                 </p>
                 <GhostBtn onClick={() => seedAndFinish("free")}>
                   Continuar com acesso limitado
