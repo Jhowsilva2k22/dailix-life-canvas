@@ -1,12 +1,7 @@
-import { useState, useCallback } from "react";
-import { initMercadoPago, Payment } from "@mercadopago/sdk-react";
+import { useState, useCallback, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
-const MP_PUBLIC_KEY = import.meta.env.VITE_MP_PUBLIC_KEY;
-
-if (MP_PUBLIC_KEY) {
-  initMercadoPago(MP_PUBLIC_KEY, { locale: "pt-BR" });
-}
+let mpInitialized = false;
 
 interface PaymentBrickProps {
   userEmail: string;
@@ -17,6 +12,38 @@ interface PaymentBrickProps {
 
 const PaymentBrick = ({ userEmail, onSuccess, onError, onPending }: PaymentBrickProps) => {
   const [processing, setProcessing] = useState(false);
+  const [sdkReady, setSdkReady] = useState(false);
+  const [publicKey, setPublicKey] = useState<string | null>(null);
+
+  // Fetch public key and initialize SDK
+  useEffect(() => {
+    let cancelled = false;
+
+    const init = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke("get-mp-public-key");
+        if (error || !data?.public_key) {
+          console.error("Failed to fetch MP public key");
+          return;
+        }
+        if (cancelled) return;
+
+        setPublicKey(data.public_key);
+
+        if (!mpInitialized) {
+          const { initMercadoPago } = await import("@mercadopago/sdk-react");
+          initMercadoPago(data.public_key, { locale: "pt-BR" });
+          mpInitialized = true;
+        }
+        setSdkReady(true);
+      } catch (err) {
+        console.error("MP SDK init error:", err);
+      }
+    };
+
+    init();
+    return () => { cancelled = true; };
+  }, []);
 
   const handleSubmit = useCallback(
     async (formData: any) => {
@@ -69,19 +96,44 @@ const PaymentBrick = ({ userEmail, onSuccess, onError, onPending }: PaymentBrick
     [onError]
   );
 
-  if (!MP_PUBLIC_KEY) {
+  if (!sdkReady) {
     return (
-      <div className="rounded-xl p-5 text-center" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.06)" }}>
-        <p className="text-[13px]" style={{ color: "rgba(255,255,255,0.4)" }}>
-          Pagamento em configuração. Tente novamente em breve.
-        </p>
+      <div className="flex items-center justify-center py-8">
+        <div className="h-5 w-5 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: "#00B4D8", borderTopColor: "transparent" }} />
+        <span className="ml-3 text-[13px]" style={{ color: "rgba(255,255,255,0.4)" }}>Carregando pagamento...</span>
       </div>
     );
   }
 
+  // Dynamically render the Payment component after SDK is ready
+  return <PaymentBrickInner
+    userEmail={userEmail}
+    onSubmit={handleSubmit}
+    onError={handleError}
+    processing={processing}
+  />;
+};
+
+// Separate component to ensure Payment import happens after SDK init
+const PaymentBrickInner = ({ userEmail, onSubmit, onError, processing }: {
+  userEmail: string;
+  onSubmit: (data: any) => void;
+  onError: (error: any) => void;
+  processing: boolean;
+}) => {
+  const [PaymentComponent, setPaymentComponent] = useState<any>(null);
+
+  useEffect(() => {
+    import("@mercadopago/sdk-react").then((mod) => {
+      setPaymentComponent(() => mod.Payment);
+    });
+  }, []);
+
+  if (!PaymentComponent) return null;
+
   return (
     <div className="mp-brick-container">
-      <Payment
+      <PaymentComponent
         initialization={{
           amount: 9.9,
           payer: { email: userEmail },
@@ -90,14 +142,14 @@ const PaymentBrick = ({ userEmail, onSuccess, onError, onPending }: PaymentBrick
           paymentMethods: {
             creditCard: "all",
             debitCard: "all",
-            ticket: [],
-            bankTransfer: [],
-            atm: [],
+            ticket: [] as any,
+            bankTransfer: [] as any,
+            atm: [] as any,
             maxInstallments: 1,
           },
           visual: {
             style: {
-              theme: "dark",
+              theme: "dark" as const,
               customVariables: {
                 formBackgroundColor: "rgba(12,18,34,0.95)",
                 baseColor: "#00B4D8",
@@ -108,14 +160,14 @@ const PaymentBrick = ({ userEmail, onSuccess, onError, onPending }: PaymentBrick
                 borderRadiusLarge: "12px",
                 borderRadiusMedium: "10px",
                 borderRadiusSmall: "8px",
-              } as any,
+              },
             },
             hideFormTitle: true,
             hidePaymentButton: false,
           },
         }}
-        onSubmit={handleSubmit}
-        onError={handleError}
+        onSubmit={onSubmit}
+        onError={onError}
       />
       {processing && (
         <div className="flex items-center justify-center mt-4">
