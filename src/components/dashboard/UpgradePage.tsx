@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Check, ArrowRight, ArrowLeft } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAvatar } from "@/contexts/AvatarContext";
@@ -25,8 +25,28 @@ const UpgradePage = ({ onBack }: UpgradePageProps) => {
   const { user } = useAuth();
   const { plano, refreshAvatar } = useAvatar();
   const [showCheckout, setShowCheckout] = useState(false);
-  const [paymentStatus, setPaymentStatus] = useState<"idle" | "pending" | "error" | "success">("idle");
+  const [paymentStatus, setPaymentStatus] = useState<"idle" | "pending" | "awaiting" | "error" | "success">("idle");
   const [paymentError, setPaymentError] = useState("");
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Poll profile until backend confirms founder
+  const startPolling = () => {
+    if (pollingRef.current) return;
+    pollingRef.current = setInterval(async () => {
+      if (!user) return;
+      const { data } = await supabase.from("profiles").select("plano").eq("user_id", user.id).single();
+      if (data?.plano === "fundador") {
+        if (pollingRef.current) clearInterval(pollingRef.current);
+        pollingRef.current = null;
+        refreshAvatar();
+        setPaymentStatus("success");
+      }
+    }, 3000);
+  };
+
+  useEffect(() => {
+    return () => { if (pollingRef.current) clearInterval(pollingRef.current); };
+  }, []);
 
   if (plano === "fundador") {
     return (
@@ -133,9 +153,14 @@ const UpgradePage = ({ onBack }: UpgradePageProps) => {
             </button>
           ) : (
             <div className="w-full">
-              {paymentStatus === "pending" && (
+              {(paymentStatus === "pending" || paymentStatus === "awaiting") && (
                 <div className="rounded-xl p-5 mb-4 text-center" style={{ background: "rgba(0,180,216,0.06)", border: "1px solid rgba(0,180,216,0.12)" }}>
-                  <p className="text-[14px] mb-1" style={{ color: "var(--dash-accent)" }}>Pagamento pendente</p>
+                  <div className="flex items-center justify-center gap-2 mb-1">
+                    <div className="h-4 w-4 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: "var(--dash-accent)", borderTopColor: "transparent" }} />
+                    <p className="text-[14px]" style={{ color: "var(--dash-accent)" }}>
+                      {paymentStatus === "awaiting" ? "Confirmando pagamento..." : "Pagamento pendente"}
+                    </p>
+                  </div>
                   <p className="text-[13px]" style={{ color: "var(--dash-text-muted)", fontWeight: 300 }}>
                     Assim que o pagamento for confirmado, seu acesso será liberado automaticamente.
                   </p>
@@ -148,10 +173,9 @@ const UpgradePage = ({ onBack }: UpgradePageProps) => {
               )}
               <PaymentBrick
                 userEmail={user?.email || ""}
-                onSuccess={async () => {
-                  await supabase.from("profiles").update({ plano: "fundador" }).eq("user_id", user!.id);
-                  refreshAvatar();
-                  setPaymentStatus("success");
+                onSuccess={() => {
+                  setPaymentStatus("awaiting");
+                  startPolling();
                 }}
                 onError={(msg) => {
                   setPaymentStatus("error");
@@ -159,6 +183,7 @@ const UpgradePage = ({ onBack }: UpgradePageProps) => {
                 }}
                 onPending={() => {
                   setPaymentStatus("pending");
+                  startPolling();
                 }}
               />
               <button
