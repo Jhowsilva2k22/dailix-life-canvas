@@ -176,12 +176,15 @@ const TasksTab = ({ isActive = true, onReadyChange, highlightId = null, onHighli
         </div>
         <button
           onClick={openCreate}
-          className="inline-flex items-center gap-1.5 rounded-lg transition-colors"
+          disabled={atLimit}
+          className="inline-flex items-center gap-1.5 rounded-lg transition-colors disabled:opacity-40"
           style={{ border: "1px solid var(--dash-primary)", color: "var(--dash-text-secondary)", fontSize: 13, fontWeight: 400, padding: "7px 12px" }}
         >
           <Plus size={14} /> Nova
         </button>
       </div>
+
+      {atLimit && <div className="mb-4"><UpgradeBanner message={`Você atingiu o limite de ${limits.maxTasks} tarefas no plano gratuito. Ative o Plano Fundador para criar sem limites.`} compact /></div>}
 
       <div className="mb-5" style={{ fontSize: 12, color: "var(--dash-text-muted)", fontWeight: 300 }}>
         <span>{pending.length} pendentes</span><span className="mx-1.5">·</span><span>{done.length} concluídas</span>

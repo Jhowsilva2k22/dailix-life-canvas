@@ -383,7 +383,8 @@ const GoalsTabInner = ({ isActive = true, onReadyChange, highlightId = null }: G
         <SummaryStrip goals={goals} />
         <button
           onClick={openCreate}
-          className="inline-flex items-center gap-1.5 rounded-lg transition-colors"
+          disabled={atLimit}
+          className="inline-flex items-center gap-1.5 rounded-lg transition-colors disabled:opacity-40"
           style={{
             border: "1px solid var(--dash-primary)",
             color: "var(--dash-text-secondary)",
@@ -395,6 +396,8 @@ const GoalsTabInner = ({ isActive = true, onReadyChange, highlightId = null }: G
           <Plus size={14} /> Nova meta
         </button>
       </div>
+
+      {atLimit && <div className="mb-4"><UpgradeBanner message={`Limite de ${limits.maxGoals} meta no plano gratuito. Ative o Plano Fundador para criar mais.`} compact /></div>}
 
       {/* Goals list */}
       <div className="space-y-3">
