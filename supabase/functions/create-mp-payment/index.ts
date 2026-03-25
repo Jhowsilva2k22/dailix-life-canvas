@@ -1,6 +1,11 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+/* ── Centralized Config ──────────────────────────────────────────── */
+const FOUNDER_AMOUNT = 9.90;
+const FOUNDER_PLAN = "fundador";
+const PAYMENT_DESCRIPTION = "Dailix — Plano Fundador (ativação)";
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -22,6 +27,7 @@ serve(async (req) => {
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseAnonKey, {
       global: { headers: { Authorization: authHeader } },
     });
@@ -35,12 +41,10 @@ serve(async (req) => {
     const body = await req.json();
     const { token, payment_method_id, installments, payer, issuer_id, idempotency_key } = body;
 
-    const FOUNDER_AMOUNT = 9.90;
-
     // Create payment via MP API
     const paymentBody: Record<string, unknown> = {
       transaction_amount: FOUNDER_AMOUNT,
-      description: "Dailix — Plano Fundador (ativação)",
+      description: PAYMENT_DESCRIPTION,
       payment_method_id,
       payer: {
         email: payer?.email || user.email,
@@ -48,7 +52,7 @@ serve(async (req) => {
       },
       metadata: {
         user_id: user.id,
-        plan: "fundador",
+        plan: FOUNDER_PLAN,
       },
     };
 
@@ -86,17 +90,34 @@ serve(async (req) => {
       );
     }
 
-    // If approved immediately (common for Pix QR or test cards)
+    // ── Record payment in audit trail ────────────────────────────
+    const adminClient = createClient(supabaseUrl, serviceRoleKey);
+    await adminClient.from("payments").upsert(
+      {
+        user_id: user.id,
+        provider: "mercadopago",
+        payment_id: String(mpData.id),
+        status: mpData.status,
+        amount: FOUNDER_AMOUNT,
+        plan: FOUNDER_PLAN,
+        metadata: {
+          status_detail: mpData.status_detail,
+          payment_method_id: mpData.payment_method_id,
+        },
+        approved_at: mpData.status === "approved" ? new Date().toISOString() : null,
+      },
+      { onConflict: "provider,payment_id" }
+    );
+
+    // If approved immediately (common for card)
     if (mpData.status === "approved") {
-      const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-      const adminClient = createClient(supabaseUrl, serviceRoleKey);
       await adminClient
         .from("profiles")
-        .update({ plano: "fundador" })
+        .update({ plano: FOUNDER_PLAN })
         .eq("user_id", user.id);
     }
 
-    // Build response based on payment type
+    // Build response
     const result: Record<string, unknown> = {
       success: true,
       status: mpData.status,

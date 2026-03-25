@@ -17,7 +17,7 @@ const SettingsPage = () => {
   const [newName, setNewName] = useState(displayName || "");
   const [savingName, setSavingName] = useState(false);
 
-  const planLabels: Record<string, string> = { free: "Gratuito", pro: "Pro", family: "Family" };
+  const planLabels: Record<string, string> = { free: "Gratuito", fundador: "Fundador", pro: "Pro", family: "Family" };
 
   const saveName = async () => {
     if (!user || !newName.trim()) return;

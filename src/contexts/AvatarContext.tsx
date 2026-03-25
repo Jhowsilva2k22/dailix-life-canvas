@@ -38,9 +38,26 @@ export const AvatarProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  // Fetch on mount and whenever user changes
   useEffect(() => {
     fetchProfile();
   }, [user]);
+
+  // Auto-refresh on visibility change (handles Pix pending → founder)
+  useEffect(() => {
+    const handleVisibility = () => {
+      if (document.visibilityState === "visible") fetchProfile();
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
+  }, [user]);
+
+  // Periodic refresh every 30s for Pix pending users
+  useEffect(() => {
+    if (!user || plano === "fundador") return;
+    const interval = setInterval(fetchProfile, 30_000);
+    return () => clearInterval(interval);
+  }, [user, plano]);
 
   return (
     <AvatarContext.Provider

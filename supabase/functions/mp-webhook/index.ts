@@ -1,6 +1,12 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
+/* ── Centralized Config ──────────────────────────────────────────── */
+const FOUNDER_AMOUNT = 9.90;
+const FOUNDER_PLAN = "fundador";
+const PAYMENT_DESCRIPTION_PREFIX = "Dailix";
+const AMOUNT_TOLERANCE = 0.05; // allow small float diff
+
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
@@ -12,6 +18,10 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const adminClient = createClient(supabaseUrl, serviceRoleKey);
+
   try {
     const MP_ACCESS_TOKEN = Deno.env.get("MP_ACCESS_TOKEN");
     if (!MP_ACCESS_TOKEN) throw new Error("MP_ACCESS_TOKEN not configured");
@@ -19,7 +29,6 @@ serve(async (req) => {
     const body = await req.json();
     console.log("Webhook received:", JSON.stringify(body));
 
-    // MP sends different notification formats
     const paymentId =
       body.data?.id || body.id || (body.type === "payment" && body.data?.id);
 
@@ -43,9 +52,7 @@ serve(async (req) => {
     // Fetch real payment status from MP API
     const mpResponse = await fetch(
       `https://api.mercadopago.com/v1/payments/${paymentId}`,
-      {
-        headers: { Authorization: `Bearer ${MP_ACCESS_TOKEN}` },
-      }
+      { headers: { Authorization: `Bearer ${MP_ACCESS_TOKEN}` } }
     );
 
     if (!mpResponse.ok) {
@@ -58,41 +65,115 @@ serve(async (req) => {
     }
 
     const payment = await mpResponse.json();
+    const userId = payment.metadata?.user_id;
+    const paymentPlan = payment.metadata?.plan;
+    const paymentAmount = payment.transaction_amount;
+
     console.log(
-      `Payment ${paymentId}: status=${payment.status}, user_id=${payment.metadata?.user_id}`
+      `Payment ${paymentId}: status=${payment.status}, amount=${paymentAmount}, plan=${paymentPlan}, user_id=${userId}`
     );
 
-    const userId = payment.metadata?.user_id;
+    // ── Record payment in audit trail ────────────────────────────
+    await adminClient.from("payments").upsert(
+      {
+        user_id: userId || "00000000-0000-0000-0000-000000000000",
+        provider: "mercadopago",
+        payment_id: String(paymentId),
+        status: payment.status,
+        amount: paymentAmount,
+        plan: paymentPlan || "unknown",
+        metadata: {
+          status_detail: payment.status_detail,
+          payment_method_id: payment.payment_method_id,
+          description: payment.description,
+          payer_email: payment.payer?.email,
+        },
+        approved_at: payment.status === "approved" ? new Date().toISOString() : null,
+      },
+      { onConflict: "provider,payment_id" }
+    );
+
     if (!userId) {
-      console.log("No user_id in metadata, skipping");
+      console.log("No user_id in metadata, skipping promotion");
       return new Response(JSON.stringify({ received: true }), {
         status: 200,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Only activate on approved status
+    // ── Strict validation before promoting ───────────────────────
     if (payment.status === "approved") {
-      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-      const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-      const adminClient = createClient(supabaseUrl, serviceRoleKey);
+      const validations: string[] = [];
 
-      // Idempotent: update only if not already fundador
-      const { data: profile } = await adminClient
-        .from("profiles")
-        .select("plano")
-        .eq("user_id", userId)
+      // 1. Amount must match expected
+      if (Math.abs(paymentAmount - FOUNDER_AMOUNT) > AMOUNT_TOLERANCE) {
+        validations.push(`amount_mismatch: expected=${FOUNDER_AMOUNT}, got=${paymentAmount}`);
+      }
+
+      // 2. Plan metadata must match
+      if (paymentPlan !== FOUNDER_PLAN) {
+        validations.push(`plan_mismatch: expected=${FOUNDER_PLAN}, got=${paymentPlan}`);
+      }
+
+      // 3. Description should start with expected prefix
+      if (!payment.description?.startsWith(PAYMENT_DESCRIPTION_PREFIX)) {
+        validations.push(`description_mismatch: got="${payment.description}"`);
+      }
+
+      // 4. Check if already processed (idempotency)
+      const { data: existingPayment } = await adminClient
+        .from("payments")
+        .select("status, approved_at")
+        .eq("provider", "mercadopago")
+        .eq("payment_id", String(paymentId))
         .single();
 
-      if (profile && profile.plano !== "fundador") {
-        await adminClient
+      if (existingPayment?.approved_at && existingPayment.status === "approved") {
+        // Already processed this exact payment - check if user is already founder
+        const { data: profile } = await adminClient
           .from("profiles")
-          .update({ plano: "fundador" })
-          .eq("user_id", userId);
-        console.log(`User ${userId} upgraded to fundador`);
-      } else {
-        console.log(`User ${userId} already fundador, skipping`);
+          .select("plano")
+          .eq("user_id", userId)
+          .single();
+
+        if (profile?.plano === FOUNDER_PLAN) {
+          console.log(`Payment ${paymentId} already processed, user ${userId} already founder`);
+          return new Response(JSON.stringify({ received: true }), {
+            status: 200,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
       }
+
+      if (validations.length > 0) {
+        console.error(`Promotion blocked for payment ${paymentId}: ${validations.join("; ")}`);
+        // Update payment record with validation failure
+        await adminClient.from("payments").update({
+          metadata: {
+            ...((existingPayment as any)?.metadata || {}),
+            validation_errors: validations,
+          },
+        }).eq("provider", "mercadopago").eq("payment_id", String(paymentId));
+
+        return new Response(JSON.stringify({ received: true }), {
+          status: 200,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+
+      // ── All validations passed → promote ─────────────────────
+      await adminClient
+        .from("profiles")
+        .update({ plano: FOUNDER_PLAN })
+        .eq("user_id", userId);
+
+      // Update payment record with approved_at
+      await adminClient.from("payments").update({
+        status: "approved",
+        approved_at: new Date().toISOString(),
+      }).eq("provider", "mercadopago").eq("payment_id", String(paymentId));
+
+      console.log(`User ${userId} upgraded to ${FOUNDER_PLAN}`);
     }
 
     return new Response(JSON.stringify({ received: true }), {
@@ -101,7 +182,6 @@ serve(async (req) => {
     });
   } catch (error: unknown) {
     console.error("Webhook error:", error);
-    // Always return 200 to MP to avoid retries on our errors
     return new Response(JSON.stringify({ received: true }), {
       status: 200,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

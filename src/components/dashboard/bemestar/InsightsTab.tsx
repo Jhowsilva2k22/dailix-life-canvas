@@ -1,9 +1,11 @@
 import { useEffect, useState, useMemo } from "react";
 import { useSearchHighlight } from "@/hooks/useSearchHighlight";
 import { supabase } from "@/integrations/supabase/client";
-import { Lightbulb, Sparkles, Brain, Moon, Target, Zap, Shield, ChevronDown, Share2 } from "lucide-react";
+import { Lightbulb, Sparkles, Brain, Moon, Target, Zap, Shield, ChevronDown, Share2, Lock } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import InsightShareModal from "./InsightShareModal";
+import UpgradeBanner from "../UpgradeBanner";
+import { usePlanLimits } from "@/hooks/usePlanLimits";
 
 interface InsightsTabProps {
   isActive?: boolean;
@@ -36,6 +38,7 @@ const LOAD_MORE = 3;
 
 const InsightsTab = ({ isActive = true, onReadyChange, highlightId = null, onHighlightConsumed }: InsightsTabProps) => {
   const { isHighlighted } = useSearchHighlight(highlightId);
+  const limits = usePlanLimits();
   const [insights, setInsights] = useState<Insight[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
@@ -123,6 +126,28 @@ const InsightsTab = ({ isActive = true, onReadyChange, highlightId = null, onHig
   }
 
   const DiaIcon = insightDoDia ? (categoryMeta[insightDoDia.categoria]?.icon || Lightbulb) : Lightbulb;
+
+  if (!limits.canAccessInsights) {
+    return (
+      <div className="space-y-4">
+        <UpgradeBanner message="Insights completos são exclusivos do Plano Fundador. Ative para acessar conteúdos organizados por categoria." />
+        {insightDoDia && (
+          <div className="rounded-2xl p-6" style={{ background: "var(--dash-surface)", border: "1px solid var(--dash-border)" }}>
+            <div className="flex items-center gap-2 mb-3">
+              <Sparkles size={14} style={{ color: "var(--dash-accent)" }} />
+              <span style={{ fontSize: 11, fontWeight: 500, letterSpacing: "0.1em", textTransform: "uppercase" as const, color: "var(--dash-accent)" }}>Prévia do dia</span>
+            </div>
+            <h3 style={{ color: "var(--dash-text)", fontSize: 16, fontWeight: 400, marginBottom: 8 }}>{insightDoDia.titulo}</h3>
+            <p style={{ color: "var(--dash-text-muted)", fontSize: 13, fontWeight: 300, lineHeight: 1.7 }}>{insightDoDia.texto_curto || insightDoDia.texto.slice(0, 120) + "..."}</p>
+          </div>
+        )}
+        <div className="flex items-center justify-center py-8 rounded-2xl" style={{ background: "var(--dash-surface)", border: "1px solid var(--dash-border)" }}>
+          <Lock size={16} style={{ color: "var(--dash-text-muted)", marginRight: 8 }} />
+          <p style={{ color: "var(--dash-text-muted)", fontSize: 13, fontWeight: 300 }}>Mais {insights.length - 1} insights disponíveis no Plano Fundador</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

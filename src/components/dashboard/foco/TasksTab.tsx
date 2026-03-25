@@ -5,6 +5,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import AddTaskModal from "../AddTaskModal";
+import UpgradeBanner from "../UpgradeBanner";
+import { usePlanLimits, canCreate } from "@/hooks/usePlanLimits";
 
 interface TasksTabProps {
   isActive?: boolean;
@@ -51,6 +53,7 @@ const CheckIcon = () => <svg width="10" height="10" viewBox="0 0 12 12" fill="no
 const TasksTab = ({ isActive = true, onReadyChange, highlightId = null, onHighlightConsumed }: TasksTabProps) => {
   const { isHighlighted } = useSearchHighlight(highlightId);
   const { user, loading: authLoading } = useAuth();
+  const limits = usePlanLimits();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [filter, setFilter] = useState("hoje");
   const [showModal, setShowModal] = useState(false);
@@ -112,7 +115,12 @@ const TasksTab = ({ isActive = true, onReadyChange, highlightId = null, onHighli
   const handleTaskSaved = () => { setShowModal(false); setEditingTask(null); fetchTasks(); };
 
   const openEdit = (task: Task) => { setEditingTask(task); setShowModal(true); };
-  const openCreate = () => { setEditingTask(null); setShowModal(true); };
+  const totalTasks = tasks.length;
+  const atLimit = !canCreate(totalTasks, limits.maxTasks);
+  const openCreate = () => {
+    if (atLimit) { toast.error(`Limite de ${limits.maxTasks} tarefas atingido. Ative o Plano Fundador para continuar.`); return; }
+    setEditingTask(null); setShowModal(true);
+  };
 
   const pending = tasks.filter((t) => !t.concluida);
   const done = tasks.filter((t) => t.concluida);
@@ -168,12 +176,15 @@ const TasksTab = ({ isActive = true, onReadyChange, highlightId = null, onHighli
         </div>
         <button
           onClick={openCreate}
-          className="inline-flex items-center gap-1.5 rounded-lg transition-colors"
+          disabled={atLimit}
+          className="inline-flex items-center gap-1.5 rounded-lg transition-colors disabled:opacity-40"
           style={{ border: "1px solid var(--dash-primary)", color: "var(--dash-text-secondary)", fontSize: 13, fontWeight: 400, padding: "7px 12px" }}
         >
           <Plus size={14} /> Nova
         </button>
       </div>
+
+      {atLimit && <div className="mb-4"><UpgradeBanner message={`Você atingiu o limite de ${limits.maxTasks} tarefas no plano gratuito. Ative o Plano Fundador para criar sem limites.`} compact /></div>}
 
       <div className="mb-5" style={{ fontSize: 12, color: "var(--dash-text-muted)", fontWeight: 300 }}>
         <span>{pending.length} pendentes</span><span className="mx-1.5">·</span><span>{done.length} concluídas</span>

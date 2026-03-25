@@ -5,6 +5,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import GoalModal, { type Goal } from "./GoalModal";
+import UpgradeBanner from "../UpgradeBanner";
+import { usePlanLimits, canCreate } from "@/hooks/usePlanLimits";
 
 interface GoalsTabProps {
   isActive?: boolean;
@@ -343,7 +345,12 @@ const GoalsTabInner = ({ isActive = true, onReadyChange, highlightId = null }: G
     setShowModal(false); setEditing(null);
   };
 
-  const openCreate = () => { setEditing(null); setShowModal(true); };
+  const limits = usePlanLimits();
+  const atLimit = !canCreate(goals.length, limits.maxGoals);
+  const openCreate = () => {
+    if (atLimit) { toast.error(`Limite de ${limits.maxGoals} meta(s) atingido. Ative o Plano Fundador.`); return; }
+    setEditing(null); setShowModal(true);
+  };
 
   /* Loading */
   if (authLoading || loading) return (
@@ -376,7 +383,8 @@ const GoalsTabInner = ({ isActive = true, onReadyChange, highlightId = null }: G
         <SummaryStrip goals={goals} />
         <button
           onClick={openCreate}
-          className="inline-flex items-center gap-1.5 rounded-lg transition-colors"
+          disabled={atLimit}
+          className="inline-flex items-center gap-1.5 rounded-lg transition-colors disabled:opacity-40"
           style={{
             border: "1px solid var(--dash-primary)",
             color: "var(--dash-text-secondary)",
@@ -388,6 +396,8 @@ const GoalsTabInner = ({ isActive = true, onReadyChange, highlightId = null }: G
           <Plus size={14} /> Nova meta
         </button>
       </div>
+
+      {atLimit && <div className="mb-4"><UpgradeBanner message={`Limite de ${limits.maxGoals} meta no plano gratuito. Ative o Plano Fundador para criar mais.`} compact /></div>}
 
       {/* Goals list */}
       <div className="space-y-3">

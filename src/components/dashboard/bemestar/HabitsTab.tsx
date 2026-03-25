@@ -5,6 +5,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import HabitModal from "./HabitModal";
+import UpgradeBanner from "../UpgradeBanner";
+import { usePlanLimits, canCreate } from "@/hooks/usePlanLimits";
 import { calculateStreak, localDateStr } from "@/utils/streakCalculator";
 
 interface HabitsTabProps {
@@ -221,7 +223,12 @@ const HabitsTab = ({ isActive = true, onReadyChange, highlightId = null, onHighl
   };
 
   const handleSaved = () => { setShowModal(false); setEditingHabit(null); fetchHabits(); };
-  const openCreate = () => { setEditingHabit(null); setShowModal(true); };
+  const limits = usePlanLimits();
+  const atLimit = !canCreate(habits.length, limits.maxHabits);
+  const openCreate = () => {
+    if (atLimit) { toast.error(`Limite de ${limits.maxHabits} hábitos atingido. Ative o Plano Fundador.`); return; }
+    setEditingHabit(null); setShowModal(true);
+  };
   const openEdit = (habit: Habit) => { setEditingHabit(habit); setShowModal(true); };
 
   const doneCount = habits.filter((h) => completedToday.has(h.id)).length;
@@ -271,11 +278,13 @@ const HabitsTab = ({ isActive = true, onReadyChange, highlightId = null, onHighl
           </div>
         )}
         {habits.length > 0 && (
-          <button onClick={openCreate} className="inline-flex items-center gap-1.5 rounded-lg transition-colors" style={{ border: "1px solid var(--dash-primary)", color: "var(--dash-text-secondary)", fontSize: 13, fontWeight: 400, padding: "7px 12px" }}>
+          <button onClick={openCreate} disabled={atLimit} className="inline-flex items-center gap-1.5 rounded-lg transition-colors disabled:opacity-40" style={{ border: "1px solid var(--dash-primary)", color: "var(--dash-text-secondary)", fontSize: 13, fontWeight: 400, padding: "7px 12px" }}>
             <Plus size={14} /> Novo
           </button>
         )}
       </div>
+
+      {atLimit && <div className="mb-4"><UpgradeBanner message={`Limite de ${limits.maxHabits} hábitos no plano gratuito. Ative o Plano Fundador para criar mais.`} compact /></div>}
 
       {habits.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 rounded-2xl" style={{ background: "var(--dash-surface)", border: "1px solid var(--dash-border)" }}>
