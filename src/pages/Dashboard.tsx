@@ -76,7 +76,10 @@ const Dashboard = () => {
         <BemEstarPage searchFocus={searchFocus} onClearSearchFocus={clearSearchFocus} />
       </div>
       <div style={{ display: activeItem === "configuracoes" ? "block" : "none" }}>
-        <SettingsPage />
+        <SettingsPage onUpgrade={() => setActiveItem("upgrade")} />
+      </div>
+      <div style={{ display: activeItem === "upgrade" ? "block" : "none" }}>
+        <UpgradePage onBack={() => setActiveItem("configuracoes")} />
       </div>
     </div>
   );

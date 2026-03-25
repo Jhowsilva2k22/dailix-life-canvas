@@ -81,7 +81,7 @@ const SettingsPage = ({ onUpgrade }: SettingsPageProps) => {
             </span>
           </div>
           {plano === "free" ? (
-            <button className="text-sm transition-colors" style={{ color: "var(--dash-accent)", fontWeight: 400 }}>Fazer upgrade</button>
+            <button onClick={onUpgrade} className="text-sm transition-colors" style={{ color: "var(--dash-accent)", fontWeight: 400 }}>Fazer upgrade</button>
           ) : (
             <button className="text-sm transition-colors" style={{ color: "var(--dash-accent)", fontWeight: 400 }}>Gerenciar assinatura</button>
           )}
