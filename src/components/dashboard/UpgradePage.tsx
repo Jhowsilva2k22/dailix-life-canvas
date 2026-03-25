@@ -153,9 +153,14 @@ const UpgradePage = ({ onBack }: UpgradePageProps) => {
             </button>
           ) : (
             <div className="w-full">
-              {paymentStatus === "pending" && (
+              {(paymentStatus === "pending" || paymentStatus === "awaiting") && (
                 <div className="rounded-xl p-5 mb-4 text-center" style={{ background: "rgba(0,180,216,0.06)", border: "1px solid rgba(0,180,216,0.12)" }}>
-                  <p className="text-[14px] mb-1" style={{ color: "var(--dash-accent)" }}>Pagamento pendente</p>
+                  <div className="flex items-center justify-center gap-2 mb-1">
+                    <div className="h-4 w-4 border-2 border-t-transparent rounded-full animate-spin" style={{ borderColor: "var(--dash-accent)", borderTopColor: "transparent" }} />
+                    <p className="text-[14px]" style={{ color: "var(--dash-accent)" }}>
+                      {paymentStatus === "awaiting" ? "Confirmando pagamento..." : "Pagamento pendente"}
+                    </p>
+                  </div>
                   <p className="text-[13px]" style={{ color: "var(--dash-text-muted)", fontWeight: 300 }}>
                     Assim que o pagamento for confirmado, seu acesso será liberado automaticamente.
                   </p>
@@ -168,10 +173,9 @@ const UpgradePage = ({ onBack }: UpgradePageProps) => {
               )}
               <PaymentBrick
                 userEmail={user?.email || ""}
-                onSuccess={async () => {
-                  await supabase.from("profiles").update({ plano: "fundador" }).eq("user_id", user!.id);
-                  refreshAvatar();
-                  setPaymentStatus("success");
+                onSuccess={() => {
+                  setPaymentStatus("awaiting");
+                  startPolling();
                 }}
                 onError={(msg) => {
                   setPaymentStatus("error");
@@ -179,6 +183,7 @@ const UpgradePage = ({ onBack }: UpgradePageProps) => {
                 }}
                 onPending={() => {
                   setPaymentStatus("pending");
+                  startPolling();
                 }}
               />
               <button
