@@ -48,18 +48,32 @@ const PaymentBrick = ({ userEmail, onSuccess, onError, onPending }: PaymentBrick
   const handleSubmit = useCallback(
     async (formData: any) => {
       setProcessing(true);
-      console.log("PaymentBrick formData:", JSON.stringify(formData, null, 2));
+      console.log("PaymentBrick raw payload:", JSON.stringify(formData, null, 2));
+
+      // Defensive normalization: Brick may wrap data in formData/form_data/data
+      const normalized = formData?.formData ?? formData?.form_data ?? formData?.data ?? formData;
+      console.log("PaymentBrick normalized payload:", JSON.stringify(normalized, null, 2));
+
+      const paymentMethodId = normalized?.payment_method_id;
+      if (!paymentMethodId) {
+        console.error("payment_method_id ausente após normalização", normalized);
+        onError("Método de pagamento não identificado. Tente novamente.");
+        setProcessing(false);
+        return;
+      }
+
       try {
         const idempotencyKey = crypto.randomUUID();
         const { data, error } = await supabase.functions.invoke(
           "create-mp-payment",
           {
             body: {
-              token: formData.token,
-              payment_method_id: formData.payment_method_id,
-              installments: formData.installments,
-              issuer_id: formData.issuer_id,
-              payer: formData.payer,
+              token: normalized.token,
+              payment_method_id: paymentMethodId,
+              installments: normalized.installments,
+              issuer_id: normalized.issuer_id,
+              payer: normalized.payer,
+              transaction_amount: normalized.transaction_amount,
               idempotency_key: idempotencyKey,
             },
           }

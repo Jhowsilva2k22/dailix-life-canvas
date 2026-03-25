@@ -38,8 +38,21 @@ serve(async (req) => {
     } = await supabase.auth.getUser();
     if (userError || !user) throw new Error("Unauthorized");
 
-    const body = await req.json();
-    const { token, payment_method_id, installments, payer, issuer_id, idempotency_key } = body;
+    const rawBody = await req.json();
+    console.log("create-mp-payment raw body:", JSON.stringify(rawBody));
+
+    // Defensive normalization
+    const normalized = rawBody?.formData ?? rawBody?.form_data ?? rawBody?.data ?? rawBody;
+    console.log("create-mp-payment normalized body:", JSON.stringify(normalized));
+
+    const { token, payment_method_id, installments, payer, issuer_id, idempotency_key } = normalized;
+
+    if (!payment_method_id) {
+      return new Response(
+        JSON.stringify({ success: false, error: "payment_method_id ausente no payload normalizado" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
 
     // Create payment via MP API
     const paymentBody: Record<string, unknown> = {
@@ -109,13 +122,7 @@ serve(async (req) => {
       { onConflict: "provider,payment_id" }
     );
 
-    // If approved immediately (common for card)
-    if (mpData.status === "approved") {
-      await adminClient
-        .from("profiles")
-        .update({ plano: FOUNDER_PLAN })
-        .eq("user_id", user.id);
-    }
+    // Founder promotion handled exclusively by webhook — not here
 
     // Build response
     const result: Record<string, unknown> = {
