@@ -76,6 +76,9 @@ const Setup = () => {
   const [diagnostic, setDiagnostic] = useState<DiagnosticData | null>(null);
   const [ready, setReady] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [showCheckout, setShowCheckout] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState<"idle" | "pending" | "error">("idle");
+  const [paymentError, setPaymentError] = useState("");
 
   useEffect(() => {
     const stored = localStorage.getItem("dailix_diagnostic");
