@@ -397,15 +397,57 @@ const Setup = () => {
                 </p>
               </div>
 
-              {/* CTAs */}
+              {/* CTAs / Checkout */}
               <div className="flex flex-col gap-4 items-center">
-                <PrimaryBtn onClick={() => seedAndFinish("fundador")} disabled={submitting}>
-                  {submitting ? "Ativando..." : profile.ctaPaywall}
-                  {!submitting && <ArrowRight className="h-4 w-4" />}
-                </PrimaryBtn>
-                <p className="text-[13px]" style={{ color: "rgba(255,255,255,0.3)", fontWeight: 300 }}>
-                  Acesso imediato. Cancelamento simples.
-                </p>
+                {!showCheckout ? (
+                  <>
+                    <PrimaryBtn onClick={() => setShowCheckout(true)} disabled={submitting}>
+                      {profile.ctaPaywall}
+                      <ArrowRight className="h-4 w-4" />
+                    </PrimaryBtn>
+                    <p className="text-[13px]" style={{ color: "rgba(255,255,255,0.3)", fontWeight: 300 }}>
+                      Acesso imediato. Cancelamento simples.
+                    </p>
+                  </>
+                ) : (
+                  <div className="w-full">
+                    {paymentStatus === "pending" && (
+                      <div className="rounded-xl p-5 mb-4 text-center" style={{ background: "rgba(0,180,216,0.06)", border: "1px solid rgba(0,180,216,0.12)" }}>
+                        <p className="text-[14px] mb-1" style={{ color: "#00B4D8" }}>Pagamento pendente</p>
+                        <p className="text-[13px]" style={{ color: "rgba(255,255,255,0.45)", fontWeight: 300 }}>
+                          Assim que o pagamento for confirmado, seu acesso será liberado automaticamente.
+                        </p>
+                      </div>
+                    )}
+                    {paymentStatus === "error" && paymentError && (
+                      <div className="rounded-xl p-4 mb-4 text-center" style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.15)" }}>
+                        <p className="text-[13px]" style={{ color: "rgba(239,68,68,0.8)" }}>{paymentError}</p>
+                      </div>
+                    )}
+                    <PaymentBrick
+                      userEmail={session.user.email || ""}
+                      onSuccess={async () => {
+                        await seedAndFinish("fundador");
+                      }}
+                      onError={(msg) => {
+                        setPaymentStatus("error");
+                        setPaymentError(msg);
+                      }}
+                      onPending={() => {
+                        setPaymentStatus("pending");
+                        // Seed as free for now, webhook will upgrade
+                        seedAndFinish("free");
+                      }}
+                    />
+                    <button
+                      onClick={() => { setShowCheckout(false); setPaymentStatus("idle"); setPaymentError(""); }}
+                      className="mt-4 text-[12px] block mx-auto transition-colors"
+                      style={{ color: "rgba(255,255,255,0.25)" }}
+                    >
+                      ← Voltar
+                    </button>
+                  </div>
+                )}
                 <GhostBtn onClick={() => seedAndFinish("free")}>
                   Continuar com acesso limitado
                 </GhostBtn>
