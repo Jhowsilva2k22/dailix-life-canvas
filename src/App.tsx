@@ -15,6 +15,7 @@ import Welcome from "./pages/Welcome";
 import RecuperarSenha from "./pages/RecuperarSenha";
 import ResetPassword from "./pages/ResetPassword";
 import Diagnostico from "./pages/Diagnostico";
+import Setup from "./pages/Setup";
 import Termos from "./pages/Termos";
 import Privacidade from "./pages/Privacidade";
 import NotFound from "./pages/NotFound";
