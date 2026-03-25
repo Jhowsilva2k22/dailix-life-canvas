@@ -48,6 +48,7 @@ const PaymentBrick = ({ userEmail, onSuccess, onError, onPending }: PaymentBrick
   const handleSubmit = useCallback(
     async (formData: any) => {
       setProcessing(true);
+      console.log("PaymentBrick formData:", JSON.stringify(formData, null, 2));
       try {
         const idempotencyKey = crypto.randomUUID();
         const { data, error } = await supabase.functions.invoke(
