@@ -65,7 +65,15 @@ const PaymentBrick = ({ userEmail, onSuccess, onError, onPending }: PaymentBrick
         );
 
         if (error) {
+          console.error("Edge function error:", error);
           onError("Erro ao processar pagamento. Tente novamente.");
+          return;
+        }
+
+        if (!data.success) {
+          const detail = data.cause?.[0]?.description || data.error || "Erro desconhecido";
+          console.error("MP payment error:", data);
+          onError(detail);
           return;
         }
 
