@@ -79,14 +79,18 @@ const PaymentBrick = ({ userEmail, onSuccess, onError, onPending }: PaymentBrick
           }
         );
 
+        console.log("create-mp-payment invoke error:", error);
+        console.log("create-mp-payment invoke data:", JSON.stringify(data, null, 2));
+
         if (error) {
-          console.error("Edge function error:", error);
-          onError("Erro ao processar pagamento. Tente novamente.");
+          const realMessage = error?.message || data?.error || data?.message || data?.details || "Erro ao processar pagamento. Tente novamente.";
+          console.error("Edge function error (real):", realMessage);
+          onError(realMessage);
           return;
         }
 
         if (!data.success) {
-          const detail = data.cause?.[0]?.description || data.error || "Erro desconhecido";
+          const detail = data.cause?.[0]?.description || data.error || data.message || data.details || "Erro desconhecido";
           console.error("MP payment error:", data);
           onError(detail);
           return;
