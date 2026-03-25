@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Vertente } from "@/lib/diagnosticData";
 import { vertenteLabelMap, resultContent } from "@/lib/diagnosticData";
 import { profileSeeds } from "@/lib/onboardingProfiles";
+import PaymentBrick from "@/components/setup/PaymentBrick";
 
 interface DiagnosticData {
   principal: Vertente;
