@@ -64,7 +64,7 @@ serve(async (req) => {
       headers: {
         Authorization: `Bearer ${MP_ACCESS_TOKEN}`,
         "Content-Type": "application/json",
-        "X-Idempotency-Key": `${user.id}-${Date.now()}`,
+        "X-Idempotency-Key": idempotency_key || crypto.randomUUID(),
       },
       body: JSON.stringify(paymentBody),
     });
