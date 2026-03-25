@@ -16,7 +16,7 @@ interface DiagnosticData {
 
 const ORIGINAL_PRICE = "R$ 19,90";
 const FOUNDER_PRICE = "R$ 9,90";
-const FOUNDER_PERIOD = "/mês";
+const FOUNDER_PERIOD = "";
 
 const fade = {
   initial: { opacity: 0, y: 24 },
