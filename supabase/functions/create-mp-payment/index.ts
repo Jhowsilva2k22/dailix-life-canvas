@@ -122,13 +122,7 @@ serve(async (req) => {
       { onConflict: "provider,payment_id" }
     );
 
-    // If approved immediately (common for card)
-    if (mpData.status === "approved") {
-      await adminClient
-        .from("profiles")
-        .update({ plano: FOUNDER_PLAN })
-        .eq("user_id", user.id);
-    }
+    // Founder promotion handled exclusively by webhook — not here
 
     // Build response
     const result: Record<string, unknown> = {
