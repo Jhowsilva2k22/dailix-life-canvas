@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import UserAvatar from "./UserAvatar";
 import AvatarUploadModal from "./AvatarUploadModal";
 import PushNotificationToggle from "./PushNotificationToggle";
+import { OPEN_ACCESS_MODE } from "@/lib/featureFlags";
 
 interface SettingsPageProps {
   onUpgrade?: () => void;
