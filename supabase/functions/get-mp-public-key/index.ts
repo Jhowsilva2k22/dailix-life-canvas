@@ -12,6 +12,7 @@ serve(async (req) => {
   }
 
   const publicKey = Deno.env.get("MP_PUBLIC_KEY");
+  console.log("MP public key prefix:", publicKey?.substring(0, 10) + "...");
   if (!publicKey) {
     return new Response(
       JSON.stringify({ error: "MP_PUBLIC_KEY not configured" }),
