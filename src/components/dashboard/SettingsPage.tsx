@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import UserAvatar from "./UserAvatar";
 import AvatarUploadModal from "./AvatarUploadModal";
 import PushNotificationToggle from "./PushNotificationToggle";
+import { OPEN_ACCESS_MODE } from "@/lib/featureFlags";
 
 interface SettingsPageProps {
   onUpgrade?: () => void;
@@ -80,7 +81,9 @@ const SettingsPage = ({ onUpgrade }: SettingsPageProps) => {
               {planLabels[plano] || plano}
             </span>
           </div>
-          {plano === "free" ? (
+          {OPEN_ACCESS_MODE ? (
+            <span className="text-sm" style={{ color: "var(--dash-accent)", fontWeight: 400 }}>Acesso liberado nesta fase</span>
+          ) : plano === "free" ? (
             <button onClick={onUpgrade} className="text-sm transition-colors" style={{ color: "var(--dash-accent)", fontWeight: 400 }}>Fazer upgrade</button>
           ) : (
             <button className="text-sm transition-colors" style={{ color: "var(--dash-accent)", fontWeight: 400 }}>Gerenciar assinatura</button>
