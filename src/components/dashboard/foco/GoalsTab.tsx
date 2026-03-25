@@ -345,7 +345,12 @@ const GoalsTabInner = ({ isActive = true, onReadyChange, highlightId = null }: G
     setShowModal(false); setEditing(null);
   };
 
-  const openCreate = () => { setEditing(null); setShowModal(true); };
+  const limits = usePlanLimits();
+  const atLimit = !canCreate(goals.length, limits.maxGoals);
+  const openCreate = () => {
+    if (atLimit) { toast.error(`Limite de ${limits.maxGoals} meta(s) atingido. Ative o Plano Fundador.`); return; }
+    setEditing(null); setShowModal(true);
+  };
 
   /* Loading */
   if (authLoading || loading) return (
