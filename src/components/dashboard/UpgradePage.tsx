@@ -25,8 +25,28 @@ const UpgradePage = ({ onBack }: UpgradePageProps) => {
   const { user } = useAuth();
   const { plano, refreshAvatar } = useAvatar();
   const [showCheckout, setShowCheckout] = useState(false);
-  const [paymentStatus, setPaymentStatus] = useState<"idle" | "pending" | "error" | "success">("idle");
+  const [paymentStatus, setPaymentStatus] = useState<"idle" | "pending" | "awaiting" | "error" | "success">("idle");
   const [paymentError, setPaymentError] = useState("");
+  const pollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Poll profile until backend confirms founder
+  const startPolling = () => {
+    if (pollingRef.current) return;
+    pollingRef.current = setInterval(async () => {
+      if (!user) return;
+      const { data } = await supabase.from("profiles").select("plano").eq("user_id", user.id).single();
+      if (data?.plano === "fundador") {
+        if (pollingRef.current) clearInterval(pollingRef.current);
+        pollingRef.current = null;
+        refreshAvatar();
+        setPaymentStatus("success");
+      }
+    }, 3000);
+  };
+
+  useEffect(() => {
+    return () => { if (pollingRef.current) clearInterval(pollingRef.current); };
+  }, []);
 
   if (plano === "fundador") {
     return (
