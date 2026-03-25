@@ -143,7 +143,7 @@ const PaymentBrickInner = ({ userEmail, onSubmit, onError, processing }: {
             creditCard: "all",
             debitCard: "all",
             ticket: [] as any,
-            bankTransfer: [] as any,
+            bankTransfer: ["pix"] as any,
             atm: [] as any,
             maxInstallments: 1,
           },
