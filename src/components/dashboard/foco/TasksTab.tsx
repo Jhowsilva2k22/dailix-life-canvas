@@ -5,6 +5,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import AddTaskModal from "../AddTaskModal";
+import UpgradeBanner from "../UpgradeBanner";
+import { usePlanLimits, canCreate } from "@/hooks/usePlanLimits";
 
 interface TasksTabProps {
   isActive?: boolean;
