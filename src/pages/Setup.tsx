@@ -13,7 +13,8 @@ interface DiagnosticData {
   secundario: Vertente;
 }
 
-const FOUNDER_PRICE = "R$ 19,90";
+const ORIGINAL_PRICE = "R$ 19,90";
+const FOUNDER_PRICE = "R$ 9,90";
 const FOUNDER_PERIOD = "/mês";
 
 const fade = {
