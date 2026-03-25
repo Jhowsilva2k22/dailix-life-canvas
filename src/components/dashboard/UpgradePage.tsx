@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useAvatar } from "@/contexts/AvatarContext";
 import { supabase } from "@/integrations/supabase/client";
 import PaymentBrick from "@/components/setup/PaymentBrick";
+import { OPEN_ACCESS_MODE } from "@/lib/featureFlags";
 
 const ORIGINAL_PRICE = "R$ 19,90";
 const FOUNDER_PRICE = "R$ 9,90";
