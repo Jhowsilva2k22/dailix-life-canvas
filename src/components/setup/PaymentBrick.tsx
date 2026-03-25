@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { FunctionsHttpError, FunctionsRelayError, FunctionsFetchError } from "@supabase/supabase-js";
 
 let mpInitialized = false;
 
@@ -83,8 +84,29 @@ const PaymentBrick = ({ userEmail, onSuccess, onError, onPending }: PaymentBrick
         console.log("create-mp-payment invoke data:", JSON.stringify(data, null, 2));
 
         if (error) {
-          const realMessage = error?.message || data?.error || data?.message || data?.details || "Erro ao processar pagamento. Tente novamente.";
-          console.error("Edge function error (real):", realMessage);
+          let realMessage = "Erro ao processar pagamento. Tente novamente.";
+          try {
+            if (error instanceof FunctionsHttpError) {
+              const errorBody = await error.context.json();
+              console.error("create-mp-payment http error body:", errorBody);
+              realMessage = errorBody?.error || errorBody?.message || errorBody?.details || error.message;
+            } else if (error instanceof FunctionsRelayError) {
+              console.error("create-mp-payment relay error:", error.message);
+              realMessage = error.message;
+            } else if (error instanceof FunctionsFetchError) {
+              console.error("create-mp-payment fetch error:", error.message);
+              realMessage = error.message;
+            } else {
+              console.error("create-mp-payment unknown error:", error);
+              realMessage = error.message || realMessage;
+            }
+          } catch (parseErr) {
+            console.error("create-mp-payment error parse failed, falling back to text:", parseErr);
+            try {
+              const text = await (error as FunctionsHttpError).context?.text?.();
+              if (text) realMessage = text;
+            } catch (_) { /* use default */ }
+          }
           onError(realMessage);
           return;
         }
