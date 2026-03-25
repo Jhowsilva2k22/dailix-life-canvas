@@ -115,7 +115,12 @@ const TasksTab = ({ isActive = true, onReadyChange, highlightId = null, onHighli
   const handleTaskSaved = () => { setShowModal(false); setEditingTask(null); fetchTasks(); };
 
   const openEdit = (task: Task) => { setEditingTask(task); setShowModal(true); };
-  const openCreate = () => { setEditingTask(null); setShowModal(true); };
+  const totalTasks = tasks.length;
+  const atLimit = !canCreate(totalTasks, limits.maxTasks);
+  const openCreate = () => {
+    if (atLimit) { toast.error(`Limite de ${limits.maxTasks} tarefas atingido. Ative o Plano Fundador para continuar.`); return; }
+    setEditingTask(null); setShowModal(true);
+  };
 
   const pending = tasks.filter((t) => !t.concluida);
   const done = tasks.filter((t) => t.concluida);
