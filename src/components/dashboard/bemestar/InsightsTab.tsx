@@ -38,6 +38,7 @@ const LOAD_MORE = 3;
 
 const InsightsTab = ({ isActive = true, onReadyChange, highlightId = null, onHighlightConsumed }: InsightsTabProps) => {
   const { isHighlighted } = useSearchHighlight(highlightId);
+  const limits = usePlanLimits();
   const [insights, setInsights] = useState<Insight[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState<string | null>(null);
