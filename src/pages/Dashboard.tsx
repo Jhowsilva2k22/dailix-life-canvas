@@ -6,6 +6,7 @@ import MobileNav from "@/components/dashboard/MobileNav";
 import FocoPage from "@/components/dashboard/foco/FocoPage";
 import BemEstarPage from "@/components/dashboard/bemestar/BemEstarPage";
 import SettingsPage from "@/components/dashboard/SettingsPage";
+import UpgradePage from "@/components/dashboard/UpgradePage";
 import GlobalSearchDialog, { type SearchFocus } from "@/components/dashboard/GlobalSearchDialog";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -76,7 +77,10 @@ const Dashboard = () => {
         <BemEstarPage searchFocus={searchFocus} onClearSearchFocus={clearSearchFocus} />
       </div>
       <div style={{ display: activeItem === "configuracoes" ? "block" : "none" }}>
-        <SettingsPage />
+        <SettingsPage onUpgrade={() => setActiveItem("upgrade")} />
+      </div>
+      <div style={{ display: activeItem === "upgrade" ? "block" : "none" }}>
+        <UpgradePage onBack={() => setActiveItem("configuracoes")} />
       </div>
     </div>
   );

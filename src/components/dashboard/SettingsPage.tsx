@@ -8,7 +8,11 @@ import UserAvatar from "./UserAvatar";
 import AvatarUploadModal from "./AvatarUploadModal";
 import PushNotificationToggle from "./PushNotificationToggle";
 
-const SettingsPage = () => {
+interface SettingsPageProps {
+  onUpgrade?: () => void;
+}
+
+const SettingsPage = ({ onUpgrade }: SettingsPageProps) => {
   const { user, signOut } = useAuth();
   const { avatarUrl, displayName, plano, refreshAvatar } = useAvatar();
   const [confirmLogout, setConfirmLogout] = useState(false);
@@ -77,7 +81,7 @@ const SettingsPage = () => {
             </span>
           </div>
           {plano === "free" ? (
-            <button className="text-sm transition-colors" style={{ color: "var(--dash-accent)", fontWeight: 400 }}>Fazer upgrade</button>
+            <button onClick={onUpgrade} className="text-sm transition-colors" style={{ color: "var(--dash-accent)", fontWeight: 400 }}>Fazer upgrade</button>
           ) : (
             <button className="text-sm transition-colors" style={{ color: "var(--dash-accent)", fontWeight: 400 }}>Gerenciar assinatura</button>
           )}
