@@ -5,6 +5,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import HabitModal from "./HabitModal";
+import UpgradeBanner from "../UpgradeBanner";
+import { usePlanLimits, canCreate } from "@/hooks/usePlanLimits";
 import { calculateStreak, localDateStr } from "@/utils/streakCalculator";
 
 interface HabitsTabProps {
