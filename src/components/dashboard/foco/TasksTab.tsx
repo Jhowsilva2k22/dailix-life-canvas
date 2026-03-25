@@ -53,6 +53,7 @@ const CheckIcon = () => <svg width="10" height="10" viewBox="0 0 12 12" fill="no
 const TasksTab = ({ isActive = true, onReadyChange, highlightId = null, onHighlightConsumed }: TasksTabProps) => {
   const { isHighlighted } = useSearchHighlight(highlightId);
   const { user, loading: authLoading } = useAuth();
+  const limits = usePlanLimits();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [filter, setFilter] = useState("hoje");
   const [showModal, setShowModal] = useState(false);
