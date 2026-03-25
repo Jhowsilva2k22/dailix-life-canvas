@@ -16,7 +16,7 @@ interface DiagnosticData {
 
 const ORIGINAL_PRICE = "R$ 19,90";
 const FOUNDER_PRICE = "R$ 9,90";
-const FOUNDER_PERIOD = "/mês";
+const FOUNDER_PERIOD = "";
 
 const fade = {
   initial: { opacity: 0, y: 24 },
@@ -393,7 +393,7 @@ const Setup = () => {
                   <span className="text-[14px]" style={{ color: "rgba(255,255,255,0.4)" }}>{FOUNDER_PERIOD}</span>
                 </div>
                 <p className="text-[12px] mt-3" style={{ color: "rgba(255,255,255,0.25)", fontWeight: 300 }}>
-                  Condição especial de ativação da fase inicial do Dailix.
+                  Ativação única · Condição especial da fase inicial do Dailix.
                 </p>
               </div>
 

@@ -49,6 +49,7 @@ const PaymentBrick = ({ userEmail, onSuccess, onError, onPending }: PaymentBrick
     async (formData: any) => {
       setProcessing(true);
       try {
+        const idempotencyKey = crypto.randomUUID();
         const { data, error } = await supabase.functions.invoke(
           "create-mp-payment",
           {
@@ -58,6 +59,7 @@ const PaymentBrick = ({ userEmail, onSuccess, onError, onPending }: PaymentBrick
               installments: formData.installments,
               issuer_id: formData.issuer_id,
               payer: formData.payer,
+              idempotency_key: idempotencyKey,
             },
           }
         );
@@ -143,7 +145,7 @@ const PaymentBrickInner = ({ userEmail, onSubmit, onError, processing }: {
             creditCard: "all",
             debitCard: "all",
             ticket: [] as any,
-            bankTransfer: [] as any,
+            bankTransfer: ["pix"] as any,
             atm: [] as any,
             maxInstallments: 1,
           },
