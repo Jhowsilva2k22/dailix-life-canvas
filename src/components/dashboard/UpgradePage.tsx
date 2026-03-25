@@ -49,7 +49,7 @@ const UpgradePage = ({ onBack }: UpgradePageProps) => {
     return () => { if (pollingRef.current) clearInterval(pollingRef.current); };
   }, []);
 
-  if (plano === "fundador") {
+  if (OPEN_ACCESS_MODE || plano === "fundador") {
     return (
       <div className="flex-1 min-h-screen md:ml-[240px]" style={{ background: "var(--dash-bg)" }}>
         <div className="max-w-xl mx-auto px-5 md:px-10 pt-20 md:pt-10 pb-24 md:pb-12 text-center">
@@ -58,8 +58,12 @@ const UpgradePage = ({ onBack }: UpgradePageProps) => {
           </button>
           <div className="rounded-xl p-8" style={{ background: "var(--dash-surface)", border: "1px solid var(--dash-border)" }}>
             <Check size={32} style={{ color: "var(--dash-accent)" }} className="mx-auto mb-4" />
-            <h2 className="font-display text-xl mb-2" style={{ color: "var(--dash-text)" }}>Você já é Fundador</h2>
-            <p className="text-sm" style={{ color: "var(--dash-text-muted)" }}>Seu acesso completo já está ativo.</p>
+            <h2 className="font-display text-xl mb-2" style={{ color: "var(--dash-text)" }}>
+              {OPEN_ACCESS_MODE ? "Acesso liberado" : "Você já é Fundador"}
+            </h2>
+            <p className="text-sm" style={{ color: "var(--dash-text-muted)" }}>
+              {OPEN_ACCESS_MODE ? "Nesta fase, todos os recursos estão disponíveis sem custo." : "Seu acesso completo já está ativo."}
+            </p>
           </div>
         </div>
       </div>

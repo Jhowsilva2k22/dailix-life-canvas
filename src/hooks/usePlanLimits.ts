@@ -1,4 +1,5 @@
 import { useAvatar } from "@/contexts/AvatarContext";
+import { OPEN_ACCESS_MODE } from "@/lib/featureFlags";
 
 export interface PlanLimits {
   maxTasks: number;
@@ -35,6 +36,7 @@ const FOUNDER_LIMITS: PlanLimits = {
 
 export const usePlanLimits = (): PlanLimits => {
   const { plano } = useAvatar();
+  if (OPEN_ACCESS_MODE) return FOUNDER_LIMITS;
   return plano === "fundador" ? FOUNDER_LIMITS : FREE_LIMITS;
 };
 
