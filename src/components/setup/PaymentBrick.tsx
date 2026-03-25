@@ -48,6 +48,7 @@ const PaymentBrick = ({ userEmail, onSuccess, onError, onPending }: PaymentBrick
   const handleSubmit = useCallback(
     async (formData: any) => {
       setProcessing(true);
+      console.log("PaymentBrick formData:", JSON.stringify(formData, null, 2));
       try {
         const idempotencyKey = crypto.randomUUID();
         const { data, error } = await supabase.functions.invoke(
@@ -65,7 +66,15 @@ const PaymentBrick = ({ userEmail, onSuccess, onError, onPending }: PaymentBrick
         );
 
         if (error) {
+          console.error("Edge function error:", error);
           onError("Erro ao processar pagamento. Tente novamente.");
+          return;
+        }
+
+        if (!data.success) {
+          const detail = data.cause?.[0]?.description || data.error || "Erro desconhecido";
+          console.error("MP payment error:", data);
+          onError(detail);
           return;
         }
 
