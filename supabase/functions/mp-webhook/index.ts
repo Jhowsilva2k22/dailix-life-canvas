@@ -5,13 +5,76 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const FOUNDER_AMOUNT = 9.90;
 const FOUNDER_PLAN = "fundador";
 const PAYMENT_DESCRIPTION_PREFIX = "Dailix";
-const AMOUNT_TOLERANCE = 0.05; // allow small float diff
+const AMOUNT_TOLERANCE = 0.05;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type",
 };
+
+/* ── Signature Verification (MP x-signature) ─────────────────────── */
+async function verifyWebhookSignature(
+  req: Request,
+  body: Record<string, unknown>
+): Promise<boolean> {
+  const secret = Deno.env.get("MP_WEBHOOK_SECRET");
+  if (!secret) {
+    console.warn("MP_WEBHOOK_SECRET not configured — skipping signature check");
+    return true; // graceful degradation for test env
+  }
+
+  const xSignature = req.headers.get("x-signature");
+  const xRequestId = req.headers.get("x-request-id");
+
+  if (!xSignature || !xRequestId) {
+    console.error("Missing x-signature or x-request-id headers");
+    return false;
+  }
+
+  // Parse ts and v1 from x-signature header: "ts=...,v1=..."
+  const parts = xSignature.split(",");
+  let ts: string | null = null;
+  let hash: string | null = null;
+
+  for (const part of parts) {
+    const [key, value] = part.trim().split("=", 2);
+    if (key === "ts") ts = value;
+    if (key === "v1") hash = value;
+  }
+
+  if (!ts || !hash) {
+    console.error("Invalid x-signature format");
+    return false;
+  }
+
+  // Build manifest: id:<data.id>;request-id:<x-request-id>;ts:<ts>;
+  const dataId = (body.data as Record<string, unknown>)?.id;
+  let manifest = "";
+  if (dataId) manifest += `id:${dataId};`;
+  manifest += `request-id:${xRequestId};ts:${ts};`;
+
+  // HMAC-SHA256
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(secret),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const signature = await crypto.subtle.sign("HMAC", key, encoder.encode(manifest));
+  const computedHash = Array.from(new Uint8Array(signature))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+
+  if (computedHash !== hash) {
+    console.error(`Signature mismatch: computed=${computedHash}, received=${hash}`);
+    return false;
+  }
+
+  return true;
+}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -28,6 +91,16 @@ serve(async (req) => {
 
     const body = await req.json();
     console.log("Webhook received:", JSON.stringify(body));
+
+    // ── Verify signature ────────────────────────────────────────
+    const signatureValid = await verifyWebhookSignature(req, body);
+    if (!signatureValid) {
+      console.error("Webhook signature verification failed — rejecting");
+      return new Response(JSON.stringify({ error: "invalid signature" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const paymentId =
       body.data?.id || body.id || (body.type === "payment" && body.data?.id);
@@ -105,22 +178,18 @@ serve(async (req) => {
     if (payment.status === "approved") {
       const validations: string[] = [];
 
-      // 1. Amount must match expected
       if (Math.abs(paymentAmount - FOUNDER_AMOUNT) > AMOUNT_TOLERANCE) {
         validations.push(`amount_mismatch: expected=${FOUNDER_AMOUNT}, got=${paymentAmount}`);
       }
 
-      // 2. Plan metadata must match
       if (paymentPlan !== FOUNDER_PLAN) {
         validations.push(`plan_mismatch: expected=${FOUNDER_PLAN}, got=${paymentPlan}`);
       }
 
-      // 3. Description should start with expected prefix
       if (!payment.description?.startsWith(PAYMENT_DESCRIPTION_PREFIX)) {
         validations.push(`description_mismatch: got="${payment.description}"`);
       }
 
-      // 4. Check if already processed (idempotency)
       const { data: existingPayment } = await adminClient
         .from("payments")
         .select("status, approved_at")
@@ -129,7 +198,6 @@ serve(async (req) => {
         .single();
 
       if (existingPayment?.approved_at && existingPayment.status === "approved") {
-        // Already processed this exact payment - check if user is already founder
         const { data: profile } = await adminClient
           .from("profiles")
           .select("plano")
@@ -147,7 +215,6 @@ serve(async (req) => {
 
       if (validations.length > 0) {
         console.error(`Promotion blocked for payment ${paymentId}: ${validations.join("; ")}`);
-        // Update payment record with validation failure
         await adminClient.from("payments").update({
           metadata: {
             ...((existingPayment as any)?.metadata || {}),
@@ -167,7 +234,6 @@ serve(async (req) => {
         .update({ plano: FOUNDER_PLAN })
         .eq("user_id", userId);
 
-      // Update payment record with approved_at
       await adminClient.from("payments").update({
         status: "approved",
         approved_at: new Date().toISOString(),
