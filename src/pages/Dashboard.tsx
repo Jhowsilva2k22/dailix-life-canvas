@@ -29,7 +29,8 @@ const Dashboard = () => {
       .single()
       .then(({ data }) => {
         if (data && !data.onboarding_completed) {
-          navigate("/welcome", { replace: true });
+          const hasDiagnostic = localStorage.getItem("dailix_diagnostic");
+          navigate(hasDiagnostic ? "/setup" : "/welcome", { replace: true });
         } else {
           setReady(true);
         }

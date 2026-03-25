@@ -47,6 +47,14 @@ const App = () => (
               }
             />
             <Route
+              path="/setup"
+              element={
+                <ProtectedRoute>
+                  <Setup />
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/welcome"
               element={
                 <ProtectedRoute>
