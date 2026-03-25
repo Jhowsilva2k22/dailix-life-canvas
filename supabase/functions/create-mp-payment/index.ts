@@ -33,12 +33,14 @@ serve(async (req) => {
     if (userError || !user) throw new Error("Unauthorized");
 
     const body = await req.json();
-    const { token, payment_method_id, installments, payer, issuer_id } = body;
+    const { token, payment_method_id, installments, payer, issuer_id, idempotency_key } = body;
+
+    const FOUNDER_AMOUNT = 9.90;
 
     // Create payment via MP API
     const paymentBody: Record<string, unknown> = {
-      transaction_amount: 9.9,
-      description: "Dailix — Plano Fundador (mensal)",
+      transaction_amount: FOUNDER_AMOUNT,
+      description: "Dailix — Plano Fundador (ativação)",
       payment_method_id,
       payer: {
         email: payer?.email || user.email,
