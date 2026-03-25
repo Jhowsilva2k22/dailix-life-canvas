@@ -223,7 +223,12 @@ const HabitsTab = ({ isActive = true, onReadyChange, highlightId = null, onHighl
   };
 
   const handleSaved = () => { setShowModal(false); setEditingHabit(null); fetchHabits(); };
-  const openCreate = () => { setEditingHabit(null); setShowModal(true); };
+  const limits = usePlanLimits();
+  const atLimit = !canCreate(habits.length, limits.maxHabits);
+  const openCreate = () => {
+    if (atLimit) { toast.error(`Limite de ${limits.maxHabits} hábitos atingido. Ative o Plano Fundador.`); return; }
+    setEditingHabit(null); setShowModal(true);
+  };
   const openEdit = (habit: Habit) => { setEditingHabit(habit); setShowModal(true); };
 
   const doneCount = habits.filter((h) => completedToday.has(h.id)).length;
