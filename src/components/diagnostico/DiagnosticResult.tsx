@@ -23,6 +23,11 @@ const DiagnosticResult = ({ principal, secundario }: Props) => {
     return () => clearTimeout(t);
   }, []);
 
+  // Persist diagnostic result for post-signup onboarding
+  useEffect(() => {
+    localStorage.setItem("dailix_diagnostic", JSON.stringify({ principal, secundario }));
+  }, [principal, secundario]);
+
   const blocks = [
     { label: "O que isso revela", text: result.revela },
     { label: "O custo invisível disso", text: result.custo },
