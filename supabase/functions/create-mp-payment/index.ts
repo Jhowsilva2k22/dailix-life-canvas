@@ -19,6 +19,7 @@ serve(async (req) => {
 
   try {
     const MP_ACCESS_TOKEN = Deno.env.get("MP_ACCESS_TOKEN");
+    console.log("MP access token prefix:", MP_ACCESS_TOKEN?.substring(0, 10) + "...");
     if (!MP_ACCESS_TOKEN) throw new Error("MP_ACCESS_TOKEN not configured");
 
     // Verify user auth
