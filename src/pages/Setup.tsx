@@ -380,10 +380,17 @@ const Setup = () => {
               {/* Price card */}
               <div className="rounded-xl p-6 mb-8 text-center" style={{ background: "rgba(0,180,216,0.04)", border: "1px solid rgba(0,180,216,0.12)" }}>
                 <span className="text-[12px] tracking-[0.1em] uppercase block mb-3" style={{ color: "rgba(0,180,216,0.6)" }}>Plano Fundador</span>
-                <div className="flex items-baseline justify-center gap-1">
+                <div className="flex items-baseline justify-center gap-1.5">
+                  <span className="text-[15px] line-through" style={{ color: "rgba(255,255,255,0.3)", fontWeight: 300 }}>de {ORIGINAL_PRICE}</span>
+                  <span className="text-[15px]" style={{ color: "rgba(255,255,255,0.4)", fontWeight: 300 }}>por</span>
+                </div>
+                <div className="flex items-baseline justify-center gap-1 mt-1">
                   <span className="font-display text-[2rem]" style={{ color: "#fff", fontWeight: 400 }}>{FOUNDER_PRICE}</span>
                   <span className="text-[14px]" style={{ color: "rgba(255,255,255,0.4)" }}>{FOUNDER_PERIOD}</span>
                 </div>
+                <p className="text-[12px] mt-3" style={{ color: "rgba(255,255,255,0.25)", fontWeight: 300 }}>
+                  Condição especial de ativação da fase inicial do Dailix.
+                </p>
               </div>
 
               {/* CTAs */}
